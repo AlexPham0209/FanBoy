@@ -2,6 +2,7 @@
 //
 
 #include "GameBoy.h"
+#include <iostream>
 
 using namespace std;
 
