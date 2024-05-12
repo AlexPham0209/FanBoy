@@ -6,8 +6,7 @@
 
 using namespace std;
 
-int main()
-{
-	cout << "Hello CMake." << endl;
-	return 0;
+int main() {
+	GameBoy emulator;
+	emulator.emulate();
 }
