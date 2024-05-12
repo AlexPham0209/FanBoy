@@ -19,8 +19,18 @@ CPU::CPU(Memory& memory) : memory(memory) {
 
 int CPU::step() {
 	cycles = 0;
+	std::cout << "PC: " << pc << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
+	std::cout << "A: " << (int)A << std::endl;
+	std::cout << "B: " << (int)B << std::endl;
+	std::cout << "C: " << (int)C << std::endl;
+	std::cout << "D: " << (int)D << std::endl;
+	std::cout << "E: " << (int)E << std::endl;
+	std::cout << "F: " << (int)F << std::endl;
+	std::cout << "H: " << (int)H << std::endl;
+	std::cout << "L: " << (int)L << std::endl;
+	std::cout << "Cycles: " << cycles << "\n" << std::endl;
 	return cycles;
 }
 
@@ -72,6 +82,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 		case 0x7E:
 			LDR(A, memory.read((H << 8) | L));
+			cycles += 4;
 			break;
 
 		//LD B, r2
@@ -95,6 +106,151 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 		case 0x46:
 			LDR(B, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+
+		//LD C, r2
+		case 0x48:
+			LDR(C, B);
+			break;
+		case 0x49:
+			LDR(C, C);
+			break;
+		case 0x4A:
+			LDR(C, D);
+			break;
+		case 0x4B:
+			LDR(C, E);
+			break;
+		case 0x4C:
+			LDR(C, H);
+			break;
+		case 0x4D:
+			LDR(C, L);
+			break;
+		case 0x4E:
+			LDR(C, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+
+		//LD D, r2
+		case 0x50:
+			LDR(D, B);
+			break;
+		case 0x51:
+			LDR(D, C);
+			break;
+		case 0x52:
+			LDR(D, D);
+			break;
+		case 0x53:
+			LDR(D, E);
+			break;
+		case 0x54:
+			LDR(D, H);
+			break;
+		case 0x55:
+			LDR(D, L);
+			break;
+		case 0x56:
+			LDR(D, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+
+		//LD E, r2
+		case 0x58:
+			LDR(E, B);
+			break;
+		case 0x59:
+			LDR(E, C);
+			break;
+		case 0x5A:
+			LDR(E, D);
+			break;
+		case 0x5B:
+			LDR(E, E);
+			break;
+		case 0x5C:
+			LDR(E, H);
+			break;
+		case 0x5D:
+			LDR(E, L);
+			break;
+		case 0x5E:
+			LDR(E, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+
+		//LD H, r2
+		case 0x60:
+			LDR(H, B);
+			break;
+		case 0x61:
+			LDR(H, C);
+			break;
+		case 0x62:
+			LDR(H, D);
+			break;
+		case 0x63:
+			LDR(H, E);
+			break;
+		case 0x64:
+			LDR(H, H);
+			break;
+		case 0x65:
+			LDR(H, L);
+			break;
+		case 0x66:
+			LDR(H, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+
+		//LD L, r2
+		case 0x68:
+			LDR(L, B);
+			break;
+		case 0x69:
+			LDR(L, C);
+			break;
+		case 0x6A:
+			LDR(L, D);
+			break;
+		case 0x6B:
+			LDR(L, E);
+			break;
+		case 0x6C:
+			LDR(L, H);
+			break;
+		case 0x6D:
+			LDR(L, L);
+			break;
+		case 0x6E:
+			LDR(L, memory.read((H << 8) | L));
+			cycles += 4;
+			break;
+		
+		//LD (HL), r2
+		case 0x70:
+			LDR(((H << 8) | L), B);
+			break;
+		case 0x71:
+			LDR(((H << 8) | L), C);
+			break;
+		case 0x72:
+			LDR(((H << 8) | L), D);
+			break;
+		case 0x73:
+			LDR(((H << 8) | L), E);
+			break;
+		case 0x74:
+			LDR(((H << 8) | L), H);
+			break;
+		case 0x75:
+			LDR(((H << 8) | L), L);
+			break;
+		case 0x36:
+			LDR(((H << 8) | L), memory.read(pc++));
+			cycles += 8;
 			break;
 	}
 }
@@ -108,6 +264,12 @@ void CPU::LDNN(unsigned char& reg, const unsigned char& val) {
 //Load value inside register 2/memory address into register 1
 void CPU::LDR(unsigned char& reg, const unsigned char& val) {
 	reg = val;
+	cycles += 4;
+}
+
+//Load value inside register into memory location
+void CPU::LDR(const unsigned short& address, const unsigned char& reg) {
+	memory.write(address, reg);
 	cycles += 4;
 }
 

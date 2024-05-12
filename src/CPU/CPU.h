@@ -15,4 +15,5 @@ class CPU {
 		unsigned char fetchOpcode();
 		void LDNN(unsigned char& reg, const unsigned char& val);
 		void LDR(unsigned char& reg, const unsigned char& val);
+		void LDR(const unsigned short& address, const unsigned char& reg);
 };
