@@ -24,9 +24,23 @@ void GameBoy::emulate() {
 	//Set B to val in address 0x101B
 	memory.write(0x106, 0x46);
 	memory.write(0x107, 0x48);
+
+	
+	//Set B to 0xF
+	memory.write(0x108, 0x06);
+	memory.write(0x109, 0x09);
+
+	//Writing val of B into address 
+	memory.write(0x10A, 0x70);
+
+
 	mCPU.step();
 	mCPU.step();
 	mCPU.step();
 	mCPU.step();
 	mCPU.step();
+	mCPU.step();
+	mCPU.step();
+
+	std::cout << (int)memory.read(0x101B) << std::endl;
 }

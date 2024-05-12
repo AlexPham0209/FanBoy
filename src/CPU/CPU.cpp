@@ -250,8 +250,27 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 		case 0x36:
 			LDR(((H << 8) | L), memory.read(pc++));
-			cycles += 8;
+			cycles += 4;
 			break;
+
+		//LD A, n
+		case 0x0A:
+			LDR(A, memory.read((B << 8) | C));
+			cycles += 4;
+			break;
+		case 0x1A:
+			LDR(A, memory.read((D << 8) | E));
+			cycles += 4;
+			break;
+		case 0xFA:
+			LDR(A, (memory.read(pc++) | memory.read(pc++) << 8));
+			cycles += 12;
+			break;
+		case 0x3E:
+			LDNN(A, memory.read(pc++));
+			cycles += 4;
+			break;
+
 	}
 }
 
@@ -270,7 +289,7 @@ void CPU::LDR(unsigned char& reg, const unsigned char& val) {
 //Load value inside register into memory location
 void CPU::LDR(const unsigned short& address, const unsigned char& reg) {
 	memory.write(address, reg);
-	cycles += 4;
+	cycles += 8;
 }
 
 
