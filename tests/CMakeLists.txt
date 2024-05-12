@@ -1,0 +1,7 @@
+if(BUILD_TESTING)
+	file(GLOB_RECURSE TEST_FILE "*.cpp" "*.h")
+	add_executable(Tests ${TEST_FILE})
+	target_link_libraries(Tests PRIVATE GTest::gtest_main)
+	include(GoogleTest)
+	gtest_discover_tests(Tests)
+endif()
