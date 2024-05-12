@@ -271,6 +271,37 @@ void CPU::executeOpcode(unsigned char opcode) {
 			cycles += 4;
 			break;
 
+		//LD n, A
+		case 0x47:
+			LDR(B, A);
+			break;
+		case 0x4F:
+			LDR(C, A);
+			break;
+		case 0x57:
+			LDR(D, A);
+			break;
+		case 0x5F:
+			LDR(E, A);
+			break;
+		case 0x67:
+			LDR(H, A);
+			break;
+		case 0x6F:
+			LDR(F, A);
+			break;
+		case 0x02:
+			LDR(((B << 8) | C), A);
+			break;
+		case 0x12:
+			LDR(((D << 8) | E), A);
+			break;
+		case 0x77:
+			LDR(((H << 8) | L), A);
+			break;
+		case 0xEA:
+			LDR((memory.read(pc++) | memory.read(pc++) << 8), A);
+			break;
 	}
 }
 
