@@ -1,12 +1,9 @@
-﻿// GameBoy.cpp : Defines the entry point for the application.
-//
-
-#include "GameBoy.h"
 #include <iostream>
-
-using namespace std;
+#include "GameBoy.h"
+#include "CPU/CPU.h"
 
 int main() {
-	GameBoy emulator;
-	emulator.emulate();
+	GameBoy* gameBoy = new GameBoy();
+	gameBoy->emulate();
+	return 0;
 }

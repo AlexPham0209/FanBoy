@@ -1,4 +1,5 @@
 #include "Memory.h"
+#include <iostream>
 
 unsigned char Memory::read(unsigned short address) {
 	return this->ram[address];
