@@ -4,6 +4,7 @@ class CPU {
 	public:
 		CPU(Memory& memory);
 		int step();
+		void run(int iterations);
 	private:
 		unsigned char A, B, C, D, E, F, H, L;
 		unsigned short sp, pc;

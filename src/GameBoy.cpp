@@ -1,9 +1,7 @@
 #include "GameBoy.h"
 #include <iostream>
 
-GameBoy::GameBoy() : memory(Memory()), mCPU(CPU(memory)) {
-
-}
+GameBoy::GameBoy() : memory(Memory()), mCPU(CPU(memory)) {}
 
 void GameBoy::emulate() {
 	//Set value at address 0x101B to 0x26.
@@ -34,13 +32,7 @@ void GameBoy::emulate() {
 	memory.write(0x10A, 0x70);
 
 
-	mCPU.step();
-	mCPU.step();
-	mCPU.step();
-	mCPU.step();
-	mCPU.step();
-	mCPU.step();
-	mCPU.step();
+	mCPU.run(7);
 
 	std::cout << (int)memory.read(0x101B) << std::endl;
 }

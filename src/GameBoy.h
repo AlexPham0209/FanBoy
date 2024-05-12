@@ -2,7 +2,6 @@
 #include "CPU/CPU.h"
 #include "Memory/Memory.h"
 
-
 class GameBoy {
 	public:
 		GameBoy();

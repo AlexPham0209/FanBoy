@@ -1,5 +1,6 @@
 #pragma once
 #include <corecrt_memory.h>
+
 class Memory {
 public:
 	unsigned char read(unsigned short address);

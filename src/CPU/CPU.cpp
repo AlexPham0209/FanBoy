@@ -34,6 +34,12 @@ int CPU::step() {
 	return cycles;
 }
 
+void CPU::run(int iterations) {
+	for (int i = 0; i < iterations; ++i)
+		step();
+}
+
+
 void CPU::executeOpcode(unsigned char opcode) {
 
 	//Executes certain instruction based on 8 bit opcode
@@ -308,19 +314,19 @@ void CPU::executeOpcode(unsigned char opcode) {
 //Put 8 bit value into register
 void CPU::LDNN(unsigned char& reg, const unsigned char& val) {
 	reg = val;
-	cycles += 8;
+	cycles = 8;
 }
 
 //Load value inside register 2/memory address into register 1
 void CPU::LDR(unsigned char& reg, const unsigned char& val) {
 	reg = val;
-	cycles += 4;
+	cycles = 4;
 }
 
 //Load value inside register into memory location
 void CPU::LDR(const unsigned short& address, const unsigned char& reg) {
 	memory.write(address, reg);
-	cycles += 8;
+	cycles = 8;
 }
 
 
