@@ -1,6 +1,5 @@
 #include <iostream>
-#include "GameBoy.h"
-#include "CPU/CPU.h"
+#include "../src/GameBoy.h"
 
 int main() {
 	GameBoy* gameBoy = new GameBoy();
