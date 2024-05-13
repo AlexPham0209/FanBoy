@@ -23,7 +23,7 @@ void GameBoy::emulate() {
 	memory.write(0x106, 0x46);
 	memory.write(0x107, 0x48);
 
-	
+
 	//Set B to 0xF
 	memory.write(0x108, 0x06);
 	memory.write(0x109, 0x09);
@@ -32,7 +32,22 @@ void GameBoy::emulate() {
 	memory.write(0x10A, 0x70);
 
 
-	mCPU.run(7);
-
 	std::cout << (int)memory.read(0x101B) << std::endl;
+	mCPU.run(7);
+}
+
+void GameBoy::emulate(int iterations) {
+	mCPU.run(iterations);
+}
+
+void GameBoy::write(unsigned short address, unsigned char val) {
+	memory.write(address, val);
+}
+
+void GameBoy::clear() {
+	memory.clear();
+}
+
+unsigned char GameBoy::read(unsigned short address) {
+	return memory.read(address);
 }

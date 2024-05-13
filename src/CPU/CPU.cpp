@@ -308,6 +308,66 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xEA:
 			LDR((memory.read(pc++) | memory.read(pc++) << 8), A);
 			break;
+
+		//LD A, (C)
+		case 0xF2:
+			LDR(A, memory.read(0xFF00 + C));
+			cycles += 4;
+			break;
+
+		//LD (C), A
+		case 0xE2:
+			LDR(0xFF00 + C, A);
+			cycles += 4;
+			break;
+
+		//LDD A, (HL)
+		case 0x3A:
+			unsigned short HL = (H << 8) | L;
+			LDR(A, memory.read(HL));
+			HL--;
+			H = (HL & 0xFF00) >> 8;
+			L = (HL & 0x00FF);
+			break;
+		
+		//LDD (HL), A
+		case 0x32:
+			unsigned short HL = (H << 8) | L;
+			LDR(HL, A);
+			HL--;
+			H = (HL & 0xFF00) >> 8;
+			L = (HL & 0x00FF);
+			break;
+
+		//LDI A, (HL)
+		case 0x2A:
+			unsigned short HL = (H << 8) | L;
+			LDR(A, memory.read(HL));
+			HL++;
+			H = (HL & 0xFF00) >> 8;
+			L = (HL & 0x00FF);
+			break;
+
+		//LDI (HL), A
+		case 0x22:
+			unsigned short HL = (H << 8) | L;
+			LDR(HL, A);
+			HL++;
+			H = (HL & 0xFF00) >> 8;
+			L = (HL & 0x00FF);
+			break;
+
+		//LDH (n), A
+		case 0xE0:
+			LDR(0xFF00 + memory.read(pc++), A);
+			cycles += 4;
+			break;
+
+		//LDH A, (n)
+		case 0xF0:
+			LDR(A, memory.read(0xFF00 + memory.read(pc++)));
+			cycles += 4;
+			break;
 	}
 }
 
