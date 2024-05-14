@@ -42,338 +42,325 @@ void CPU::run(int iterations) {
 
 void CPU::executeOpcode(unsigned char opcode) {
 	//Executes certain instruction based on 8 bit opcode
-	unsigned short HL = HL = (H << 8) | L;
 	switch (opcode) {
 		//LD N, NN
 		case 0x06:
-			LDNN(B, memory.readByte(pc++));
+			loadByteIntoReg(B, memory.readByte(pc++));
 			break;
 		case 0x0E:
-			LDNN(C, memory.readByte(pc++));
+			loadByteIntoReg(C, memory.readByte(pc++));
 			break;
 		case 0x16:
-			LDNN(D, memory.readByte(pc++));
+			loadByteIntoReg(D, memory.readByte(pc++));
 			break;
 		case 0x1E:
-			LDNN(E, memory.readByte(pc++));
+			loadByteIntoReg(E, memory.readByte(pc++));
 			break;
 		case 0x26:
-			LDNN(H, memory.readByte(pc++));
+			loadByteIntoReg(H, memory.readByte(pc++));
 			break;
 		case 0x2E:
-			LDNN(L, memory.readByte(pc++));
+			loadByteIntoReg(L, memory.readByte(pc++));
 			break;
 
 		//LD A, r2
 		case 0x7F:
-			LDR(A, A);
+			loadByteIntoReg(A, A);
 			break;
 		case 0x78:
-			LDR(A, B);
+			loadByteIntoReg(A, B);
 			break;
 		case 0x79:
-			LDR(A, C);
+			loadByteIntoReg(A, C);
 			break;
 		case 0x7A:
-			LDR(A, D);
+			loadByteIntoReg(A, D);
 			break;
 		case 0x7B:
-			LDR(A, E);
+			loadByteIntoReg(A, E);
 			break;
 		case 0x7C:
-			LDR(A, H);
+			loadByteIntoReg(A, H);
 			break;
 		case 0x7D:
-			LDR(A, L);
+			loadByteIntoReg(A, L);
 			break;
 		case 0x7E:
-			LDR(A, memory.readByte((H << 8) | L));
+			loadByteIntoReg(A, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD B, r2
 		case 0x40:
-			LDR(B, B);
+			loadByteIntoReg(B, B);
 			break;
 		case 0x41:
-			LDR(B, C);
+			loadByteIntoReg(B, C);
 			break;
 		case 0x42:
-			LDR(B, D);
+			loadByteIntoReg(B, D);
 			break;
 		case 0x43:
-			LDR(B, E);
+			loadByteIntoReg(B, E);
 			break;
 		case 0x44:
-			LDR(B, H);
+			loadByteIntoReg(B, H);
 			break;
 		case 0x45:
-			LDR(B, L);
+			loadByteIntoReg(B, L);
 			break;
 		case 0x46:
-			LDR(B, memory.readByte((H << 8) | L));
+			loadByteIntoReg(B, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD C, r2
 		case 0x48:
-			LDR(C, B);
+			loadByteIntoReg(C, B);
 			break;
 		case 0x49:
-			LDR(C, C);
+			loadByteIntoReg(C, C);
 			break;
 		case 0x4A:
-			LDR(C, D);
+			loadByteIntoReg(C, D);
 			break;
 		case 0x4B:
-			LDR(C, E);
+			loadByteIntoReg(C, E);
 			break;
 		case 0x4C:
-			LDR(C, H);
+			loadByteIntoReg(C, H);
 			break;
 		case 0x4D:
-			LDR(C, L);
+			loadByteIntoReg(C, L);
 			break;
 		case 0x4E:
-			LDR(C, memory.readByte((H << 8) | L));
+			loadByteIntoReg(C, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD D, r2
 		case 0x50:
-			LDR(D, B);
+			loadByteIntoReg(D, B);
 			break;
 		case 0x51:
-			LDR(D, C);
+			loadByteIntoReg(D, C);
 			break;
 		case 0x52:
-			LDR(D, D);
+			loadByteIntoReg(D, D);
 			break;
 		case 0x53:
-			LDR(D, E);
+			loadByteIntoReg(D, E);
 			break;
 		case 0x54:
-			LDR(D, H);
+			loadByteIntoReg(D, H);
 			break;
 		case 0x55:
-			LDR(D, L);
+			loadByteIntoReg(D, L);
 			break;
 		case 0x56:
-			LDR(D, memory.readByte((H << 8) | L));
+			loadByteIntoReg(D, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD E, r2
 		case 0x58:
-			LDR(E, B);
+			loadByteIntoReg(E, B);
 			break;
 		case 0x59:
-			LDR(E, C);
+			loadByteIntoReg(E, C);
 			break;
 		case 0x5A:
-			LDR(E, D);
+			loadByteIntoReg(E, D);
 			break;
 		case 0x5B:
-			LDR(E, E);
+			loadByteIntoReg(E, E);
 			break;
 		case 0x5C:
-			LDR(E, H);
+			loadByteIntoReg(E, H);
 			break;
 		case 0x5D:
-			LDR(E, L);
+			loadByteIntoReg(E, L);
 			break;
 		case 0x5E:
-			LDR(E, memory.readByte((H << 8) | L));
+			loadByteIntoReg(E, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD H, r2
 		case 0x60:
-			LDR(H, B);
+			loadByteIntoReg(H, B);
 			break;
 		case 0x61:
-			LDR(H, C);
+			loadByteIntoReg(H, C);
 			break;
 		case 0x62:
-			LDR(H, D);
+			loadByteIntoReg(H, D);
 			break;
 		case 0x63:
-			LDR(H, E);
+			loadByteIntoReg(H, E);
 			break;
 		case 0x64:
-			LDR(H, H);
+			loadByteIntoReg(H, H);
 			break;
 		case 0x65:
-			LDR(H, L);
+			loadByteIntoReg(H, L);
 			break;
 		case 0x66:
-			LDR(H, memory.readByte((H << 8) | L));
+			loadByteIntoReg(H, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 
 		//LD L, r2
 		case 0x68:
-			LDR(L, B);
+			loadByteIntoReg(L, B);
 			break;
 		case 0x69:
-			LDR(L, C);
+			loadByteIntoReg(L, C);
 			break;
 		case 0x6A:
-			LDR(L, D);
+			loadByteIntoReg(L, D);
 			break;
 		case 0x6B:
-			LDR(L, E);
+			loadByteIntoReg(L, E);
 			break;
 		case 0x6C:
-			LDR(L, H);
+			loadByteIntoReg(L, H);
 			break;
 		case 0x6D:
-			LDR(L, L);
+			loadByteIntoReg(L, L);
 			break;
 		case 0x6E:
-			LDR(L, memory.readByte((H << 8) | L));
+			loadByteIntoReg(L, memory.readByte((H << 8) | L));
 			cycles += 4;
 			break;
 		
 		//LD (HL), r2
 		case 0x70:
-			LDR(((H << 8) | L), B);
+			loadByteIntoMemory(((H << 8) | L), B);
 			break;
 		case 0x71:
-			LDR(((H << 8) | L), C);
+			loadByteIntoMemory(((H << 8) | L), C);
 			break;
 		case 0x72:
-			LDR(((H << 8) | L), D);
+			loadByteIntoMemory(((H << 8) | L), D);
 			break;
 		case 0x73:
-			LDR(((H << 8) | L), E);
+			loadByteIntoMemory(((H << 8) | L), E);
 			break;
 		case 0x74:
-			LDR(((H << 8) | L), H);
+			loadByteIntoMemory(((H << 8) | L), H);
 			break;
 		case 0x75:
-			LDR(((H << 8) | L), L);
+			loadByteIntoMemory(((H << 8) | L), L);
 			break;
 		case 0x36:
-			LDR(((H << 8) | L), memory.readByte(pc++));
+			loadByteIntoMemory(((H << 8) | L), memory.readByte(pc++));
 			cycles += 4;
 			break;
 
 		//LD A, n
 		case 0x0A:
-			LDR(A, memory.readByte((B << 8) | C));
+			loadByteIntoReg(A, memory.readByte((B << 8) | C));
 			cycles += 4;
 			break;
 		case 0x1A:
-			LDR(A, memory.readByte((D << 8) | E));
+			loadByteIntoReg(A, memory.readByte((D << 8) | E));
 			cycles += 4;
 			break;
 		case 0xFA:
-			LDR(A, (memory.readByte(pc++) | memory.readByte(pc++) << 8));
+			loadByteIntoReg(A, (memory.readByte(pc++) | memory.readByte(pc++) << 8));
 			cycles += 12;
 			break;
 		case 0x3E:
-			LDNN(A, memory.readByte(pc++));
+			loadByteIntoReg(A, memory.readByte(pc++));
 			cycles += 4;
 			break;
 
 		//LD n, A
 		case 0x47:
-			LDR(B, A);
+			loadByteIntoReg(B, A);
 			break;
 		case 0x4F:
-			LDR(C, A);
+			loadByteIntoReg(C, A);
 			break;
 		case 0x57:
-			LDR(D, A);
+			loadByteIntoReg(D, A);
 			break;
 		case 0x5F:
-			LDR(E, A);
+			loadByteIntoReg(E, A);
 			break;
 		case 0x67:
-			LDR(H, A);
+			loadByteIntoReg(H, A);
 			break;
 		case 0x6F:
-			LDR(F, A);
+			loadByteIntoReg(F, A);
 			break;
 		case 0x02:
-			LDR(((B << 8) | C), A);
+			loadByteIntoMemory(((B << 8) | C), A);
 			break;
 		case 0x12:
-			LDR(((D << 8) | E), A);
+			loadByteIntoMemory(((D << 8) | E), A);
 			break;
 		case 0x77:
-			LDR(((H << 8) | L), A);
+			loadByteIntoMemory(((H << 8) | L), A);
 			break;
 		case 0xEA:
-			LDR((memory.readByte(pc++) | memory.readByte(pc++) << 8), A);
+			loadByteIntoMemory((memory.readByte(pc++) | memory.readByte(pc++) << 8), A);
 			break;
 
 		//LD A, (C)
 		case 0xF2:
-			LDR(A, memory.readByte(0xFF00 + C));
+			loadByteIntoReg(A, memory.readByte(0xFF00 + C));
 			cycles += 4;
 			break;
 
 		//LD (C), A
 		case 0xE2:
-			LDR(0xFF00 + C, A);
+			loadByteIntoMemory(0xFF00 + C, A);
 			cycles += 4;
 			break;
 
 		//LDD A, (HL)
 		case 0x3A:
-			LDR(A, memory.readByte(HL));
-			HL--;
-			H = (HL & 0xFF00) >> 8;
-			L = (HL & 0x00FF);
+			loadByteIntoRegDecrement(A, H, L);
 			break;
 		
 		//LDD (HL), A
 		case 0x32:
-			LDR(HL, A);
-			HL--;
-			H = (HL & 0xFF00) >> 8;
-			L = (HL & 0x00FF);
+			loadByteIntoMemoryDecrement(A, H, L);
 			break;
 
 		//LDI A, (HL)
 		case 0x2A:
-			LDR(A, memory.readByte(HL));
-			HL++;
-			H = (HL & 0xFF00) >> 8;
-			L = (HL & 0x00FF);
+			loadByteIntoRegIncrement(A, H, L);
 			break;
 
 		//LDI (HL), A
 		case 0x22:
-			LDR(HL, A);
-			HL++;
-			H = (HL & 0xFF00) >> 8;
-			L = (HL & 0x00FF);
+			loadByteIntoMemoryIncrement(A, H, L);
 			break;
 
 		//LDH (n), A
 		case 0xE0:
-			LDR(0xFF00 + memory.readByte(pc++), A);
+			loadByteIntoMemory(0xFF00 + memory.readByte(pc++), A);
 			cycles += 4;
 			break;
 
 		//LDH A, (n)
 		case 0xF0:
-			LDR(A, memory.readByte(0xFF00 + memory.readByte(pc++)));
+			loadByteIntoReg(A, memory.readByte(0xFF00 + memory.readByte(pc++)));
 			cycles += 4;
 			break;
 		
 		//LD n, nn
 		case 0x01:
-			LDNNN(B, C);
+			loadShortIntoReg(B, C);
 			break;
 		case 0x11:
-			LDNNN(D, E);
+			loadShortIntoReg(D, E);
 			break;
 		case 0x21:
-			LDNNN(H, L);
+			loadShortIntoReg(H, L);
 			break;
 		case 0x31:
 			sp = (memory.readByte(pc++) << 8) | memory.readByte(pc++);
@@ -388,40 +375,92 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//LD HL, SP+n
 		case 0xF8:
-			LDR(HL, sp + memory.readByte(pc++));
+			loadShortIntoReg(H, L, sp + memory.readByte(pc++));
 			cycles = 12;
 			break;
 
 		case 0x08:
-			LDR(memory.readByte(pc++) | (memory.readByte(pc++) << 8), sp);
+			loadShortIntoMemory(memory.readByte(pc++) | (memory.readByte(pc++) << 8), sp);
 			cycles = 20;
 			break;
 	}
 }
 
-//Put 8 bit value into register
-void CPU::LDNN(unsigned char& reg, const unsigned char& val) {
+//Put byte into register
+void CPU::loadByteIntoReg(unsigned char& reg, const unsigned char& val) {
 	reg = val;
 	cycles = 8;
 }
 
-//Load value inside register 2/memory address into register 1
-void CPU::LDR(unsigned char& reg, const unsigned char& val) {
-	reg = val;
-	cycles = 4;
+//Put byte inside address (AB) into register, then decrement the 16 bit register
+void CPU::loadByteIntoRegDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
+	unsigned char ab = (a << 8) | b;
+	loadByteIntoReg(reg, memory.readByte(ab));
+	reg--;
+	a = (ab & 0xFF00) >> 8;
+	b = (ab & 0x00FF);
 }
 
+//Put byte inside address (AB) into register, then increment the 16 bit register
+void CPU::loadByteIntoRegIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
+	unsigned char ab = (a << 8) | b;
+	loadByteIntoReg(reg, memory.readByte(ab));
+	reg++;
+	a = (ab & 0xFF00) >> 8;
+	b = (ab & 0x00FF);
+}
+
+
 //Load value inside register into memory location
-void CPU::LDR(const unsigned short& address, const unsigned char& reg) {
+void CPU::loadByteIntoMemory(const unsigned short& address, const unsigned char& reg) {
 	memory.writeByte(address, reg);
 	cycles = 8;
 }
 
-void CPU::LDNNN(unsigned char& reg1, unsigned char& reg2) {
+//Load byte inside register into memory address (AB), then decrement the 16 bit register a
+void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
+	unsigned short ab = (a << 8) | b;
+	loadByteIntoMemory(ab, reg--);
+	a = (ab & 0xFF00) >> 8;
+	b = (ab & 0x00FF);
+}
+
+//Load byte inside register into memory address (AB), then decrement the 16 bit register 
+void CPU::loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
+	unsigned short ab = (a << 8) | b;
+	loadByteIntoMemory(ab, reg++);
+	a = (ab & 0xFF00) >> 8;
+	b = (ab & 0x00FF);
+}
+
+
+//Load short into the 16 bit register which is just 2 8 bit registers
+void CPU::loadShortIntoReg(unsigned char& reg1, unsigned char& reg2) {
 	reg1 = memory.readByte(pc++);
 	reg2 = memory.readByte(pc++);
 	cycles = 12;
 }
+
+//Load short into the 16 bit register which is just 2 8 bit registers
+void CPU::loadShortIntoReg(unsigned char& reg1, unsigned char& reg2, const unsigned short& val) {
+	reg1 = (val & 0xFF00) >> 8;
+	reg2 = (val & 0x00FF);
+	cycles = 12;
+}
+
+//Load short into memory location
+void CPU::loadShortIntoMemory(const unsigned short& address, const unsigned short& val) {
+	memory.writeShort(address, val);
+	cycles = 12;
+}
+
+
+void CPU::loadRegIntoSP(unsigned char& a, unsigned char& b) {
+	sp = (H << 8) | L;
+	cycles = 8;
+}
+
+
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

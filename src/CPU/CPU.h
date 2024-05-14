@@ -15,8 +15,18 @@ class CPU {
 		void executeOpcode(unsigned char opcode);
 		unsigned char fetchOpcode();
 
-		void LDNN(unsigned char& reg, const unsigned char& val);
-		void LDR(unsigned char& reg, const unsigned char& val);
-		void LDR(const unsigned short& address, const unsigned char& reg);
-		void LDNNN(unsigned char& reg1, unsigned char& reg2);
+		void loadByteIntoReg(unsigned char& reg, const unsigned char& val);
+		void loadByteIntoRegDecrement(unsigned char& reg, unsigned char& a, unsigned char& b);
+		void loadByteIntoRegIncrement(unsigned char& reg, unsigned char& a, unsigned char& b);
+
+		void loadByteIntoMemory(const unsigned short& address, const unsigned char& val);
+		void loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& a, unsigned char& b);
+		void loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& a, unsigned char& b);
+
+		void loadShortIntoReg(unsigned char& reg1, unsigned char& reg2);
+		void loadShortIntoReg(unsigned char& reg1, unsigned char& reg2, const unsigned short& val);
+
+		void loadShortIntoMemory(const unsigned short& address, const unsigned short& val);
+
+		void loadRegIntoSP(unsigned char& a, unsigned char& b);
 };
