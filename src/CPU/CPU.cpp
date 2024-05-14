@@ -22,6 +22,7 @@ int CPU::step() {
 	std::cout << "PC: " << pc << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
+	std::cout << (int)opcode << std::endl;
 	std::cout << "A: " << (int)A << std::endl;
 	std::cout << "B: " << (int)B << std::endl;
 	std::cout << "C: " << (int)C << std::endl;
@@ -268,7 +269,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			cycles += 4;
 			break;
 		case 0xFA:
-			loadByteIntoReg(A, (memory.readByte(pc++) | memory.readByte(pc++) << 8));
+			loadByteIntoReg(A, memory.readByte((memory.readByte(pc++) | memory.readByte(pc++) << 8)));
 			cycles += 12;
 			break;
 		case 0x3E:
@@ -379,9 +380,36 @@ void CPU::executeOpcode(unsigned char opcode) {
 			cycles = 12;
 			break;
 
+		//LD (nn), SP
 		case 0x08:
 			loadShortIntoMemory(memory.readByte(pc++) | (memory.readByte(pc++) << 8), sp);
 			cycles = 20;
+			break;
+
+		//PUSH nn
+		case 0xF5:
+			push(A, F);
+			break;
+		case 0xC5:
+			push(B, C);
+			break;
+		case 0xD5:
+			push(D, E);
+		case 0xE5:
+			push(H, L);
+			break;
+
+		//POP nn
+		case 0xF1:
+			pop(A, F);
+			break;
+		case 0xC1:
+			pop(B, C);
+			break;
+		case 0xD1:
+			pop(D, E);
+		case 0xE1:
+			pop(H, L);
 			break;
 	}
 }
@@ -454,13 +482,27 @@ void CPU::loadShortIntoMemory(const unsigned short& address, const unsigned shor
 	cycles = 12;
 }
 
-
+//Load 16 bit register pair into the stack pointer
 void CPU::loadRegIntoSP(unsigned char& a, unsigned char& b) {
 	sp = (H << 8) | L;
 	cycles = 8;
 }
 
+//Pushes values inside register pair onto the stack (decrements SP twice)
+void CPU::push(unsigned char a, unsigned char b) {
+	memory.writeByte(sp--, a);
+	memory.writeByte(sp--, b);
+	cycles = 16;
+}
 
+//Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
+void CPU::pop(unsigned char& a, unsigned char& b) {
+	unsigned char n1 = memory.writeByte(sp++, 0);
+	unsigned char n2 = memory.writeByte(sp++, 0);
+	a = n1;
+	b = n2;
+	cycles = 16;
+}
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

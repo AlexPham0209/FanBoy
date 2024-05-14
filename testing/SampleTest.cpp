@@ -33,3 +33,49 @@ TEST(SampleTest, Testing1) {
 
 	EXPECT_EQ(gameBoy->read(0x101B), 9);
 }
+
+TEST(SampleTest, LoadOffsetTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 10 (hex) into register C
+	memory->writeByte(0x100, 0xE);
+	memory->writeByte(0x101, 0xA);
+
+	//Write 12 (hex) into register A
+	memory->writeByte(0x102, 0x3E);
+	memory->writeByte(0x103, 0xC);
+
+	//Load value in register A into memory address (0xFF00 + C)
+	memory->writeByte(0x104, 0xE2);
+
+	mCPU->run(3);
+
+	EXPECT_EQ((int)(memory->readByte(0xFF00 + 0xA)), 0xC);
+
+	delete memory;
+	delete mCPU;
+}
+
+
+TEST(SampleTest, ReadOffsetTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xA2 in memory address (0xFF00 + C)
+	memory->writeByte(0xFF00 + 0xA, 0xA2);
+
+	//Write 10 (hex) into register C
+	memory->writeByte(0x100, 0xE);
+	memory->writeByte(0x101, 0xA);
+
+	//Load value in register A into memory address (0xFF00 + C)
+	memory->writeByte(0x103, 0xF2);
+
+	mCPU->run(3);
+
+	EXPECT_EQ((int)(mCPU->A), 0xA2);
+
+	delete memory;
+	delete mCPU;
+}

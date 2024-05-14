@@ -2,14 +2,15 @@
 #include "../Memory/Memory.h"
 class CPU {
 	public:
-		CPU(Memory& memory);
-		int step();
-		void run(int iterations);
-	private:
 		unsigned char A, B, C, D, E, F, H, L;
 		unsigned short sp, pc;
 		int cycles;
-		
+
+		CPU(Memory& memory);
+		int step();
+		void run(int iterations);
+
+	private:
 		Memory& memory;
 
 		void executeOpcode(unsigned char opcode);
@@ -29,4 +30,7 @@ class CPU {
 		void loadShortIntoMemory(const unsigned short& address, const unsigned short& val);
 
 		void loadRegIntoSP(unsigned char& a, unsigned char& b);
+
+		void push(unsigned char a, unsigned char b);
+		void pop(unsigned char& a, unsigned char& b);
 };
