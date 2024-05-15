@@ -432,11 +432,9 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x82:
 			add(A, D);
 			break;
-			//ADD A, n
 		case 0x83:
 			add(A, E);
 			break;
-			//ADD A, n
 		case 0x84:
 			add(A, H);
 			break;
@@ -449,6 +447,36 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xC6:
 			add(A, memory.readByte(pc++));
 			break;
+
+		//ADD A, Carry
+		case 0x8F:
+			addCarry(A, A);
+			break;
+		case 0x88:
+			addCarry(A, B);
+			break;
+		case 0x89:
+			addCarry(A, C);
+			break;
+		case 0x8A:
+			addCarry(A, D);
+			break;
+		case 0x8B:
+			addCarry(A, E);
+			break;
+		case 0x8C:
+			addCarry(A, H);
+			break;
+		case 0x8D:
+			addCarry(A, L);
+			break;
+		case 0x8E:
+			addCarry(A, memory.readByte((H << 8) | L));
+			break;
+		case 0xCE:
+			addCarry(A, memory.readByte(pc++));
+			break;
+			
 	}
 }
 
@@ -540,8 +568,9 @@ void CPU::pop(unsigned char& a, unsigned char& b) {
 	cycles = 16;
 }
 
+//Adds a register and another value togethers and stores the result into the register
 void CPU::add(unsigned char& reg, const unsigned char val) {
-	unsigned short res = reg + val;
+	int res = reg + val;
 
 	//Reset subtract flag
 	flag = flag & ~(1 << N);
@@ -549,21 +578,34 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 	//Set Z bit if result is zero
 	flag = (res == 0) ? flag | (1 << Z) : flag;
 
-	//Set half carry flag
-	flag = ((reg & 0x0F) + (val & 0x0F) > 0x0F) ? flag | (1 << H) : flag;
-
-	//Set carry flag
-	flag = (res > 0xFF00) ? flag | (1 << C) : flag;
+	//Set half carry flag (if the result overflows past 4 bits)
+	flag = ((unsigned int)(reg & 0xF) + (unsigned int)(val & 0xF)) > 0xF ? flag | (1 << H) : flag;
 	
-	reg = res;
+	//Set carry flag (if the result is larger than 8 bits)
+	flag = (res > 0xFF) ? flag | (1 << C) : flag;
+	
+	reg = (unsigned short)res;
 }
 
-bool CPU::canCarry(unsigned char a, unsigned char b, int iterations) {
-	unsigned char carry = 0;
-	for (int i = 0; i < iterations; ++i)
-		carry = ((a >> i) & 1) + ((b >> i) & 1) + carry >= 2;
-	return carry == 1;
+//Adds a register and another value togethers and stores the result into the register
+void CPU::addCarry(unsigned char& reg, const unsigned char val) {
+	int res = reg + val + (flag | (1 << C));
+
+	//Reset subtract flag
+	flag = flag & ~(1 << N);
+
+	//Set Z bit if result is zero
+	flag = (res == 0) ? flag | (1 << Z) : flag;
+
+	//Set half carry flag (if the result overflows past 4 bits)
+	flag = ((unsigned int)(reg & 0xF) + (unsigned int)(val & 0xF)) > 0xF ? flag | (1 << H) : flag;
+
+	//Set carry flag (if the result is larger than 8 bits)
+	flag = (res > 0xFF) ? flag | (1 << C) : flag;
+
+	reg = (unsigned short)res;
 }
+
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

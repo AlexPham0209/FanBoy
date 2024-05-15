@@ -36,5 +36,6 @@ class CPU {
 		void pop(unsigned char& a, unsigned char& b);
 
 		void add(unsigned char& reg, const unsigned char val);
-		bool canCarry(unsigned char a, unsigned char b, int iterations);
+		void addCarry(unsigned char& reg, const unsigned char val);
+
 };
