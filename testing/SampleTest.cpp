@@ -137,3 +137,33 @@ TEST(SampleTest, LoadMemoryDecrementTest) {
 }
 
 
+TEST(SampleTest, StackTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xFA into register B
+	memory->writeByte(0x100, 0x06);
+	memory->writeByte(0x101, 0xFA);
+
+	//Write 0xA into register C
+	memory->writeByte(0x102, 0x0E);
+	memory->writeByte(0x103, 0x0A);
+
+	//Push AF register onto stack
+	memory->writeByte(0x104, 0xC5);
+
+	mCPU->run(3);
+
+	EXPECT_EQ(mCPU->sp, 0xFFFE - 2);
+	EXPECT_EQ(memory->readShort(mCPU->sp), 0xFA0A);
+
+	//Pop Stack
+	memory->writeByte(0x105, 0xF1);
+	mCPU->run(1);
+
+	EXPECT_EQ(mCPU->sp, 0xFFFE);
+	EXPECT_EQ((mCPU->A << 8) | mCPU->F, 0xFA0A);
+
+	delete mCPU;
+	delete memory;
+}
