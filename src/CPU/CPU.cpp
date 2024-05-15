@@ -661,7 +661,93 @@ void CPU::executeOpcode(unsigned char opcode) {
 			addCarry(A, memory.readByte(pc++));
 			cycles = 8;
 			break;
-			
+
+		//SUB n
+		case 0x97:
+			sub(A, A);
+			cycles = 4;
+			break;
+
+		case 0x90:
+			sub(A, B);
+			cycles = 4;
+			break;
+
+		case 0x91:
+			sub(A, C);
+			cycles = 4;
+			break;
+		
+		case 0x92:
+			sub(A, D);
+			cycles = 4;
+			break;
+		
+		case 0x93:
+			sub(A, E);
+			cycles = 4;
+			break;
+		
+		case 0x94:
+			sub(A, H);
+			cycles = 4;
+			break;
+
+		case 0x95:
+			sub(A, L);
+			cycles = 4;
+			break;
+
+		case 0x96:
+			sub(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
+
+		case 0xD6:
+			sub(A, memory.readByte(pc++));
+			cycles = 8;
+			break;
+
+		//SUBC n
+		case 0x9F:
+			subBorrow(A, A);
+			cycles = 4;
+			break;
+
+		case 0x98:
+			subBorrow(A, B);
+			cycles = 4;
+			break;
+
+		case 0x99:
+			subBorrow(A, C);
+			cycles = 4;
+			break;
+
+		case 0x9A:
+			subBorrow(A, D);
+			cycles = 4;
+			break;
+
+		case 0x9B:
+			subBorrow(A, E);
+			cycles = 4;
+			break;
+
+		case 0x9C:
+			subBorrow(A, H);
+			cycles = 4;
+			break;
+
+		case 0x9D:
+			subBorrow(A, L);
+			cycles = 4;
+			break;
+
+		case 0x9E:
+			subBorrow(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
 	}
 }
 
@@ -760,6 +846,30 @@ void CPU::addCarry(unsigned char& reg, const unsigned char val) {
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
 	flag.setFlag(CARRY, (res > 0xFF));
+
+	reg = (unsigned char)res;
+}
+
+void CPU::sub(unsigned char& reg, const unsigned char& val) {
+	int res = reg - val;
+
+	//Set flags 
+	flag.setFlag(SUB, true);
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(HALF, ((reg & 0xF) - (val & 0xF) < 0));
+	flag.setFlag(CARRY, (res < 0));
+
+	reg = (unsigned char)res;
+}
+
+void CPU::subBorrow(unsigned char& reg, const unsigned char& val) {
+	int res = reg - val - flag.getFlag(CARRY);
+
+	//Set flags 
+	flag.setFlag(SUB, true);
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(HALF, ((reg & 0xF) - (val & 0xF) - flag.getFlag(CARRY) < 0));
+	flag.setFlag(CARRY, (res < 0));
 
 	reg = (unsigned char)res;
 }

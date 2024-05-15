@@ -39,5 +39,6 @@ class CPU {
 		void add(unsigned char& reg, const unsigned char val);
 		void addCarry(unsigned char& reg, const unsigned char val);
 
-		void setFlag(int type, bool set);
+		void sub(unsigned char& reg, const unsigned char& val);
+		void subBorrow(unsigned char& reg, const unsigned char& val);
 };
