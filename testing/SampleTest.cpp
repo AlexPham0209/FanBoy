@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../src/GameBoy.h"
 
+
 TEST(SampleTest, Testing1) {
 	//Set value at address 0x101B to 0x26.
 	GameBoy* gameBoy = new GameBoy();
@@ -79,3 +80,60 @@ TEST(SampleTest, ReadOffsetTest) {
 	delete memory;
 	delete mCPU;
 }
+
+TEST(SampleTest, LoadRegDecrementTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xA2 in memory address 0xFF0A
+	memory->writeByte(0xFF0A, 0xA2);
+
+	//Write 0xFF into register H
+	memory->writeByte(0x100, 0x26);
+	memory->writeByte(0x101, 0xFF);
+
+	//Write 0xA into register C
+	memory->writeByte(0x102, 0x2E);
+	memory->writeByte(0x103, 0x0A);
+
+	//LDD instruction
+	memory->writeByte(0x104, 0x3A);
+
+	mCPU->run(4);
+
+	EXPECT_EQ((int)mCPU->A, 0xA2);
+	EXPECT_EQ((int)((mCPU->H << 8) | mCPU->L), 0xFF0A - 1);
+
+	delete memory;
+	delete mCPU;
+}
+
+TEST(SampleTest, LoadMemoryDecrementTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xFF into register H
+	memory->writeByte(0x100, 0x26);
+	memory->writeByte(0x101, 0xFF);
+
+	//Write 0xA into register C
+	memory->writeByte(0x102, 0x2E);
+	memory->writeByte(0x103, 0x0A);
+
+	//Write 0xA2 into register A
+	memory->writeByte(0x104, 0x3E);
+	memory->writeByte(0x105, 0xA2);
+
+	//LDD (HL), A instruction
+	memory->writeByte(0x106, 0x32);
+
+	mCPU->run(4);
+
+	EXPECT_EQ(memory->readByte(0xFF0A), 0xA2);
+	EXPECT_EQ((int)((mCPU->H << 8) | mCPU->L), 0xFF0A - 1);
+
+	delete memory;
+	delete mCPU;
+}
+
+

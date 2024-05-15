@@ -3,6 +3,7 @@
 class CPU {
 	public:
 		unsigned char A, B, C, D, E, F, H, L;
+		unsigned char flag;
 		unsigned short sp, pc;
 		int cycles;
 
@@ -33,4 +34,7 @@ class CPU {
 
 		void push(unsigned char a, unsigned char b);
 		void pop(unsigned char& a, unsigned char& b);
+
+		void add(unsigned char& reg, const unsigned char val);
+		bool canCarry(unsigned char a, unsigned char b, int iterations);
 };

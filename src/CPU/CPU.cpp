@@ -1,7 +1,14 @@
 #include "CPU.h"
 #include <iostream>
 
-CPU::CPU(Memory& memory) : memory(memory) {
+enum FLAGS {
+	Z = 7,
+	N = 6,
+	H = 5,
+	C = 4
+};
+
+CPU::CPU(Memory& memory) : memory(memory), flag(0) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -306,7 +313,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoMemory(((H << 8) | L), A);
 			break;
 		case 0xEA:
-			loadByteIntoMemory((memory.readByte(pc++) | memory.readByte(pc++) << 8), A);
+			loadByteIntoMemory((memory.readByte(pc++) | (memory.readByte(pc++) << 8)), A);
 			break;
 
 		//LD A, (C)
@@ -411,6 +418,37 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xE1:
 			pop(H, L);
 			break;
+		
+		//ADD A, n
+		case 0x87:
+			add(A, A);
+			break;
+		case 0x80:
+			add(A, B);
+			break;
+		case 0x81:
+			add(A, C);
+			break;
+		case 0x82:
+			add(A, D);
+			break;
+			//ADD A, n
+		case 0x83:
+			add(A, E);
+			break;
+			//ADD A, n
+		case 0x84:
+			add(A, H);
+			break;
+		case 0x85:
+			add(A, L);
+			break;
+		case 0x86:
+			add(A, memory.readByte((H << 8) | L));
+			break;
+		case 0xC6:
+			add(A, memory.readByte(pc++));
+			break;
 	}
 }
 
@@ -422,18 +460,16 @@ void CPU::loadByteIntoReg(unsigned char& reg, const unsigned char& val) {
 
 //Put byte inside address (AB) into register, then decrement the 16 bit register
 void CPU::loadByteIntoRegDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned char ab = (a << 8) | b;
-	loadByteIntoReg(reg, memory.readByte(ab));
-	reg--;
+	unsigned short ab = (a << 8) | b;
+	loadByteIntoReg(reg, memory.readByte(ab--));
 	a = (ab & 0xFF00) >> 8;
 	b = (ab & 0x00FF);
 }
 
 //Put byte inside address (AB) into register, then increment the 16 bit register
 void CPU::loadByteIntoRegIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned char ab = (a << 8) | b;
-	loadByteIntoReg(reg, memory.readByte(ab));
-	reg++;
+	unsigned short ab = (a << 8) | b;
+	loadByteIntoReg(reg, memory.readByte(ab++));
 	a = (ab & 0xFF00) >> 8;
 	b = (ab & 0x00FF);
 }
@@ -448,7 +484,7 @@ void CPU::loadByteIntoMemory(const unsigned short& address, const unsigned char&
 //Load byte inside register into memory address (AB), then decrement the 16 bit register a
 void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
 	unsigned short ab = (a << 8) | b;
-	loadByteIntoMemory(ab, reg--);
+	loadByteIntoMemory(ab--, reg);
 	a = (ab & 0xFF00) >> 8;
 	b = (ab & 0x00FF);
 }
@@ -456,7 +492,7 @@ void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& a, unsi
 //Load byte inside register into memory address (AB), then decrement the 16 bit register 
 void CPU::loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
 	unsigned short ab = (a << 8) | b;
-	loadByteIntoMemory(ab, reg++);
+	loadByteIntoMemory(ab++, reg);
 	a = (ab & 0xFF00) >> 8;
 	b = (ab & 0x00FF);
 }
@@ -502,6 +538,31 @@ void CPU::pop(unsigned char& a, unsigned char& b) {
 	a = n1;
 	b = n2;
 	cycles = 16;
+}
+
+void CPU::add(unsigned char& reg, const unsigned char val) {
+	unsigned short res = reg + val;
+
+	//Reset subtract flag
+	flag = flag & ~(1 << N);
+	
+	//Set Z bit if result is zero
+	flag = (res == 0) ? flag | (1 << Z) : flag;
+
+	//Set half carry flag
+	flag = ((reg & 0x0F) + (val & 0x0F) > 0x0F) ? flag | (1 << H) : flag;
+
+	//Set carry flag
+	flag = (res > 0xFF00) ? flag | (1 << C) : flag;
+	
+	reg = res;
+}
+
+bool CPU::canCarry(unsigned char a, unsigned char b, int iterations) {
+	unsigned char carry = 0;
+	for (int i = 0; i < iterations; ++i)
+		carry = ((a >> i) & 1) + ((b >> i) & 1) + carry >= 2;
+	return carry == 1;
 }
 
 unsigned char CPU::fetchOpcode() {
