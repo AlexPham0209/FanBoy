@@ -20,19 +20,19 @@ CPU::CPU(Memory& memory) : memory(memory), flag(Flag()) {
 
 int CPU::step() {
 	cycles = 0;
-	std::cout << "PC: " << pc << std::endl;
+	//std::cout << "PC: " << pc << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
-	std::cout << (int)opcode << std::endl;
-	std::cout << "A: " << (int)A << std::endl;
-	std::cout << "B: " << (int)B << std::endl;
-	std::cout << "C: " << (int)C << std::endl;
-	std::cout << "D: " << (int)D << std::endl;
-	std::cout << "E: " << (int)E << std::endl;
-	std::cout << "F: " << (int)F << std::endl;
-	std::cout << "H: " << (int)H << std::endl;
-	std::cout << "L: " << (int)L << std::endl;
-	std::cout << "Cycles: " << cycles << "\n" << std::endl;
+	//std::cout << (int)opcode << std::endl;
+	//std::cout << "A: " << (int)A << std::endl;
+	//std::cout << "B: " << (int)B << std::endl;
+	//std::cout << "C: " << (int)C << std::endl;
+	//std::cout << "D: " << (int)D << std::endl;
+	//std::cout << "E: " << (int)E << std::endl;
+	//std::cout << "F: " << (int)F << std::endl;
+	//std::cout << "H: " << (int)H << std::endl;
+	//std::cout << "L: " << (int)L << std::endl;
+	//std::cout << "Cycles: " << cycles << "\n" << std::endl;
 	return cycles;
 }
 
@@ -748,6 +748,52 @@ void CPU::executeOpcode(unsigned char opcode) {
 			subBorrow(A, memory.readByte((H << 8) | L));
 			cycles = 8;
 			break;
+
+		//AND n 
+		case 0xA7:
+			AND(A, A);
+			cycles = 4;
+			break;
+
+		case 0xA0:
+			AND(A, B);
+			cycles = 4;
+			break;
+
+		case 0xA1:
+			AND(A, C);
+			cycles = 4;
+			break;
+
+		case 0xA2:
+			AND(A, D);
+			cycles = 4;
+			break;
+
+		case 0xA3:
+			AND(A, E);
+			cycles = 4;
+			break;
+
+		case 0xA4:
+			AND(A, H);
+			cycles = 4;
+			break;
+
+		case 0xA5:
+			AND(A, L);
+			cycles = 4;
+			break;
+
+		case 0xA6:
+			AND(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
+
+		case 0xE6:
+			AND(A, memory.readByte(pc++));
+			cycles = 8;
+			break;
 	}
 }
 
@@ -870,6 +916,18 @@ void CPU::subBorrow(unsigned char& reg, const unsigned char& val) {
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(HALF, ((reg & 0xF) - (val & 0xF) - flag.getFlag(CARRY) < 0));
 	flag.setFlag(CARRY, (res < 0));
+
+	reg = (unsigned char)res;
+}
+
+void CPU::AND(unsigned char& reg, const unsigned char& val) {
+	int res = reg & val;
+
+	//Set flags 
+	flag.setFlag(SUB, false);
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(HALF, true);
+	flag.setFlag(CARRY, false);
 
 	reg = (unsigned char)res;
 }

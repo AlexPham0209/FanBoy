@@ -41,4 +41,6 @@ class CPU {
 
 		void sub(unsigned char& reg, const unsigned char& val);
 		void subBorrow(unsigned char& reg, const unsigned char& val);
+
+		void AND(unsigned char& reg, const unsigned char& val);
 };
