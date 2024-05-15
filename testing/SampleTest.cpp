@@ -141,28 +141,75 @@ TEST(SampleTest, StackTest) {
 	Memory* memory = new Memory();
 	CPU* mCPU = new CPU(*memory);
 
-	//Write 0xFA into register B
-	memory->writeByte(0x100, 0x06);
-	memory->writeByte(0x101, 0xFA);
+	//Write 0xFF into register H
+	memory->writeByte(0x100, 0x26);
+	memory->writeByte(0x101, 0xFF);
 
 	//Write 0xA into register C
-	memory->writeByte(0x102, 0x0E);
+	memory->writeByte(0x102, 0x2E);
 	memory->writeByte(0x103, 0x0A);
 
-	//Push AF register onto stack
-	memory->writeByte(0x104, 0xC5);
+	//Write 0xA2 into register A
+	memory->writeByte(0x104, 0x3E);
+	memory->writeByte(0x105, 0xA2);
+
+	//LDD (HL), A instruction
+	memory->writeByte(0x106, 0x32);
+
+	mCPU->run(4);
+
+	EXPECT_EQ(memory->readByte(0xFF0A), 0xA2);
+	EXPECT_EQ((int)((mCPU->H << 8) | mCPU->L), 0xFF0A - 1);
+
+	delete memory;
+	delete mCPU;
+}
+
+
+TEST(SampleTest, AdderTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xFA into register B
+	memory->writeByte(0x100, 0x06);
+	memory->writeByte(0x101, 0b11110000);
+
+	//Write 0xA into register A
+	memory->writeByte(0x102, 0x3E);
+	memory->writeByte(0x103, 0b00000000);
+
+	//Add registers A and B
+	memory->writeByte(0x104, 0x80);
 
 	mCPU->run(3);
 
-	EXPECT_EQ(mCPU->sp, 0xFFFE - 2);
-	EXPECT_EQ(memory->readShort(mCPU->sp), 0xFA0A);
+	EXPECT_EQ((int)mCPU->A, 240);
+	EXPECT_EQ((int)(mCPU->flag.getFlag()), (0b0000 << 4));
 
-	//Pop Stack
-	memory->writeByte(0x105, 0xF1);
-	mCPU->run(1);
+	delete mCPU;
+	delete memory;
+}
 
-	EXPECT_EQ(mCPU->sp, 0xFFFE);
-	EXPECT_EQ((mCPU->A << 8) | mCPU->F, 0xFA0A);
+TEST(SampleTest, AdderCarryTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+	mCPU->flag.setFlag(CARRY, true);
+
+	//Write 0xFA into register B
+	memory->writeByte(0x100, 0x06);
+	memory->writeByte(0x101, 5);
+
+	//Write 0xA into register A
+	memory->writeByte(0x102, 0x3E);
+	memory->writeByte(0x103, 2);
+
+	//Add registers A and B
+	memory->writeByte(0x104, 0x88);
+
+	mCPU->run(3);
+
+	EXPECT_EQ((int)mCPU->A, 8);
+	EXPECT_EQ((int)(mCPU->flag.getFlag()), (0b0000 << 4));
 
 	delete mCPU;
 	delete memory;

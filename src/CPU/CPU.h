@@ -1,9 +1,10 @@
 #pragma once
 #include "../Memory/Memory.h"
+#include "Flag.h"
 class CPU {
 	public:
 		unsigned char A, B, C, D, E, F, H, L;
-		unsigned char flag;
+		Flag flag;
 		unsigned short sp, pc;
 		int cycles;
 
@@ -38,4 +39,5 @@ class CPU {
 		void add(unsigned char& reg, const unsigned char val);
 		void addCarry(unsigned char& reg, const unsigned char val);
 
+		void setFlag(int type, bool set);
 };

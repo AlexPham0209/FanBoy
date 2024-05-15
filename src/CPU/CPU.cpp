@@ -1,14 +1,8 @@
 #include "CPU.h"
 #include <iostream>
 
-enum FLAGS {
-	Z = 7,
-	N = 6,
-	H = 5,
-	C = 4
-};
 
-CPU::CPU(Memory& memory) : memory(memory), flag(0) {
+CPU::CPU(Memory& memory) : memory(memory), flag(Flag()) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -748,38 +742,26 @@ void CPU::pop(unsigned char& a, unsigned char& b) {
 void CPU::add(unsigned char& reg, const unsigned char val) {
 	int res = reg + val;
 
-	//Reset subtract flag
-	flag = flag & ~(1 << N);
+	//Set flags 
+	flag.setFlag(SUB, false);
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
+	flag.setFlag(CARRY, (res > 0xFF));
 	
-	//Set Z bit if result is zero
-	flag = (res == 0) ? flag | (1 << Z) : flag;
-
-	//Set half carry flag (if the result overflows past 4 bits)
-	flag = (reg & 0xF) + (val & 0xF) > 0xF ? flag | (1 << H) : flag;
-	
-	//Set carry flag (if the result is larger than 8 bits)
-	flag = (res > 0xFF) ? flag | (1 << C) : flag;
-	
-	reg = (unsigned short)res;
+	reg = (unsigned char)res;
 }
 
 //Adds a register and another value togethers and stores the result into the register
 void CPU::addCarry(unsigned char& reg, const unsigned char val) {
-	int res = reg + val + ((flag & 5) >> C);
+	int res = reg + val + flag.getFlag(CARRY);
 
-	//Reset subtract flag
-	flag = flag & ~(1 << N);
+	//Set flags 
+	flag.setFlag(SUB, false);
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
+	flag.setFlag(CARRY, (res > 0xFF));
 
-	//Set Z bit if result is zero
-	flag = (res == 0) ? flag | (1 << Z) : flag;
-
-	//Set half carry flag (if the result overflows past 4 bits)
-	flag = (reg & 0xF) + (val & 0xF) > 0xF ? flag | (1 << H) : flag;
-
-	//Set carry flag (if the result is larger than 8 bits)
-	flag = (res > 0xFF) ? flag | (1 << C) : flag;
-
-	reg = (unsigned short)res;
+	reg = (unsigned char)res;
 }
 
 
