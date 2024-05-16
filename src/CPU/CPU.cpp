@@ -887,7 +887,96 @@ void CPU::executeOpcode(unsigned char opcode) {
 			XOR(A, memory.readByte(pc++));
 			cycles = 8;
 			break;
+
+			//XOR operation
+		case 0xBF:
+			CP(A, A);
+			cycles = 4;
+			break;
+
+		case 0xB8:
+			CP(A, B);
+			cycles = 4;
+			break;
+
+		case 0xB9:
+			CP(A, C);
+			cycles = 4;
+			break;
+
+		case 0xBA:
+			CP(A, D);
+			cycles = 4;
+			break;
+
+		case 0xBB:
+			CP(A, E);
+			cycles = 4;
+			break;
+
+		case 0xBC:
+			CP(A, H);
+			cycles = 4;
+			break;
+
+		case 0xBD:
+			CP(A, L);
+			cycles = 4;
+			break;
+
+		case 0xBE:
+			CP(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
+
+		case 0xFE:
+			XOR(A, memory.readByte(pc++));
+			cycles = 8;
+			break;
+
+		//INC n
+		case 0x3C:
+			INC(A);
+			cycles = 4;
+			break;
+		
+		case 0x04:
+			INC(B);
+			cycles = 4;
+			break;
+		
+		case 0x0C:
+			INC(C);
+			cycles = 4;
+			break;
+		
+		case 0x14:
+			INC(D);
+			cycles = 4;
+			break;
+
+		case 0x1C:
+			INC(E);
+			cycles = 4;
+			break;
+
+		case 0x24:
+			INC(H);
+			cycles = 4;
+			break;
+
+		case 0x2C:
+			INC(H);
+			cycles = 4;
+			break;
+
+		case 0x34:
+			INC((H << 8)  | L);
+			cycles = 4;
+			break;
 	}
+
+
 }
 
 //Put byte into register
@@ -1054,6 +1143,25 @@ void CPU::CP(unsigned char& reg, const unsigned char val) {
 	flag.setFlag(SUB, true);
 	flag.setFlag(HALF, ((reg & 0xF) < (val & 0xF)));
 	flag.setFlag(CARRY, (reg < val));
+}
+
+
+void CPU::INC(unsigned char& reg) {
+	int res = reg + 1;
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, (reg == 0xFF));
+
+	reg = res;
+}
+
+void CPU::INC(const unsigned short address) {
+	int res = memory.readByte(address) + 1;
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, (memory.readByte(address) == 0xFF));
+
+	memory.writeByte(address, res);
 }
 
 
