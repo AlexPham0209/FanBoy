@@ -875,8 +875,8 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 	int res = reg + val;
 
 	//Set flags 
-	flag.setFlag(SUB, false);
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
 	flag.setFlag(CARRY, (res > 0xFF));
 	
@@ -888,48 +888,79 @@ void CPU::addCarry(unsigned char& reg, const unsigned char val) {
 	int res = reg + val + flag.getFlag(CARRY);
 
 	//Set flags 
-	flag.setFlag(SUB, false);
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
 	flag.setFlag(CARRY, (res > 0xFF));
 
 	reg = (unsigned char)res;
 }
 
-void CPU::sub(unsigned char& reg, const unsigned char& val) {
+void CPU::sub(unsigned char& reg, const unsigned char val) {
 	int res = reg - val;
 
 	//Set flags 
-	flag.setFlag(SUB, true);
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, true);
 	flag.setFlag(HALF, ((reg & 0xF) - (val & 0xF) < 0));
 	flag.setFlag(CARRY, (res < 0));
 
 	reg = (unsigned char)res;
 }
 
-void CPU::subBorrow(unsigned char& reg, const unsigned char& val) {
+void CPU::subBorrow(unsigned char& reg, const unsigned char val) {
 	int res = reg - val - flag.getFlag(CARRY);
 
 	//Set flags 
-	flag.setFlag(SUB, true);
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, true);
 	flag.setFlag(HALF, ((reg & 0xF) - (val & 0xF) - flag.getFlag(CARRY) < 0));
 	flag.setFlag(CARRY, (res < 0));
 
 	reg = (unsigned char)res;
 }
 
-void CPU::AND(unsigned char& reg, const unsigned char& val) {
-	int res = reg & val;
+void CPU::AND(unsigned char& reg, const unsigned char val) {
+	unsigned char res = reg & val;
 
 	//Set flags 
-	flag.setFlag(SUB, false);
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, true);
 	flag.setFlag(CARRY, false);
 
-	reg = (unsigned char)res;
+	reg = res;
+}
+
+void CPU::OR(unsigned char& reg, const unsigned val) {
+	unsigned char res = reg | val;
+
+	//Set flags 
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, false);
+
+	reg = res;
+}
+
+void CPU::XOR(unsigned char& reg, const unsigned val) {
+	unsigned char res = reg ^ val;
+
+	//Set flags 
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, false);
+
+	reg = res;
+}
+
+void CPU::CP(unsigned char& reg, const unsigned char val) {
+	flag.setFlag(ZERO, (reg == val));
+	flag.setFlag(SUB, true);
+	flag.setFlag(HALF, ((reg & 0xF) < (val & 0xF)));
+	flag.setFlag(CARRY, (reg < val));
 }
 
 

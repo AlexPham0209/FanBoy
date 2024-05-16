@@ -1,6 +1,21 @@
 #include <gtest/gtest.h>
 #include "../src/GameBoy.h"
 
+struct CPUTest : public ::testing::Test {
+	Memory* memory;
+	CPU* mCPU;
+
+	virtual void SetUp() override {
+		memory = new Memory();
+		mCPU = new CPU(*memory);	
+	}
+
+	virtual void TearDown() override {
+		delete memory;
+		delete mCPU;
+	}
+};
+
 
 TEST(SampleTest, Testing1) {
 	//Set value at address 0x101B to 0x26.
@@ -213,4 +228,10 @@ TEST(SampleTest, AdderCarryTest) {
 
 	delete mCPU;
 	delete memory;
+}
+
+TEST(SampleTest, MemoryLoadTest) {
+	Memory* memory = new Memory();
+	std::vector<unsigned char> ROM = {0x10, 0x10, 0x10, 0x10, 0x10};
+	memory->loadProgram(ROM);
 }

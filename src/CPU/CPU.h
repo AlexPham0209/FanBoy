@@ -39,8 +39,11 @@ class CPU {
 		void add(unsigned char& reg, const unsigned char val);
 		void addCarry(unsigned char& reg, const unsigned char val);
 
-		void sub(unsigned char& reg, const unsigned char& val);
-		void subBorrow(unsigned char& reg, const unsigned char& val);
+		void sub(unsigned char& reg, const unsigned char val);
+		void subBorrow(unsigned char& reg, const unsigned char val);
 
-		void AND(unsigned char& reg, const unsigned char& val);
+		void AND(unsigned char& reg, const unsigned char val);
+		void OR(unsigned char& reg, const unsigned val);
+		void XOR(unsigned char& reg, const unsigned val);
+		void CP(unsigned char& reg, const unsigned char val);
 };

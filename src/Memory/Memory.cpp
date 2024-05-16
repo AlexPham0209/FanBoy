@@ -1,6 +1,13 @@
 #include "Memory.h"
 #include <iostream>
 
+void Memory::loadProgram(std::vector<unsigned char> ROM) {
+	for (int i = 0; i < ROM.size(); ++i) {
+		std::cout << i << std::endl;
+		this->writeByte(0x100 + i, ROM[i]);
+	}
+}
+
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
 	if (address >= sizeof(ram) / sizeof(unsigned char) || address < 0)
