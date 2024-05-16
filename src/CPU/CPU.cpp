@@ -972,10 +972,10 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		case 0x34:
 			INC((H << 8)  | L);
-			cycles = 4;
+			cycles = 12;
 			break;
 
-			//INC n
+		//DEC n
 		case 0x3D:
 			DEC(A);
 			cycles = 4;
@@ -1013,7 +1013,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		case 0x35:
 			DEC((H << 8) | L);
-			cycles = 4;
+			cycles = 12;
 			break;
 	}
 
@@ -1026,19 +1026,19 @@ void CPU::loadByteIntoReg(unsigned char& reg, const unsigned char& val) {
 }
 
 //Put byte inside address (AB) into register, then decrement the 16 bit register
-void CPU::loadByteIntoRegDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned short ab = (a << 8) | b;
-	loadByteIntoReg(reg, memory.readByte(ab--));
-	a = (ab & 0xFF00) >> 8;
-	b = (ab & 0x00FF);
+void CPU::loadByteIntoRegDecrement(unsigned char& reg, unsigned char& ms, unsigned char& ls) {
+	unsigned short res = (ms << 8) | ls;
+	loadByteIntoReg(reg, memory.readByte(res--));
+	ms = (res & 0xFF00) >> 8;
+	ls = (res & 0x00FF);
 }
 
 //Put byte inside address (AB) into register, then increment the 16 bit register
-void CPU::loadByteIntoRegIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned short ab = (a << 8) | b;
-	loadByteIntoReg(reg, memory.readByte(ab++));
-	a = (ab & 0xFF00) >> 8;
-	b = (ab & 0x00FF);
+void CPU::loadByteIntoRegIncrement(unsigned char& reg, unsigned char& ms, unsigned char& ls) {
+	unsigned short res = (ms << 8) | ls;
+	loadByteIntoReg(reg, memory.readByte(res++));
+	ms = (res & 0xFF00) >> 8;
+	ls = (res & 0x00FF);
 }
 
 
@@ -1048,19 +1048,19 @@ void CPU::loadByteIntoMemory(const unsigned short& address, const unsigned char&
 }
 
 //Load byte inside register into memory address (AB), then decrement the 16 bit register a
-void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned short ab = (a << 8) | b;
-	loadByteIntoMemory(ab--, reg);
-	a = (ab & 0xFF00) >> 8;
-	b = (ab & 0x00FF);
+void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& ms, unsigned char& ls) {
+	unsigned short res = (ms << 8) | ls;
+	loadByteIntoMemory(res--, reg);
+	ms = (res & 0xFF00) >> 8;
+	ls = (res & 0x00FF);
 }
 
 //Load byte inside register into memory address (AB), then decrement the 16 bit register 
-void CPU::loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& a, unsigned char& b) {
-	unsigned short ab = (a << 8) | b;
-	loadByteIntoMemory(ab++, reg);
-	a = (ab & 0xFF00) >> 8;
-	b = (ab & 0x00FF);
+void CPU::loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& ms, unsigned char& ls) {
+	unsigned short res = (ls << 8) | ls;
+	loadByteIntoMemory(res++, reg);
+	ms = (res & 0xFF00) >> 8;
+	ls = (res & 0x00FF);
 }
 
 //Load short into the 16 bit register which is just 2 8 bit registers
@@ -1075,22 +1075,22 @@ void CPU::loadShortIntoMemory(const unsigned short& address, const unsigned shor
 }
 
 //Load 16 bit register pair into the stack pointer
-void CPU::loadRegIntoSP(unsigned char& a, unsigned char& b) {
-	sp = (H << 8) | L;
+void CPU::loadRegIntoSP(unsigned char& ms, unsigned char& ls) {
+	sp = (ms << 8) | ls;
 }
 
 //Pushes values inside register pair onto the stack (decrements SP twice)
-void CPU::push(unsigned char a, unsigned char b) {
-	memory.writeByte(--sp, a);
-	memory.writeByte(--sp, b);
+void CPU::push(unsigned char ms, unsigned char ls) {
+	memory.writeByte(--sp, ms);
+	memory.writeByte(--sp, ls);
 }
 
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
-void CPU::pop(unsigned char& a, unsigned char& b) {
+void CPU::pop(unsigned char& ms, unsigned char& ls) {
 	unsigned char n1 = memory.writeByte(sp++, 0);
 	unsigned char n2 = memory.writeByte(sp++, 0);
-	a = n2;
-	b = n1;
+	ms = n2;
+	ls = n1;
 }
 
 //Adds a register and another value togethers and stores the result into the register
@@ -1222,6 +1222,10 @@ void CPU::DEC(const unsigned short address) {
 	flag.setFlag(HALF, ((memory.readByte(address) & 0xFF) == 0));
 
 	memory.writeByte(address, res);
+}
+
+void CPU::add(unsigned short& ms, unsigned short& ls) {
+
 }
 
 unsigned char CPU::fetchOpcode() {
