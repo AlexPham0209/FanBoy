@@ -47,6 +47,9 @@ class CPU {
 		void OR(unsigned char& reg, const unsigned val);
 		void XOR(unsigned char& reg, const unsigned val);
 		void CP(unsigned char& reg, const unsigned char val);
+
 		void INC(unsigned char& reg);
 		void INC(const unsigned short address);
+		void DEC(unsigned char& reg);
+		void DEC(const unsigned short address);
 };

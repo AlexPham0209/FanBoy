@@ -974,6 +974,47 @@ void CPU::executeOpcode(unsigned char opcode) {
 			INC((H << 8)  | L);
 			cycles = 4;
 			break;
+
+			//INC n
+		case 0x3D:
+			DEC(A);
+			cycles = 4;
+			break;
+
+		case 0x05:
+			DEC(B);
+			cycles = 4;
+			break;
+
+		case 0x0D:
+			DEC(C);
+			cycles = 4;
+			break;
+
+		case 0x15:
+			DEC(D);
+			cycles = 4;
+			break;
+
+		case 0x1D:
+			DEC(E);
+			cycles = 4;
+			break;
+
+		case 0x25:
+			DEC(H);
+			cycles = 4;
+			break;
+
+		case 0x2D:
+			DEC(H);
+			cycles = 4;
+			break;
+
+		case 0x35:
+			DEC((H << 8) | L);
+			cycles = 4;
+			break;
 	}
 
 
@@ -1150,7 +1191,7 @@ void CPU::INC(unsigned char& reg) {
 	int res = reg + 1;
 	flag.setFlag(ZERO, (res == 0));
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, (reg == 0xFF));
+	flag.setFlag(HALF, ((reg & 0xFF) == 0xFF));
 
 	reg = res;
 }
@@ -1159,11 +1200,29 @@ void CPU::INC(const unsigned short address) {
 	int res = memory.readByte(address) + 1;
 	flag.setFlag(ZERO, (res == 0));
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, (memory.readByte(address) == 0xFF));
+	flag.setFlag(HALF, ((memory.readByte(address) & 0xFF) == 0xFF));
 
 	memory.writeByte(address, res);
 }
 
+
+void CPU::DEC(unsigned char& reg) {
+	int res = reg - 1;
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, true);
+	flag.setFlag(HALF, ((reg & 0xFF) == 0));
+
+	reg = res;
+}
+
+void CPU::DEC(const unsigned short address) {
+	int res = memory.readByte(address) + 1;
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, ((memory.readByte(address) & 0xFF) == 0));
+
+	memory.writeByte(address, res);
+}
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);
