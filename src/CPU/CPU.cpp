@@ -794,6 +794,99 @@ void CPU::executeOpcode(unsigned char opcode) {
 			AND(A, memory.readByte(pc++));
 			cycles = 8;
 			break;
+
+		//OR operation
+		case 0xB7:
+			OR(A, A);
+			cycles = 4;
+			break;
+		
+		case 0xB0:
+			OR(A, B);
+			cycles = 4;
+			break;
+		
+		case 0xB1:
+			OR(A, C);
+			cycles = 4;
+			break;
+		
+		case 0xB2:
+			OR(A, D);
+			cycles = 4;
+			break;
+		
+		case 0xB3:
+			OR(A, E);
+			cycles = 4;
+			break;
+
+		case 0xB4:
+			OR(A, H);
+			cycles = 4;
+			break;
+				
+		case 0xB5:
+			OR(A, L);
+			cycles = 4;
+			break;
+
+		case 0xB6:
+			OR(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
+
+		case 0xF6:
+			OR(A, memory.readByte(pc++));
+			cycles = 8;
+			break;
+
+			
+		//XOR operation
+		case 0xAF:
+			XOR(A, A);
+			cycles = 4;
+			break;
+
+		case 0xA8:
+			XOR(A, B);
+			cycles = 4;
+			break;
+
+		case 0xA9:
+			XOR(A, C);
+			cycles = 4;
+			break;
+
+		case 0xAA:
+			XOR(A, D);
+			cycles = 4;
+			break;
+
+		case 0xAB:
+			XOR(A, E);
+			cycles = 4;
+			break;
+
+		case 0xAC:
+			XOR(A, H);
+			cycles = 4;
+			break;
+
+		case 0xAD:
+			XOR(A, L);
+			cycles = 4;
+			break;
+
+		case 0xAE:
+			XOR(A, memory.readByte((H << 8) | L));
+			cycles = 8;
+			break;
+
+		case 0xEE:
+			XOR(A, memory.readByte(pc++));
+			cycles = 8;
+			break;
 	}
 }
 
@@ -966,5 +1059,19 @@ void CPU::CP(unsigned char& reg, const unsigned char val) {
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);
+}
+
+void CPU::reset() {
+	pc = 0x100;
+	sp = 0xFFFE;
+
+	A = 0x0000;
+	B = 0x0000;
+	C = 0x0000;
+	D = 0x0000;
+	E = 0x0000;
+	F = 0x0000;
+	H = 0x0000;
+	L = 0x0000;
 }
 

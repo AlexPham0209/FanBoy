@@ -2,10 +2,8 @@
 #include <iostream>
 
 void Memory::loadProgram(std::vector<unsigned char> ROM) {
-	for (int i = 0; i < ROM.size(); ++i) {
-		std::cout << i << std::endl;
+	for (int i = 0; i < ROM.size(); ++i) 
 		this->writeByte(0x100 + i, ROM[i]);
-	}
 }
 
 //Reads byte value at address

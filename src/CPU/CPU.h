@@ -11,6 +11,7 @@ class CPU {
 		CPU(Memory& memory);
 		int step();
 		void run(int iterations);
+		void reset();
 
 	private:
 		Memory& memory;
