@@ -38,6 +38,9 @@ class CPU {
 		void pop(unsigned char& a, unsigned char& b);
 
 		void add(unsigned char& reg, const unsigned char val);
+		void add(unsigned char& ms, unsigned char& ls, const unsigned short val);
+		void add(unsigned short& dest, const unsigned short val);
+			
 		void addCarry(unsigned char& reg, const unsigned char val);
 
 		void sub(unsigned char& reg, const unsigned char val);
@@ -50,6 +53,9 @@ class CPU {
 
 		void INC(unsigned char& reg);
 		void INC(const unsigned short address);
+		void INC(unsigned char& ms, unsigned char& ls);
+
 		void DEC(unsigned char& reg);
 		void DEC(const unsigned short address);
+		void DEC(unsigned char& ms, unsigned char& ls);
 };

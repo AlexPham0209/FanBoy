@@ -492,21 +492,25 @@ void CPU::executeOpcode(unsigned char opcode) {
 		//LD n, nn
 		case 0x01:
 			loadShortIntoReg(B, C, memory.readShort(pc));
+			pc += 2;
 			cycles = 12;
 			break;
 
 		case 0x11:
 			loadShortIntoReg(D, E, memory.readShort(pc));
+			pc += 2;
 			cycles = 12;
 			break;
 
 		case 0x21:
 			loadShortIntoReg(H, L, memory.readShort(pc));
+			pc += 2;
 			cycles = 12;
 			break;
 
 		case 0x31:
 			sp = memory.readShort(pc);
+			pc += 2;
 			cycles = 12;
 			break;
 		
@@ -524,7 +528,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//LD (nn), SP
 		case 0x08:
-			loadShortIntoMemory(memory.readByte(pc), sp);
+			loadShortIntoMemory(memory.readByte(pc++), sp);
 			cycles = 20;
 			break;
 
@@ -1015,6 +1019,67 @@ void CPU::executeOpcode(unsigned char opcode) {
 			DEC((H << 8) | L);
 			cycles = 12;
 			break;
+
+		//ADD HL, n
+		case 0x09:
+			add(H, L, (B << 8) | C);
+			cycles = 8;
+			break;
+
+		case 0x19:
+			add(H, L, (D << 8) | E);
+			cycles = 8;
+			break;
+
+		case 0x29:
+			add(H, L, (H << 8) | L);
+			cycles = 8;
+			break;
+
+		case 0x39:
+			add(H, L, sp);
+			cycles = 8;
+			break;
+
+		case 0xE8:
+			add(sp, memory.readShort(pc));
+			pc += 2;
+			cycles = 8;
+			break;
+
+		//INC nn
+		case 0x03:
+			INC(B, C);
+			break;
+
+		case 0x13:
+			INC(D, E);
+			break;
+
+		case 0x23:
+			INC(H, L);
+			break;
+
+		case 0x33:
+			sp++;
+			break;
+
+		//INC nn
+		case 0x0B:
+			DEC(B, C);
+			break;
+
+		case 0x1B:
+			DEC(D, E);
+			break;
+
+		case 0x2B:
+			DEC(H, L);
+			break;
+
+		case 0x3B:
+			sp--;
+			break;
 	}
 
 
@@ -1057,7 +1122,7 @@ void CPU::loadByteIntoMemoryDecrement(unsigned char& reg, unsigned char& ms, uns
 
 //Load byte inside register into memory address (AB), then decrement the 16 bit register 
 void CPU::loadByteIntoMemoryIncrement(unsigned char& reg, unsigned char& ms, unsigned char& ls) {
-	unsigned short res = (ls << 8) | ls;
+	unsigned short res = (ms << 8) | ls;
 	loadByteIntoMemory(res++, reg);
 	ms = (res & 0xFF00) >> 8;
 	ls = (res & 0x00FF);
@@ -1224,8 +1289,36 @@ void CPU::DEC(const unsigned short address) {
 	memory.writeByte(address, res);
 }
 
-void CPU::add(unsigned short& ms, unsigned short& ls) {
+void CPU::add(unsigned char& ms, unsigned char& ls, const unsigned short val) {
+	int res = ((ms << 8) | ls) + val;
 
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, (((ms << 8) | ls) & 0xFFF) + (val & 0xFFF) > 0xFFF);
+	flag.setFlag(CARRY, res > 0xFFFF);
+
+	ms = ((unsigned short)res & 0xFF00) >> 8;
+	ls = (unsigned short)res & 0xFF;
+}
+
+void CPU::add(unsigned short& dest, const unsigned short val) {
+	int res = dest + val;
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, (dest & 0xFFF) + (val & 0xFFF) > 0xFFF);
+	flag.setFlag(CARRY, res > 0xFFFF);
+
+	dest = (unsigned short)res;
+}
+
+void CPU::INC(unsigned char& ms, unsigned char& ls) {
+	int res = ((ms << 8) | ls) + 1;
+	ms = ((unsigned short)res & 0xFF00) >> 8;
+	ls = (unsigned short)res & 0xFF;
+}
+
+void CPU::DEC(unsigned char& ms, unsigned char& ls) {
+	int res = ((ms << 8) | ls) - 1;
+	ms = ((unsigned short)res & 0xFF00) >> 8;
+	ls = (unsigned short)res & 0xFF;
 }
 
 unsigned char CPU::fetchOpcode() {

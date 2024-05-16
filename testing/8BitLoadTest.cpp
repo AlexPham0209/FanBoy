@@ -116,6 +116,17 @@ TEST_F(CPUTest, LDRegisterTest) {
 	}
 }
 
+void test(int i) {
+	std::cout << i << std::endl;
+}
+
+
+TEST(Bruh, IncrementTest) {
+	int i = 0;
+	test(i);
+	i += 2;
+	std::cout << i << std::endl;
+}
 
 
 
