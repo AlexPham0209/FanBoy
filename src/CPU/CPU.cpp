@@ -1043,6 +1043,28 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xFF:
 			restart(0x38);
 			break;
+
+		//RET
+		case 0xC9:
+			ret();
+			break;
+
+		//RET cc
+		case 0xC0:
+			ret(!flag.getFlag(ZERO));
+			break;
+
+		case 0xC8:
+			ret(flag.getFlag(ZERO));
+			break;
+
+		case 0xD0:
+			ret(!flag.getFlag(CARRY));
+			break;
+
+		case 0xD8:
+			jump(flag.getFlag(CARRY));
+			break;
 		
 	}		
 
@@ -1416,6 +1438,16 @@ void CPU::restart(unsigned char val) {
 	push(pc);
 	jump((unsigned char)(0x0000 + val));
 }
+
+void CPU::ret() {
+	pop(pc);
+}
+
+void CPU::ret(bool condition) {
+	if (condition)
+		ret();
+}
+
 
 
 unsigned char CPU::fetchOpcode() {

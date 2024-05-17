@@ -84,4 +84,7 @@ class CPU {
 		void call(unsigned short address, bool condition);
 
 		void restart(unsigned char val);
+
+		void ret();
+		void ret(bool condition);
 };
