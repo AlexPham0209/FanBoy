@@ -863,9 +863,9 @@ void CPU::executeOpcode(unsigned char opcode) {
 			add(H, L, sp);			
 			break;
 
+		//ADD SP, n
 		case 0xE8:
-			add(sp, memory.readShort(pc));
-			pc += 2;			
+			addSP(memory.readByte(pc++));
 			break;
 
 		//INC nn
@@ -977,24 +977,24 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//JR n
 		case 0x18:
-			jump(memory.readByte(pc++));
+			jump((char)memory.readByte(pc++));
 			break;
 
 		//JR cc, n
 		case 0x20:
-			jump(memory.readByte(pc), !flag.getFlag(ZERO));
+			jump((char)memory.readByte(pc), !flag.getFlag(ZERO));
 			break;
 
 		case 0x28:
-			jump(memory.readByte(pc), flag.getFlag(ZERO));
+			jump((char)memory.readByte(pc), flag.getFlag(ZERO));
 			break;
 
 		case 0x30:
-			jump(memory.readByte(pc), !flag.getFlag(CARRY));
+			jump((char)memory.readByte(pc), !flag.getFlag(CARRY));
 			break;
 
 		case 0x38:
-			jump(memory.readByte(pc), flag.getFlag(CARRY));
+			jump((char)memory.readByte(pc), flag.getFlag(CARRY));
 			break;
 
 		//CALL nn
@@ -1052,6 +1052,27 @@ void CPU::executeOpcode(unsigned char opcode) {
 			restart(0x38);
 			break;
 		
+		//RET
+		case 0xC9:
+			ret();
+			break;
+
+		//RET cc
+		case 0xC0:
+			ret(!flag.getFlag(ZERO));
+			break;
+
+		case 0xC8:
+			ret(!flag.getFlag(ZERO));
+			break;
+		
+		case 0xD0:
+			ret(flag.getFlag(CARRY));
+			break;
+
+		case 0xD8:
+			ret(!flag.getFlag(CARRY));
+			break;
 	}		
 
 
@@ -1297,13 +1318,13 @@ void CPU::add(unsigned char& ms, unsigned char& ls, const unsigned short val) {
 	ls = (unsigned short)res & 0xFF;
 }
 
-void CPU::add(unsigned short& dest, const unsigned short val) {
-	int res = dest + val;
+void CPU::addSP(const char val) {
+	int res = sp + val;
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, (dest & 0xFFF) + (val & 0xFFF) > 0xFFF);
-	flag.setFlag(CARRY, res > 0xFFFF);
+	flag.setFlag(HALF, ((sp ^ val ^ (res & 0xFFFF)) & 0x10) == 0x10);
+	flag.setFlag(CARRY, ((sp ^ val ^ (res & 0xFFFF)) & 0x100) == 0x100);
 
-	dest = (unsigned short)res;
+	sp = (unsigned short)res;
 }
 
 void CPU::INC(unsigned char& ms, unsigned char& ls) {
@@ -1399,18 +1420,18 @@ void CPU::jump(unsigned short address) {
 	pc = address; 
 }
 
-void CPU::jump(unsigned char val) {
+void CPU::jump(char val) {
 	pc += val;
 }
 
 void CPU::jump(unsigned short address, bool condition) {
 	if (condition)
-		pc = address;
+		pc += address;
 	else
 		pc += 2;
 }
 
-void CPU::jump(unsigned char val, bool condition) {
+void CPU::jump(char val, bool condition) {
 	if (condition)
 		pc += val;
 	else
@@ -1418,22 +1439,29 @@ void CPU::jump(unsigned char val, bool condition) {
 }
 
 void CPU::call(unsigned short address) {
-	push(pc);
+	push(pc + 2);
 	jump(address);
 }
 
 void CPU::call(unsigned short address, bool condition) {
-	if (condition) {
-		push(pc + 2);
-		jump(address);
-	}
+	if (condition)
+		call(address);
 	else
 		pc += 2;
 }
 
 void CPU::restart(unsigned char val) {
 	push(pc);
-	jump((unsigned char)(0x0000 + val));
+	jump((char)(0x0000 + val));
+}
+
+void CPU::ret() {
+	pop(pc);
+}
+
+void CPU::ret(bool condition) {
+	if (condition)
+		ret();
 }
 
 

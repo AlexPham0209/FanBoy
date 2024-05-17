@@ -44,7 +44,7 @@ class CPU {
 
 		void add(unsigned char& reg, const unsigned char val);
 		void add(unsigned char& ms, unsigned char& ls, const unsigned short val);
-		void add(unsigned short& dest, const unsigned short val);
+		void addSP(char val);
 			
 		void addCarry(unsigned char& reg, const unsigned char val);
 
@@ -78,11 +78,14 @@ class CPU {
 		void jump(unsigned short address);
 		void jump(unsigned short address, bool condition);
 
-		void jump(unsigned char val);
-		void jump(unsigned char val, bool condition);
+		void jump(char val);
+		void jump(char val, bool condition);
 
 		void call(unsigned short address);
 		void call(unsigned short address, bool condition);
 
 		void restart(unsigned char val);
+
+		void ret();
+		void ret(bool condition);
 };
