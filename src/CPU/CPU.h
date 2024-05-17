@@ -37,7 +37,9 @@ class CPU {
 		void loadRegIntoSP(unsigned char& a, unsigned char& b);
 
 		void push(unsigned char a, unsigned char b);
+		void push(unsigned short val);
 		void pop(unsigned char& a, unsigned char& b);
+		void pop(unsigned short& val);
 
 		void add(unsigned char& reg, const unsigned char val);
 		void add(unsigned char& ms, unsigned char& ls, const unsigned short val);
@@ -77,4 +79,7 @@ class CPU {
 
 		void jump(unsigned char val);
 		void jump(unsigned char val, bool condition);
+
+		void call(unsigned short address);
+		void call(unsigned short address, bool condition);
 };

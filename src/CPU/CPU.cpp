@@ -988,6 +988,28 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x38:
 			jump(memory.readByte(pc), flag.getFlag(CARRY));
 			break;
+
+		//CALL nn
+		case 0xCD:
+			call(memory.readShort(pc));
+			break;
+
+		//CALL cc, nn
+		case 0xC4:
+			call(memory.readShort(pc), !flag.getFlag(ZERO));
+			break;
+
+		case 0xCC:
+			call(memory.readShort(pc), flag.getFlag(ZERO));
+			break;
+
+		case 0xD4:
+			call(memory.readShort(pc), !flag.getFlag(CARRY));
+			break;
+
+		case 0xDC:
+			call(memory.readShort(pc), flag.getFlag(CARRY));
+			break;
 	}		
 
 
@@ -1058,12 +1080,26 @@ void CPU::push(unsigned char ms, unsigned char ls) {
 	memory.writeByte(--sp, ls);
 }
 
+//Pushes values inside register pair onto the stack (decrements SP twice)
+void CPU::push(unsigned short val) {
+	memory.writeByte(--sp, (val & 0xFF00) >> 8);
+	memory.writeByte(--sp, (val & 0xFF));
+}
+
+
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
 void CPU::pop(unsigned char& ms, unsigned char& ls) {
 	unsigned char n1 = memory.writeByte(sp++, 0);
 	unsigned char n2 = memory.writeByte(sp++, 0);
 	ms = n2;
 	ls = n1;
+}
+
+//Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
+void CPU::pop(unsigned short& val) {
+	unsigned char n1 = memory.writeByte(sp++, 0);
+	unsigned char n2 = memory.writeByte(sp++, 0);
+	val = (n2 << 8) | n1;
 }
 
 //Adds a register and another value togethers and stores the result into the register
@@ -1324,6 +1360,20 @@ void CPU::jump(unsigned short address, bool condition) {
 void CPU::jump(unsigned char val, bool condition) {
 	if (condition)
 		pc += val;
+	else
+		pc += 2;
+}
+
+void CPU::call(unsigned short address) {
+	push(pc);
+	jump(address);
+}
+
+void CPU::call(unsigned short address, bool condition) {
+	if (condition) {
+		push(pc);
+		jump(address);
+	}
 	else
 		pc += 2;
 }
