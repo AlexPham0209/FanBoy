@@ -1,5 +1,6 @@
 #include "CPU.h"
 #include <iostream>
+#include "OpcodeCycles.h"
 
 
 CPU::CPU(Memory& memory) : memory(memory), flag(Flag()), running(true) {
@@ -19,20 +20,9 @@ CPU::CPU(Memory& memory) : memory(memory), flag(Flag()), running(true) {
 }
 
 int CPU::step() {
-	cycles = 0;
-	//std::cout << "PC: " << pc << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
-	//std::cout << (int)opcode << std::endl;
-	//std::cout << "A: " << (int)A << std::endl;
-	//std::cout << "B: " << (int)B << std::endl;
-	//std::cout << "C: " << (int)C << std::endl;
-	//std::cout << "D: " << (int)D << std::endl;
-	//std::cout << "E: " << (int)E << std::endl;
-	//std::cout << "F: " << (int)F << std::endl;
-	//std::cout << "H: " << (int)H << std::endl;
-	//std::cout << "L: " << (int)L << std::endl;
-	//std::cout << "Cycles: " << cycles << "\n" << std::endl;
+	cycles = opcodeCycles[opcode];
 	return cycles;
 }
 
@@ -42,7 +32,7 @@ void CPU::run(int iterations) {
 }
 
 
-//TODO: Create Instructions STOP, DI, EL
+//TODO: Create Instructions STOP, DI, EL. RETI
 void CPU::executeOpcode(unsigned char opcode) {
 	//Executes certain instruction based on 8 bit opcode
 	switch (opcode) {
@@ -135,6 +125,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoReg(B, memory.readByte((H << 8) | L));
 			break;
 
+
 		//LD C, r2
 		case 0x48:
 			loadByteIntoReg(C, B);
@@ -146,7 +137,6 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		case 0x4A:
 			loadByteIntoReg(C, D);
-			
 			break;
 
 		case 0x4B:
@@ -164,6 +154,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x4E:
 			loadByteIntoReg(C, memory.readByte((H << 8) | L));			
 			break;
+
 
 		//LD D, r2
 		case 0x50:
@@ -194,6 +185,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoReg(D, memory.readByte((H << 8) | L));			
 			break;
 
+
 		//LD E, r2
 		case 0x58:
 			loadByteIntoReg(E, B);			
@@ -222,6 +214,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x5E:
 			loadByteIntoReg(E, memory.readByte((H << 8) | L));			
 			break;
+
 
 		//LD H, r2
 		case 0x60:
@@ -252,6 +245,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoReg(H, memory.readByte((H << 8) | L));			
 			break;
 
+
 		//LD L, r2
 		case 0x68:
 			loadByteIntoReg(L, B);			
@@ -281,6 +275,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoReg(L, memory.readByte((H << 8) | L));			
 			break;
 		
+
 		//LD (HL), r2
 		case 0x70:
 			loadByteIntoMemory(((H << 8) | L), B);			
@@ -289,9 +284,11 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x71:
 			loadByteIntoMemory(((H << 8) | L), C);			
 			break;
+
 		case 0x72:
 			loadByteIntoMemory(((H << 8) | L), D);			
 			break;
+
 		case 0x73:
 			loadByteIntoMemory(((H << 8) | L), E);			
 			break;
@@ -308,15 +305,14 @@ void CPU::executeOpcode(unsigned char opcode) {
 			loadByteIntoMemory(((H << 8) | L), memory.readByte(pc++));
 			break;
 
+
 		//LD A, n
 		case 0x0A:
 			loadByteIntoReg(A, memory.readByte((B << 8) | C));
-			
 			break;
 
 		case 0x1A:
-			loadByteIntoReg(A, memory.readByte((D << 8) | E));
-			
+			loadByteIntoReg(A, memory.readByte((D << 8) | E));			
 			break;
 
 		case 0xFA:
@@ -326,6 +322,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x3E:
 			loadByteIntoReg(A, memory.readByte(pc++));		
 			break;
+
 
 		//LD n, A
 		case 0x47:
@@ -367,6 +364,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xEA:
 			loadByteIntoMemory((memory.readByte(pc++) | (memory.readByte(pc++) << 8)), A);
 			break;
+
 
 		//LD A, (C)
 		case 0xF2:
@@ -436,13 +434,14 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//LD HL, SP+n
 		case 0xF8:
-			loadShortIntoReg(H, L, sp + memory.readByte(pc++));
+			loadHL(memory.readByte(pc++));
 			break;
 
 		//LD (nn), SP
 		case 0x08:
 			loadShortIntoMemory(memory.readByte(pc++), sp);
 			break;
+
 
 		//PUSH nn
 		case 0xF5:
@@ -461,6 +460,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			push(H, L);
 			break;
 
+
 		//POP nn
 		case 0xF1:
 			pop(A, F);
@@ -478,6 +478,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			pop(H, L);
 			break;
 		
+
 		//ADD A, n
 		case 0x87:
 			add(A, A);
@@ -514,6 +515,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xC6:
 			add(A, memory.readByte(pc++));			
 			break;
+
 
 		//ADC A, n
 		case 0x8F:
@@ -552,6 +554,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			addCarry(A, memory.readByte(pc++));			
 			break;
 
+
 		//SUB n
 		case 0x97:
 			sub(A, A);			
@@ -589,6 +592,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			sub(A, memory.readByte(pc++));			
 			break;
 
+
 		//SUBC n
 		case 0x9F:
 			subBorrow(A, A);			
@@ -621,6 +625,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x9E:
 			subBorrow(A, memory.readByte((H << 8) | L));		
 			break;
+
 
 		//AND n 
 		case 0xA7:
@@ -658,6 +663,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xE6:
 			AND(A, memory.readByte(pc++));			
 			break;
+
 
 		//OR operation
 		case 0xB7:
@@ -697,7 +703,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 			
-		//XOR operation
+		//XOR n
 		case 0xAF:
 			XOR(A, A);			
 			break;
@@ -734,7 +740,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			XOR(A, memory.readByte(pc++));			
 			break;
 
-			//XOR operation
+		//CP n
 		case 0xBF:
 			CP(A, A);			
 			break;
@@ -768,8 +774,9 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0xFE:
-			XOR(A, memory.readByte(pc++));
+			CP(A, memory.readByte(pc++));
 			break;
+			
 
 		//INC n
 		case 0x3C:
@@ -797,13 +804,13 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x2C:
-			INC(H);		
+			INC(L);		
 			break;
 
 		case 0x34:
-			INC((H << 8)  | L);
-			cycles = 12;
+			INC((H << 8) | L);
 			break;
+
 
 		//DEC n
 		case 0x3D:
@@ -831,12 +838,13 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x2D:
-			DEC(H);		
+			DEC(L);		
 			break;
 
 		case 0x35:
 			DEC((H << 8) | L);
 			break;
+
 
 		//ADD HL, n
 		case 0x09:
@@ -1106,6 +1114,17 @@ void CPU::loadShortIntoMemory(const unsigned short& address, const unsigned shor
 //Load 16 bit register pair into the stack pointer
 void CPU::loadRegIntoSP(unsigned char& ms, unsigned char& ls) {
 	sp = (ms << 8) | ls;
+};
+
+void CPU::loadHL(unsigned char val) {
+	unsigned short offset = sp + val;
+
+	loadShortIntoReg(H, L, offset);
+
+	flag.setFlag(ZERO, false);
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, ((sp ^ val ^ (offset & 0xFFFF)) & 0x10) == 0x10);
+	flag.setFlag(CARRY, ((sp ^ val ^ (offset & 0xFFFF)) & 0x100) == 0x100);
 }
 
 //Pushes values inside register pair onto the stack (decrements SP twice)
@@ -1143,7 +1162,7 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 	//Set flags 
 	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) + flag.getFlag(CARRY) > 0xF));
+	flag.setFlag(HALF, ((reg & 0xF) + (val & 0xF) > 0xF));
 	flag.setFlag(CARRY, (res > 0xFF));
 	
 	reg = (unsigned char)res;
@@ -1190,7 +1209,7 @@ void CPU::AND(unsigned char& reg, const unsigned char val) {
 	unsigned char res = reg & val;
 
 	//Set flags 
-	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(ZERO, (res == 0));
 	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, true);
 	flag.setFlag(CARRY, false);
@@ -1202,7 +1221,7 @@ void CPU::OR(unsigned char& reg, const unsigned val) {
 	unsigned char res = reg | val;
 
 	//Set flags 
-	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(ZERO, (res == 0));
 	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, false);
 	flag.setFlag(CARRY, false);
@@ -1214,7 +1233,7 @@ void CPU::XOR(unsigned char& reg, const unsigned val) {
 	unsigned char res = reg ^ val;
 
 	//Set flags 
-	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(ZERO, (res == 0));
 	flag.setFlag(SUB, false);
 	flag.setFlag(HALF, false);
 	flag.setFlag(CARRY, false);
@@ -1232,37 +1251,37 @@ void CPU::CP(unsigned char& reg, const unsigned char val) {
 
 void CPU::INC(unsigned char& reg) {
 	int res = reg + 1;
-	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, ((reg & 0xFF) == 0xFF));
+	flag.setFlag(HALF, ((reg & 0x0F) == 0x0F));
 
-	reg = res;
+	reg = (unsigned char)res;
 }
 
 void CPU::INC(const unsigned short address) {
 	int res = memory.readByte(address) + 1;
-	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, ((memory.readByte(address) & 0xFF) == 0xFF));
+	flag.setFlag(HALF, ((memory.readByte(address) & 0x0F) == 0x0F));
 
-	memory.writeByte(address, res);
+	memory.writeByte(address, (unsigned char)res);
 }
 
 
 void CPU::DEC(unsigned char& reg) {
 	int res = reg - 1;
-	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
 	flag.setFlag(SUB, true);
-	flag.setFlag(HALF, ((reg & 0xFF) == 0));
+	flag.setFlag(HALF, ((reg & 0x0F) == 0));
 
 	reg = res;
 }
 
 void CPU::DEC(const unsigned short address) {
 	int res = memory.readByte(address) + 1;
-	flag.setFlag(ZERO, (res == 0));
-	flag.setFlag(SUB, false);
-	flag.setFlag(HALF, ((memory.readByte(address) & 0xFF) == 0));
+	flag.setFlag(ZERO, ((unsigned char)res == 0));
+	flag.setFlag(SUB, true);
+	flag.setFlag(HALF, ((memory.readByte(address) & 0x0F) == 0));
 
 	memory.writeByte(address, res);
 }

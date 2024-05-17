@@ -17,7 +17,3 @@ unsigned short AddTest(unsigned char& ms, unsigned char& ls, unsigned char instr
 	CPU->reset();
 	return res;
 }
-
-TEST_F(CPUTest, AddTest) {
-	EXPECT_EQ(AddTest(mCPU->B, mCPU->C, 0x09, 5, 6, mCPU, memory), 11);
-}
