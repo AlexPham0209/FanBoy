@@ -1010,6 +1010,40 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xDC:
 			call(memory.readShort(pc), flag.getFlag(CARRY));
 			break;
+
+		//RST n
+		case 0xC7:
+			restart(0x00);
+			break;
+
+		case 0xCF:
+			restart(0x08);
+			break;
+
+		case 0xD7:
+			restart(0x10);
+			break;
+
+		case 0xDF:
+			restart(0x18);
+			break;
+
+		case 0xE7:
+			restart(0x20);
+			break;
+
+		case 0xEF:
+			restart(0x28);
+			break;
+
+		case 0xF7:
+			restart(0x30);
+			break;
+
+		case 0xFF:
+			restart(0x38);
+			break;
+		
 	}		
 
 
@@ -1371,11 +1405,16 @@ void CPU::call(unsigned short address) {
 
 void CPU::call(unsigned short address, bool condition) {
 	if (condition) {
-		push(pc);
+		push(pc + 2);
 		jump(address);
 	}
 	else
 		pc += 2;
+}
+
+void CPU::restart(unsigned char val) {
+	push(pc);
+	jump((unsigned char)(0x0000 + val));
 }
 
 
