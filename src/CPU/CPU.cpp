@@ -1,6 +1,5 @@
 #include "CPU.h"
 #include <iostream>
-#include <Cpl.h>
 
 
 CPU::CPU(Memory& memory) : memory(memory), flag(Flag()), running(true) {
@@ -941,7 +940,55 @@ void CPU::executeOpcode(unsigned char opcode) {
 			RR(A);
 			break;
 		
-	}
+		//JP nn
+		case 0xC3:
+			jump(memory.readShort(pc));
+			break;
+
+		//JP cc, nn
+		case 0xC2:
+			jump(memory.readShort(pc), !flag.getFlag(ZERO));
+			break;
+
+		case 0xCA:
+			jump(memory.readShort(pc), flag.getFlag(ZERO));
+			break;
+
+		case 0xD2:
+			jump(memory.readShort(pc), !flag.getFlag(CARRY));
+			break;
+
+		case 0xDA:
+			jump(memory.readShort(pc), flag.getFlag(CARRY));
+			break;
+
+		//JP (HL)
+		case 0xE9:
+			jump((unsigned short)((H << 8) | L));
+			break;
+
+		//JR n
+		case 0x18:
+			jump(memory.readByte(pc++));
+			break;
+
+		//JR cc, n
+		case 0x20:
+			jump(memory.readByte(pc), !flag.getFlag(ZERO));
+			break;
+
+		case 0x28:
+			jump(memory.readByte(pc), flag.getFlag(ZERO));
+			break;
+
+		case 0x30:
+			jump(memory.readByte(pc), !flag.getFlag(CARRY));
+			break;
+
+		case 0x38:
+			jump(memory.readByte(pc), flag.getFlag(CARRY));
+			break;
+	}		
 
 
 }
@@ -1258,6 +1305,29 @@ void CPU::RR(unsigned char& reg) {
 	flag.setFlag(CARRY, (reg >> 7) & 1);
 	reg = res;
 }
+
+void CPU::jump(unsigned short address) {
+	pc = address; 
+}
+
+void CPU::jump(unsigned char val) {
+	pc += val;
+}
+
+void CPU::jump(unsigned short address, bool condition) {
+	if (condition)
+		pc = address;
+	else
+		pc += 2;
+}
+
+void CPU::jump(unsigned char val, bool condition) {
+	if (condition)
+		pc += val;
+	else
+		pc += 2;
+}
+
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

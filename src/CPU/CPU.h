@@ -71,4 +71,10 @@ class CPU {
 
 		void RRC(unsigned char& reg);
 		void RR(unsigned char& reg);
+
+		void jump(unsigned short address);
+		void jump(unsigned short address, bool condition);
+
+		void jump(unsigned char val);
+		void jump(unsigned char val, bool condition);
 };
