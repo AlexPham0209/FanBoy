@@ -15,7 +15,7 @@ public:
 	}
 
 	unsigned char getFlag(int type) {
-		return (flag & (1 << type)) >> type;
+		return (flag >> type) & 1;
 	}
 
 	unsigned char getFlag() {

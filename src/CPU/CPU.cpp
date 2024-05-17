@@ -919,7 +919,27 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x76:
 			running = false;
 			break;
+		
 
+		//RLCA
+		case 0x07:
+			RLC(A);
+			break;
+
+		//RLA
+		case 0x17:
+			RL(A);
+			break;
+		
+		//RRCA
+		case 0x0F:
+			RRC(A);
+			break;
+
+		//RRA
+		case 0x1F:
+			RR(A);
+			break;
 		
 	}
 
@@ -1203,11 +1223,41 @@ void CPU::SCF() {
 }
 
 
-void CPU::RLCA() {
-	
+void CPU::RLC(unsigned char& reg) {
+	unsigned char res = (reg << 1) | ((reg >> 7) & 1);
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, (reg >> 7) & 1);
+	reg = res;
 }
 
+void CPU::RL(unsigned char& reg) {
+	unsigned char res = (reg << 1) | flag.getFlag(CARRY);
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, (reg >> 7) & 1);
+	reg = res;
+}
 
+void CPU::RRC(unsigned char& reg) {
+	unsigned char res = (reg >> 1) | ((reg & 1) << 7);
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, (reg >> 7) & 1);
+	reg = res;
+}
+
+void CPU::RR(unsigned char& reg) {
+	unsigned char res = (reg >> 1) | (flag.getFlag(CARRY) << 7);
+	flag.setFlag(ZERO, (res == 0));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+	flag.setFlag(CARRY, (reg >> 7) & 1);
+	reg = res;
+}
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

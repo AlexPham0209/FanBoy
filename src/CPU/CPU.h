@@ -65,5 +65,10 @@ class CPU {
 		void CPL(unsigned char& reg);
 		void CCF();
 		void SCF();
-		void RLCA();
+
+		void RLC(unsigned char& reg);
+		void RL(unsigned char& reg);
+
+		void RRC(unsigned char& reg);
+		void RR(unsigned char& reg);
 };
