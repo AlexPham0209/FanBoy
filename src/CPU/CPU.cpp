@@ -1,8 +1,9 @@
 #include "CPU.h"
 #include <iostream>
+#include <Cpl.h>
 
 
-CPU::CPU(Memory& memory) : memory(memory), flag(Flag()) {
+CPU::CPU(Memory& memory) : memory(memory), flag(Flag()), running(true) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -42,6 +43,7 @@ void CPU::run(int iterations) {
 }
 
 
+//TODO: Create Instructions STOP, DI, EL
 void CPU::executeOpcode(unsigned char opcode) {
 	//Executes certain instruction based on 8 bit opcode
 	switch (opcode) {
@@ -892,6 +894,33 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0x3B:
 			sp--;
 			break;
+
+		//DAA
+		case 0x27:
+			DAA(A);
+			break;
+
+		//CPL
+		case 0x2F:
+			CPL(A);
+			break;
+		
+		//CCF
+		case 0x3F:
+			CCF();
+			break;
+
+		//SCF
+		case 0x37:
+			SCF(); 
+			break;
+		
+		//HALT
+		case 0x76:
+			running = false;
+			break;
+
+		
 	}
 
 
@@ -1132,6 +1161,53 @@ void CPU::DEC(unsigned char& ms, unsigned char& ls) {
 	ms = ((unsigned short)res & 0xFF00) >> 8;
 	ls = (unsigned short)res & 0xFF;
 }
+
+void CPU::DAA(unsigned char& reg) {
+	if (!flag.getFlag(SUB)) {
+		if (flag.getFlag(CARRY) || reg > 0x99) {
+			reg += 0x60;
+			flag.setFlag(CARRY, true);
+		}
+
+		if (flag.getFlag(HALF) || (reg & 0xF) > 0x9) 
+			reg += 0x6;
+		return;
+	}
+
+	if (flag.getFlag(CARRY))
+		reg -= 0x60;
+
+	if (flag.getFlag(HALF))
+		reg -= 0x6;
+
+	flag.setFlag(ZERO, (A == 0));
+	flag.setFlag(HALF, false);
+}
+
+void CPU::CPL(unsigned char& reg) {
+	reg = ~reg;
+	flag.setFlag(SUB, true);
+	flag.setFlag(HALF, true);
+}
+
+void CPU::CCF() {
+	flag.setFlag(CARRY, !flag.getFlag(CARRY));
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+}
+
+void CPU::SCF() {
+	flag.setFlag(CARRY, true);
+	flag.setFlag(SUB, false);
+	flag.setFlag(HALF, false);
+}
+
+
+void CPU::RLCA() {
+	
+}
+
+
 
 unsigned char CPU::fetchOpcode() {
 	return memory.readByte(pc++);

@@ -8,6 +8,8 @@ class CPU {
 		unsigned short sp, pc;
 		int cycles;
 
+		bool running;
+
 		CPU(Memory& memory);
 		int step();
 		void run(int iterations);
@@ -58,4 +60,10 @@ class CPU {
 		void DEC(unsigned char& reg);
 		void DEC(const unsigned short address);
 		void DEC(unsigned char& ms, unsigned char& ls);
+
+		void DAA(unsigned char& reg);
+		void CPL(unsigned char& reg);
+		void CCF();
+		void SCF();
+		void RLCA();
 };
