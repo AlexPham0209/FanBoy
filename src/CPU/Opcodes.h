@@ -9,14 +9,3 @@ struct Instruction {
 	void (*Instruction)();
 	int cycles;
 };
-
-class Opcodes {
-public:
-	int execute(unsigned char opcode);
-
-private:
-	std::vector<Instruction> instructions;
-	CPU CPU;
-	
-
-};

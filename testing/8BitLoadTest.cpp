@@ -121,13 +121,47 @@ void test(int i) {
 }
 
 
-TEST(Bruh, IncrementTest) {
-	int i = 0;
-	test(i);
-	i += 2;
-	std::cout << i << std::endl;
+TEST(SampleTest, LoadRegDecrementTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xA2 in memory address 0xFF0A
+	memory->writeByte(0xFF0A, 0xA2);
+
+	//Write 0xFF into register H
+	memory->writeByte(0x100, 0x26);
+	memory->writeByte(0x101, 0xFF);
+
+	//Write 0xA into register C
+	memory->writeByte(0x102, 0x2E);
+	memory->writeByte(0x103, 0x0A);
+
+	//LDD instruction
+	memory->writeByte(0x104, 0x3A);
+
+	mCPU->run(4);
+
+	EXPECT_EQ((int)mCPU->A, 0xA2);
+	EXPECT_EQ((int)((mCPU->H << 8) | mCPU->L), 0xFF0A - 1);
+
+	delete memory;
+	delete mCPU;
 }
 
 
 
+TEST(SampleTest, ShortLoadTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
 
+	memory->writeByte(0x100, 0x01);
+	memory->writeByte(0x101, 0x31);
+	memory->writeByte(0x102, 0xF0);
+
+	mCPU->run(1);
+
+	EXPECT_EQ((int)((mCPU->B << 8) | mCPU->C), 0xF031);
+
+	delete memory;
+	delete mCPU;
+}
