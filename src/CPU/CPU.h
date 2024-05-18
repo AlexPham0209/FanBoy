@@ -11,7 +11,7 @@ class CPU {
 		unsigned short sp, pc;
 		int cycles;
 
-		bool running;
+		bool halt;
 
 		CPU(Memory& memory);
 		int step();
@@ -37,19 +37,19 @@ class CPU {
 
 		void loadShortIntoMemory(const unsigned short& address, const unsigned short& val);
 
-		void loadRegIntoSP(unsigned char& a, unsigned char& b);
+		void loadRegIntoSP(Register16& reg);
 		void loadHL(unsigned char val);
 
-		void push(unsigned char a, unsigned char b);
+		void push(Register16& reg);
 		void push(unsigned short val);
-		void pop(unsigned char& a, unsigned char& b);
+		void pop(Register16& reg);
 		void pop(unsigned short& val);
 
 		void add(unsigned char& reg, const unsigned char val);
-		void add(unsigned char& ms, unsigned char& ls, const unsigned short val);
-		void addSP(char val);
-			
+		void add(Register16& reg, const unsigned short val);
 		void addCarry(unsigned char& reg, const unsigned char val);
+
+		void addSP(char val);
 
 		void sub(unsigned char& reg, const unsigned char val);
 		void subBorrow(unsigned char& reg, const unsigned char val);
@@ -60,12 +60,14 @@ class CPU {
 		void CP(unsigned char& reg, const unsigned char val);
 
 		void INC(unsigned char& reg);
+		void INC(Register16& reg);
 		void INC(const unsigned short address);
-		void INC(unsigned char& ms, unsigned char& ls);
+	
 
 		void DEC(unsigned char& reg);
+		void DEC(Register16& reg);
 		void DEC(const unsigned short address);
-		void DEC(unsigned char& ms, unsigned char& ls);
+		
 
 		void DAA(unsigned char& reg);
 		void CPL(unsigned char& reg);
@@ -91,4 +93,7 @@ class CPU {
 
 		void ret();
 		void ret(bool condition);
+
+
+		void Opcode06();
 };

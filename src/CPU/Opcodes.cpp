@@ -43,7 +43,7 @@ void CPU::loadShortIntoMemory(const unsigned short& address, const unsigned shor
 }
 
 //Load 16 bit register pair into the stack pointer
-void CPU::loadRegIntoSP(Register16 reg) {
+void CPU::loadRegIntoSP(Register16& reg) {
 	sp = reg;
 };
 
@@ -58,7 +58,7 @@ void CPU::loadHL(unsigned char val) {
 }
 
 //Pushes values inside register pair onto the stack (decrements SP twice)
-void CPU::push(Register16 reg) {
+void CPU::push(Register16& reg) {
 	memory.writeByte(--sp, reg.getHigh());
 	memory.writeByte(--sp, reg.getLow());
 }
@@ -71,11 +71,10 @@ void CPU::push(unsigned short val) {
 
 
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
-void CPU::pop(unsigned char& ms, unsigned char& ls) {
+void CPU::pop(Register16& reg) {
 	unsigned char n1 = memory.writeByte(sp++, 0);
 	unsigned char n2 = memory.writeByte(sp++, 0);
-	ms = n2;
-	ls = n1;
+	reg = (n2 << 8) | n1;
 }
 
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
@@ -96,6 +95,16 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 	F.setFlag(CARRY, (res > 0xFF));
 
 	reg = (unsigned char)res;
+}
+
+void CPU::add(Register16& reg, const unsigned short val) {
+	int res = reg + val;
+
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, (reg & 0xFFF) + (val & 0xFFF) > 0xFFF);
+	F.setFlag(CARRY, res > 0xFFFF);
+
+	reg = res;
 }
 
 //Adds a register and another value togethers and stores the result into the register
@@ -216,16 +225,6 @@ void CPU::DEC(const unsigned short address) {
 	memory.writeByte(address, res);
 }
 
-void CPU::add(unsigned char& ms, unsigned char& ls, const unsigned short val) {
-	int res = ((ms << 8) | ls) + val;
-
-	F.setFlag(SUB, false);
-	F.setFlag(HALF, (((ms << 8) | ls) & 0xFFF) + (val & 0xFFF) > 0xFFF);
-	F.setFlag(CARRY, res > 0xFFFF);
-
-	ms = ((unsigned short)res & 0xFF00) >> 8;
-	ls = (unsigned short)res & 0xFF;
-}
 
 void CPU::addSP(const char val) {
 	int res = sp + val;
@@ -236,16 +235,12 @@ void CPU::addSP(const char val) {
 	sp = (unsigned short)res;
 }
 
-void CPU::INC(unsigned char& ms, unsigned char& ls) {
-	int res = ((ms << 8) | ls) + 1;
-	ms = ((unsigned short)res & 0xFF00) >> 8;
-	ls = (unsigned short)res & 0xFF;
+void CPU::INC(Register16& reg) {
+	reg++;
 }
 
-void CPU::DEC(unsigned char& ms, unsigned char& ls) {
-	int res = ((ms << 8) | ls) - 1;
-	ms = ((unsigned short)res & 0xFF00) >> 8;
-	ls = (unsigned short)res & 0xFF;
+void CPU::DEC(Register16& reg) {
+	reg--;
 }
 
 void CPU::DAA(unsigned char& reg) {

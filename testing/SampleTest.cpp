@@ -33,3 +33,31 @@ TEST(SampleTest, Testing1) {
 
 	EXPECT_EQ(gameBoy->read(0x101B), 9);
 }
+
+TEST(SampleTest, StackTest) {
+	Memory* memory = new Memory();
+	CPU* mCPU = new CPU(*memory);
+
+	//Write 0xFF into register H
+	memory->writeByte(0x100, 0x26);
+	memory->writeByte(0x101, 0xFF);
+
+	//Write 0xA into register C
+	memory->writeByte(0x102, 0x2E);
+	memory->writeByte(0x103, 0x0A);
+
+	//Write 0xA2 into register A
+	memory->writeByte(0x104, 0x3E);
+	memory->writeByte(0x105, 0xA2);
+
+	//LDD (HL), A instruction
+	memory->writeByte(0x106, 0x32);
+
+	mCPU->run(4);
+
+	EXPECT_EQ(memory->readByte(0xFF0A), 0xA2);
+	EXPECT_EQ((int)((mCPU->H << 8) | mCPU->L), 0xFF0A - 1);
+
+	delete memory;
+	delete mCPU;
+}
