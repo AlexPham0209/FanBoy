@@ -3,7 +3,7 @@
 #include "OpcodeCycles.h"
 
 CPU::CPU(Memory& memory) : memory(memory), F(FlagRegister()), 
-AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)) {
+AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(this->memory, *this)) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -21,8 +21,6 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 
 int CPU::step() {
 	interrupts.handleInterrupts();
-	if (halt)
-		return -1;
 
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);

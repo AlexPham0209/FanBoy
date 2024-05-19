@@ -1,7 +1,4 @@
 #pragma once
-#include "CPU.h"
-#include "../Memory/Memory.h"
-
 
 enum IFLAGS {
 	VBLANK = 0,
@@ -11,72 +8,30 @@ enum IFLAGS {
 	JOYPAD = 4
 };
 
+class CPU;
 class Interrupts {
 private:
-	bool IME;
 	CPU& mCPU;
+	bool IME;
 	Memory& memory;
 	
 public:
-	Interrupts(Memory& memory, CPU& mCPU) : mCPU(mCPU), memory(memory), IME(0) {}
+	Interrupts(Memory& memory, CPU& mCPU);
 
-	void setInterruptFlag(unsigned char flag, bool condition) {
-		unsigned char IF = memory.readByte(0xFF0F);
-		unsigned char val = condition ? IF | (1 << flag) : IF & ~(1 << flag);
-		memory.writeByte(0xFF0F, val);
-	}
+	void setInterruptFlag(unsigned char flag, bool condition);
 
-	bool getInterruptFlag(unsigned char flag) {
-		unsigned char IF = memory.readByte(0xFF0F);
-		bool val = (IF >> flag) & 1;
-		return val;
-	}
+	bool getInterruptFlag(unsigned char flag);
 
-	void setInterruptEnabled(unsigned char flag, bool condition) {
-		unsigned char IF = memory.readByte(0xFFFF);
-		unsigned char val = condition ? IF | (1 << flag) : IF & ~(1 << flag);
-		memory.writeByte(0xFFFF, val);
-	}
+	void setInterruptEnabled(unsigned char flag, bool condition);
 
-	bool getInterruptEnabled(unsigned char flag) {
-		unsigned char IF = memory.readByte(0xFFFF);
-		bool val = (IF >> flag) & 1;
-		return val;
-	}
+	bool getInterruptEnabled(unsigned char flag);
 
-	void setIME(bool val) {
-		IME = val;
-	}
+	void setIME(bool val);
 
-	bool getIME() {
-		return IME;
-	}
+	bool getIME();
 
 
-	void handleInterrupts() {
-		if (mCPU.halt)
-			return;
+	void handleInterrupts();
 
-		if (getInterruptEnabled(VBLANK) && getInterruptFlag(VBLANK))
-			triggerInterrupt(VBLANK, 0x40);
-
-		if (getInterruptEnabled(LCD) && getInterruptFlag(LCD))
-			triggerInterrupt(LCD, 0x48);
-
-		if (getInterruptEnabled(TIMER) && getInterruptFlag(TIMER))
-			triggerInterrupt(TIMER, 0x50);
-
-		if (getInterruptEnabled(SERIAL) && getInterruptFlag(SERIAL))
-			triggerInterrupt(SERIAL, 0x58);
-
-		if (getInterruptEnabled(JOYPAD) && getInterruptFlag(JOYPAD))
-			triggerInterrupt(JOYPAD, 0x60);
-	}
-
-	bool triggerInterrupt(unsigned char flag, unsigned short address) {
-		mCPU.push(mCPU.pc);
-		setIME(false);
-		setInterruptFlag(flag, false);
-		mCPU.pc = address;
-	}
+	bool triggerInterrupt(unsigned char flag, unsigned short address);
 };

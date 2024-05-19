@@ -2,6 +2,7 @@
 #include "../Memory/Memory.h"
 #include "Register.h"
 #include "Interrupts.h"
+
 class CPU {
 	public:
 		//General purpose registers
