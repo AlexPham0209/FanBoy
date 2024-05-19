@@ -367,3 +367,8 @@ void CPU::ret(bool condition) {
 	if (condition)
 		ret();
 }
+
+void CPU::reti() {
+	ret();
+	interrupts.setIME(true);
+}

@@ -1,13 +1,17 @@
 #pragma once
 #include "../Memory/Memory.h"
 #include "Register.h"
+#include "Interrupts.h"
 class CPU {
 	public:
 		//General purpose registers
 		unsigned char A, B, C, D, E, H, L;
 		FlagRegister F;
+		Interrupts interrupts;
+
 		Register16 AF, BC, DE, HL;
 
+		unsigned char IF;
 		unsigned short sp, pc;
 		int cycles;
 
@@ -17,6 +21,12 @@ class CPU {
 		int step();
 		void run(int iterations);
 		void reset();
+
+		//Stack operation
+		void push(Register16& reg);
+		void push(unsigned short val);
+		void pop(Register16& reg);
+		void pop(unsigned short& val);
 
 	private:
 		Memory& memory;
@@ -39,11 +49,6 @@ class CPU {
 
 		void loadRegIntoSP(Register16& reg);
 		void loadHL(unsigned char val);
-
-		void push(Register16& reg);
-		void push(unsigned short val);
-		void pop(Register16& reg);
-		void pop(unsigned short& val);
 
 		void add(unsigned char& reg, const unsigned char val);
 		void add(Register16& reg, const unsigned short val);
@@ -93,7 +98,5 @@ class CPU {
 
 		void ret();
 		void ret(bool condition);
-
-
-		void Opcode06();
+		void reti();
 };

@@ -6,6 +6,6 @@
 
 struct Instruction {
 	std::string type;
-	void (*Instruction)();
+	void (*Execute)();
 	int cycles;
 };

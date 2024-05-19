@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include <iostream>
 
 enum FLAGS {
@@ -42,14 +42,17 @@ public:
 		F = F & ~(1 << type);
 	}
 
+	//Converts FlagRegister object to unsigned short value (copy)
 	operator unsigned char() const {
 		return F;
 	}
 
+	//Converts FlagRegister to flag value reference
 	operator unsigned char&() {
 		return F;
 	}
 	
+	//Set value of flag
 	void operator=(const unsigned short val) {
 		F = val;
 	}
@@ -66,31 +69,38 @@ private:
 public:
 	Register16(unsigned char& high, unsigned char& low) : high(high), low(low) {}
 
+	//Combine most significant and least significant byte to create a 16 bit value
 	unsigned short read() {
 		return (high << 8) | low;
 	}
 
+	//Write 16 bit value into two 8 bit registers
 	void write(unsigned short val) {
 		high = (val & 0xFF00) >> 8;
 		low = val & 0xFF;
 	}
 
+	//Converts Register16 object to unsigned short
 	operator unsigned short() {
 		return read();
 	}
 
+	//E
 	void operator=(const unsigned short val) {
 		write(val);
 	}
 
+	//Returns most significant byte
 	unsigned char& getHigh() {
 		return high;
 	}
 
+	//Return least significant byte
 	unsigned char& getLow() {
 		return low;
 	}
 
+	//Addition operation
 	unsigned short operator+=(const unsigned short val) {
 		write(read() + val);
 		return read();
@@ -109,6 +119,7 @@ public:
 		return read();
 	}
 
+	//Subtraction operation
 	unsigned short operator-=(const unsigned short val) {
 		write(read() - val);
 		return read();
