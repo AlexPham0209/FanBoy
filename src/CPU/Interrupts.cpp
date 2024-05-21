@@ -1,7 +1,7 @@
 #include "CPU.h"
 #include "Interrupts.h"
 
-Interrupts::Interrupts(Memory & memory, CPU & mCPU) : memory(memory), mCPU(mCPU), IME(0) {}
+Interrupts::Interrupts(Memory& memory, CPU& mCPU) : memory(memory), mCPU(mCPU), IME(0) {}
 
 void Interrupts::setInterruptFlag(unsigned char flag, bool condition) {
 	unsigned char IF = memory.readByte(0xFF0F);

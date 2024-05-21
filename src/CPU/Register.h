@@ -53,7 +53,7 @@ public:
 	}
 	
 	//Set value of flag
-	void operator=(const unsigned short val) {
+	void operator=(const unsigned char val) {
 		F = val;
 	}
 	

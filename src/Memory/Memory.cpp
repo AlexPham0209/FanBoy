@@ -1,10 +1,43 @@
 #include "Memory.h"
-#include <iostream>
+
+Memory::Memory(const char* path) {
+	std::vector<unsigned char> ROM = this->loadROM(path);
+	loadProgram(ROM);
+}
 
 void Memory::loadProgram(std::vector<unsigned char> ROM) {
-	for (int i = 0; i < ROM.size(); ++i) 
-		this->writeByte(0x100 + i, ROM[i]);
+	for (int i = 0; i < ROM.size(); ++i) {
+		//std::cout << i << ", " << ((int)ROM[i]) << std::endl;
+		this->writeByte(i, ROM[i]);
+	}
 }
+
+std::vector<unsigned char> Memory::loadROM(const char* path) {
+	// open the file:
+	std::ifstream file(path, std::ios::binary);
+
+	// Stop eating new lines in binary mode!!!
+	file.unsetf(std::ios::skipws);
+
+	// get its size:
+	std::streampos fileSize;
+
+	file.seekg(0, std::ios::end);
+	fileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	// reserve capacity
+	std::vector<unsigned char> vec;
+	vec.reserve(0x7FFF);
+
+	// read the data:
+	vec.insert(vec.begin(),
+		std::istream_iterator<unsigned char>(file),
+		std::istream_iterator<unsigned char>());
+
+	return vec;
+}
+
 
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
@@ -16,8 +49,10 @@ unsigned char Memory::readByte(unsigned short address) {
 
 //Reads byte values inside address i and address i + 1 then merges them into a short (little endian)
 unsigned short Memory::readShort(unsigned short address) {
+	//Making sure address is not outside of RAM
 	if (address + 1 >= sizeof(ram) / sizeof(unsigned char) || address + 1 < 0)
 		return 0;
+
 
 	return this->ram[address] | (this->ram[address + 1] << 8);
 }
@@ -25,7 +60,16 @@ unsigned short Memory::readShort(unsigned short address) {
 //Writes byte value into memory address
 unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address >= sizeof(ram) / sizeof(unsigned char) || address < 0)
-		return 0;
+		return -1;
+
+	////Can't write into read only memory
+	//if (address < 0x8000)
+	//	return -1;
+
+	////Restricted access
+	//if (address >= 0xFEA0 && address < 0xFEFF)
+	//	return -1;
+
 
 	unsigned char temp = this->ram[address];
 	this->ram[address] = val;

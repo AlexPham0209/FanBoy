@@ -12,6 +12,7 @@ void CPU::loadByteIntoRegDecrement(unsigned char& dest, Register16& src) {
 
 //Put byte inside address (AB) into register, then increment the 16 bit register
 void CPU::loadByteIntoRegIncrement(unsigned char& dest, Register16& src) {
+	std::cout << src << std::endl;
 	loadByteIntoReg(dest, memory.readByte(src++));
 }
 

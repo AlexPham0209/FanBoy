@@ -1,5 +1,6 @@
 //TODO: Create Instructions STOP, DI, EL. RETI
 #include "CPU.h"
+
 void CPU::executeOpcode(unsigned char opcode) {
 	//Executes certain instruction based on 8 bit opcode
 	switch (opcode) {
@@ -926,6 +927,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//JP nn
 		case 0xC3:
+			std::cout << "jump" << std::endl;
 			jump(memory.readShort(pc));
 			break;
 

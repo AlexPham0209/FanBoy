@@ -4,7 +4,8 @@
 
 class GameBoy {
 	public:
-		GameBoy();
+
+		GameBoy(const char* file);
 		void emulate();
 		void emulate(int iterations);
 		void write(unsigned short address, unsigned char val);

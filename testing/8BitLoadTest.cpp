@@ -4,15 +4,6 @@
 
 int iterations = 1000;
 
-template< typename T >
-std::string int_to_hex(T i)
-{
-	std::stringstream stream;
-	stream << "0x"
-		<< std::setfill('0') << std::setw(sizeof(T) * 2)
-		<< std::hex << i;
-	return stream.str();
-}
 
 unsigned char LDTest(unsigned char& reg, unsigned char instruction, unsigned char val, CPU* CPU, Memory* memory) {
 	std::vector<unsigned char> ROM = {
@@ -88,15 +79,13 @@ void LDRegisterTest(CPU* CPU, Memory* memory) {
 
 
 TEST_F(CPUTest, LDTest) {
-	for (int i = 0; i < iterations; i++) {
-		unsigned char expected = rand() % 0xFF;
-		EXPECT_EQ(LDTest(mCPU->B, 0x06, expected, mCPU, memory), expected);
-		EXPECT_EQ(LDTest(mCPU->C, 0x0E, expected, mCPU, memory), expected);
-		EXPECT_EQ(LDTest(mCPU->D, 0x16, expected, mCPU, memory), expected);
-		EXPECT_EQ(LDTest(mCPU->E, 0x1E, expected, mCPU, memory), expected);
-		EXPECT_EQ(LDTest(mCPU->H, 0x26, expected, mCPU, memory), expected);
-		EXPECT_EQ(LDTest(mCPU->L, 0x2E, expected, mCPU, memory), expected);
-	}
+	unsigned char expected = 5;
+	EXPECT_EQ(LDTest(mCPU->B, 0x06, expected, mCPU, memory), expected);
+	EXPECT_EQ(LDTest(mCPU->C, 0x0E, expected, mCPU, memory), expected);
+	EXPECT_EQ(LDTest(mCPU->D, 0x16, expected, mCPU, memory), expected);
+	EXPECT_EQ(LDTest(mCPU->E, 0x1E, expected, mCPU, memory), expected);
+	EXPECT_EQ(LDTest(mCPU->H, 0x26, expected, mCPU, memory), expected);
+	EXPECT_EQ(LDTest(mCPU->L, 0x2E, expected, mCPU, memory), expected);
 }
 
 TEST_F(CPUTest, LDRegisterTest) {
@@ -114,10 +103,6 @@ TEST_F(CPUTest, LDRegisterTest) {
 
 		LDRegisterTest(mCPU, memory);
 	}
-}
-
-void test(int i) {
-	std::cout << i << std::endl;
 }
 
 

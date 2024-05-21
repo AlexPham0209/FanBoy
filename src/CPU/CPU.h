@@ -16,11 +16,12 @@ class CPU {
 		unsigned short sp, pc;
 		int cycles;
 
-		bool halt;
+		bool halt = false;
 
 		CPU(Memory& memory);
 		int step();
 		void run(int iterations);
+		void run();
 		void reset();
 
 		//Stack operation
