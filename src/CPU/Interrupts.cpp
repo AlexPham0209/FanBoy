@@ -39,7 +39,7 @@ bool Interrupts::getIME() {
 void Interrupts::handleInterrupts() {
 	if (mCPU.halt)
 		return;
-
+		
 	if (getInterruptEnabled(VBLANK) && getInterruptFlag(VBLANK))
 		triggerInterrupt(VBLANK, 0x40);
 

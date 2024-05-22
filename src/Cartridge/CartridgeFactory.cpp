@@ -2,13 +2,13 @@
 
 
 Cartridge* CartridgeFactory::createCartridge(const char* path) {
-	std::vector<unsigned char> ROM = this->loadROM(path);
+	std::vector<unsigned char> rom = this->loadROM(path);
 
-	if (ROM.size() <= 0)
+	if (rom.size() <= 0)
 		return nullptr;
 
-	Header header = this->generateHeader(ROM);
-	MBC MBC = this->generateMBC(ROM);
+	Header header = this->generateHeader(rom);
+	MBC MBC = this->generateMBC(rom, header);
 	
 	Cartridge* cartridge = new Cartridge(header, MBC);
 	return cartridge;
@@ -47,7 +47,7 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 	return vec;
 }
 
-Header CartridgeFactory::generateHeader(std::vector<unsigned char> ROM) {
+Header CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
 	std::cout << "Generating Header" << std::endl;
 
 	std::string title;
@@ -56,18 +56,18 @@ Header CartridgeFactory::generateHeader(std::vector<unsigned char> ROM) {
 
 	//Read title
 	for (int i = 0; i < 16; ++i) 
-		title.push_back((char)ROM[i + 0x0134]);
+		title.push_back((char)rom[i + 0x0134]);
 	
 	
 	//Read license codes
 
-	newLicense = std::to_string((int)ROM[0x0144]) + std::to_string((int)ROM[0x145]);
-	oldLicense = (char)ROM[0x014B];
+	newLicense = std::to_string((int)rom[0x0144]) + std::to_string((int)rom[0x145]);
+	oldLicense = (char)rom[0x014B];
 	
-	unsigned char version = ROM[0x14C];
-	unsigned char SGBFlag = ROM[0x0146];
-	int romSize = 32 * (1 << ROM[0x0148]);
-	int ramSize = ROM[0x149] <= 0x01 ? 0 : 8 * pow(4,(ROM[0x149] - 2));
+	unsigned char version = rom[0x14C];
+	unsigned char SGBFlag = rom[0x0146];
+	int romSize = 32 * (1 << rom[0x0148]);
+	int ramSize = rom[0x149] <= 0x01 ? 0 : 8 * pow(4,(rom[0x149] - 2));
 	
 
 	//Create header object to be injected into resulting cartidge
@@ -75,27 +75,29 @@ Header CartridgeFactory::generateHeader(std::vector<unsigned char> ROM) {
 	return header;
 }
 
-MBC CartridgeFactory::generateMBC(std::vector<unsigned char> ROM) {
+MBC CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header header) {
 	std::cout << "Generating Memory Bank Controller" << std::endl;
-	unsigned char type = ROM[0x147];
+	unsigned char type = rom[0x147];
 	switch (type) {
 
 		//ROM only
 		case 0x00:
-			return MBC();
+			return MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
 	
 		//MBC1
 		case 0x01: case 0x02: case 0x03:
-			return MBC();
+			return  MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
 		
 		//MBC2
 		case 0x05: case 0x06:
-			return MBC();
+			return  MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
 
 		//MBC3
 		case 0x0F: case 0x10: case 0x11: case 0x12: case 0x13:
-			return MBC();
+			return  MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
 	}
+
+	return MBC0(header.romSize, header.ramSize, std::vector<unsigned char>(header.romSize), std::vector<unsigned char>(header.ramSize));
 }
 
 CartridgeFactory* CartridgeFactory::getInstance() {

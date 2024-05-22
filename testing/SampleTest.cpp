@@ -35,7 +35,8 @@
 //}
 
 TEST(SampleTest, StackTest) {
-	Memory* memory = new Memory();
+	Cartridge* cartridge = new Cartridge();
+	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
 
 	//Write 0xFF into register H
@@ -60,4 +61,5 @@ TEST(SampleTest, StackTest) {
 
 	delete memory;
 	delete mCPU;
+	delete cartridge;
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <array>
 #include "../Cartridge/Cartridge.h"
 #include <map>
 
@@ -22,9 +23,9 @@ const std::map<unsigned char, std::string> oldLicenseCode = {
 class Memory {
 public:
 	Memory(const char* path);
-	Memory();
-
 	Memory(Cartridge& cartridge);
+
+	void loadProgram(std::vector<unsigned char> rom);
 	unsigned char readByte(unsigned short address);
 	unsigned short readShort(unsigned short address);
 	unsigned char writeByte(unsigned short address, unsigned char val);
@@ -32,6 +33,6 @@ public:
 	void clear();
 
 private:
-	unsigned char ram[0xFFFF];
+	std::array<unsigned char, 0x8000> ram;
 	Cartridge& cartridge;
 };

@@ -18,12 +18,23 @@ struct Header {
 class Cartridge {
 private:
 	std::vector<unsigned char> ROM;
+	MBC& memory;
+	Header& header;
 
 public:
-	MBC memory;
-	Header header;
+	Cartridge(Header& header, MBC& memory);
+	Cartridge();
+	~Cartridge() {
+		delete &memory;
+		delete &header;
+	}
 
-	Cartridge(Header header, MBC memory);
+	unsigned char readByte(unsigned short address);
+	unsigned char writeByte(unsigned short address, unsigned char val);
+
+	unsigned short readShort(unsigned short address);
+	unsigned short writeShort(unsigned short address, unsigned short val);
+
 	std::string getInfo();
 
 };

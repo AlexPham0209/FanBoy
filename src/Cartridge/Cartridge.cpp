@@ -1,9 +1,28 @@
 #include "Cartridge.h"
 
 
+Cartridge::Cartridge() : header(*(new Header())), memory(*(new MBC(0, 0, *(new std::vector<unsigned char>(0)), *(new std::vector<unsigned char>(0))))) {}
 
-Cartridge::Cartridge(Header header, MBC memory) : header(header), memory(memory) {
+Cartridge::Cartridge(Header& header, MBC& memory) : header(header), memory(memory) {
 	std::cout << this->getInfo() << std::endl;
+}
+
+
+unsigned char Cartridge::readByte(unsigned short address) {
+	std::cout << "read" << std::endl;
+	return memory.readByte(address);
+}
+
+unsigned char Cartridge::writeByte(unsigned short address, unsigned char val) {
+	return memory.writeByte(address, val);
+}
+
+unsigned short Cartridge::readShort(unsigned short address) {
+	return memory.readShort(address);
+}
+
+unsigned short Cartridge::writeShort(unsigned short address, unsigned short val) {
+	return memory.writeShort(address, val);
 }
 
 std::string Cartridge::getInfo() {

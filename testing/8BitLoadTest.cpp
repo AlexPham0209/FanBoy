@@ -107,7 +107,8 @@ TEST_F(CPUTest, LDRegisterTest) {
 
 
 TEST(SampleTest, LoadRegDecrementTest) {
-	Memory* memory = new Memory();
+	Cartridge* cartridge = new Cartridge();
+	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
 
 	//Write 0xA2 in memory address 0xFF0A
@@ -136,7 +137,8 @@ TEST(SampleTest, LoadRegDecrementTest) {
 
 
 TEST(SampleTest, ShortLoadTest) {
-	Memory* memory = new Memory();
+	Cartridge* cartridge = new Cartridge();
+	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
 
 	memory->writeByte(0x100, 0x01);

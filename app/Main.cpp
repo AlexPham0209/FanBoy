@@ -8,22 +8,15 @@ int main() {
 
 	//Creates Cartridge
 	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(tetris);
+	Cartridge* cartridge = cartridgeFactory->createCartridge(test);
 
-	//Header header = cartridge->header;
-	/*Memory* memory = new Memory("C:/Users/RedAP/Downloads/06-ld r,r.gb");
+	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
-	mCPU->run(20);s
+	mCPU->run(5);
 
-	if (memory->readByte(0xFF02) == 0x81) {
-		char c = memory->readByte(0xff01);
-		printf("%c", c);
-		memory->writeByte(0xff02, 0x0);
-	}
 
-	delete memory;
-	delete mCPU;*/
 	delete cartridge;
-
+	delete memory;
+	delete mCPU;
 	return 0;
 }

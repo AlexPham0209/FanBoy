@@ -20,12 +20,12 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 }
 
 int CPU::step() {
-	interrupts.handleInterrupts();
-	std::cout << "PC: " << pc << std::endl;
+	//interrupts.handleInterrupts();
+	std::cout << std::hex << "PC: " << pc << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
 
-	std::cout << (int)opcode << std::endl;
+	std::cout << std::hex << (int)opcode << std::endl;
 	std::cout << "A: " << (int)A << std::endl;
 	std::cout << "B: " << (int)B << std::endl;
 	std::cout << "C: " << (int)C << std::endl;
