@@ -1,44 +1,6 @@
 #include "Memory.h"
 
-Memory::Memory(const char* path) {
-	std::vector<unsigned char> ROM = this->loadROM(path);
-	loadProgram(ROM);
-}
-
-void Memory::loadProgram(std::vector<unsigned char> ROM) {
-	for (int i = 0; i < ROM.size(); ++i) {
-		//std::cout << i << ", " << ((int)ROM[i]) << std::endl;
-		this->writeByte(i, ROM[i]);
-	}
-}
-
-std::vector<unsigned char> Memory::loadROM(const char* path) {
-	// open the file:
-	std::ifstream file(path, std::ios::binary);
-
-	// Stop eating new lines in binary mode!!!
-	file.unsetf(std::ios::skipws);
-
-	// get its size:
-	std::streampos fileSize;
-
-	file.seekg(0, std::ios::end);
-	fileSize = file.tellg();
-	file.seekg(0, std::ios::beg);
-
-	// reserve capacity
-	std::vector<unsigned char> vec;
-	vec.reserve(0x7FFF);
-
-	// read the data:
-	vec.insert(vec.begin(),
-		std::istream_iterator<unsigned char>(file),
-		std::istream_iterator<unsigned char>());
-
-	return vec;
-}
-
-
+Memory::Memory(Cartridge& cartridge) : cartridge(cartridge) {}
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
 	if (address >= sizeof(ram) / sizeof(unsigned char) || address < 0)

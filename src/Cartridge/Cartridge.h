@@ -1,11 +1,14 @@
 #pragma once
 #include <fstream>
 #include <vector>
+#include <sstream>
+#include <iostream>
 #include "MBC.h"
 
 struct Header {
 	std::string title;
-	std::string license;
+	std::string newLicense;
+	char oldLicense;
 	unsigned char version;
 	unsigned char SGBFlag;
 	int romSize;
@@ -20,7 +23,7 @@ public:
 	MBC memory;
 	Header header;
 
-	Cartridge(const char* path);
 	Cartridge(Header header, MBC memory);
+	std::string getInfo();
 
 };

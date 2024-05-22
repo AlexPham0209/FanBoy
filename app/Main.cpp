@@ -5,8 +5,12 @@
 int main() {
 	const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 	const char* test = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
-	Cartridge* cartridge = CartridgeFactory::getInstance()->createCartridge(tetris);
-	std::cout << cartridge->header.title << std::endl;
+
+	//Creates Cartridge
+	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
+	Cartridge* cartridge = cartridgeFactory->createCartridge(tetris);
+
+	//Header header = cartridge->header;
 	/*Memory* memory = new Memory("C:/Users/RedAP/Downloads/06-ld r,r.gb");
 	CPU* mCPU = new CPU(*memory);
 	mCPU->run(20);s

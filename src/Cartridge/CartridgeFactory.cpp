@@ -1,17 +1,5 @@
 #include "CartridgeFactory.h"
 
-const std::map<unsigned char, const char*> newLicenseCode = {
-	{0x00, "NONE"}, 
-	{0x01, "Nintendo Research and Development"},
-	{0x08, "Capcom"},
-	{0x13, "EA"}, 
-	{0x18, "Hudston Soft"},
-	{0x19, "B-AI"},
-};
-
-const std::map<unsigned char, std::string> oldLicenseCode = {
-	 
-};
 
 Cartridge* CartridgeFactory::createCartridge(const char* path) {
 	std::vector<unsigned char> ROM = this->loadROM(path);
@@ -21,11 +9,13 @@ Cartridge* CartridgeFactory::createCartridge(const char* path) {
 
 	Header header = this->generateHeader(ROM);
 	MBC MBC = this->generateMBC(ROM);
+	
 	Cartridge* cartridge = new Cartridge(header, MBC);
 	return cartridge;
 }
 
 std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
+	std::cout << "Loading ROM: " << path << std::endl;
 	std::ifstream file(path, std::ios::binary);
 
 	if (file.fail()) {
@@ -58,18 +48,35 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 }
 
 Header CartridgeFactory::generateHeader(std::vector<unsigned char> ROM) {
-	//Initialize title of ROM
+	std::cout << "Generating Header" << std::endl;
+
 	std::string title;
+	std::string newLicense;
+	char oldLicense;
+
+	//Read title
 	for (int i = 0; i < 16; ++i) 
 		title.push_back((char)ROM[i + 0x0134]);
 	
+	
+	//Read license codes
 
-	Header header = {title, "", 0, 0, 0, 0};
+	newLicense = std::to_string((int)ROM[0x0144]) + std::to_string((int)ROM[0x145]);
+	oldLicense = (char)ROM[0x014B];
+	
+	unsigned char version = ROM[0x14C];
+	unsigned char SGBFlag = ROM[0x0146];
+	int romSize = 32 * (1 << ROM[0x0148]);
+	int ramSize = ROM[0x149] <= 0x01 ? 0 : 8 * pow(4,(ROM[0x149] - 2));
+	
 
+	//Create header object to be injected into resulting cartidge
+	Header header = {title, newLicense, oldLicense, version, SGBFlag, romSize, ramSize};
 	return header;
 }
 
 MBC CartridgeFactory::generateMBC(std::vector<unsigned char> ROM) {
+	std::cout << "Generating Memory Bank Controller" << std::endl;
 	unsigned char type = ROM[0x147];
 	switch (type) {
 
