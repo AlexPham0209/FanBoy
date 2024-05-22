@@ -8,9 +8,9 @@ MBC0::MBC0(unsigned char romBankSize, unsigned char ramBankSize, std::vector<uns
 }
 
 unsigned char MBC0::readByte(unsigned short address) {
-	std::cout << rom[address] << std::endl;
 	return rom[address];
 }
+
 unsigned char MBC0::writeByte(unsigned short address, unsigned char val) {
 	return NULL;
 }

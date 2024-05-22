@@ -21,21 +21,9 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 
 int CPU::step() {
 	//interrupts.handleInterrupts();
-	std::cout << std::hex << "PC: " << pc << std::endl;
+	std::cout << debug() << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
-
-	std::cout << std::hex << (int)opcode << std::endl;
-	std::cout << "A: " << (int)A << std::endl;
-	std::cout << "B: " << (int)B << std::endl;
-	std::cout << "C: " << (int)C << std::endl;
-	std::cout << "D: " << (int)D << std::endl;
-	std::cout << "E: " << (int)E << std::endl;
-	std::cout << "F: " << (int)F << std::endl;
-	std::cout << "H: " << (int)H << std::endl;
-	std::cout << "L: " << (int)L << std::endl;
-	std::cout << "Cycles: " << cycles << "\n" << std::endl;
-
 	cycles = opcodeCycles[opcode];
 	return cycles;
 }
@@ -66,6 +54,26 @@ void CPU::reset() {
 	F = 0x0000;
 	H = 0x0000;
 	L = 0x0000;
+}
+
+std::string CPU::debug() {
+	std::stringstream ss;
+
+	ss << "A: " << std::hex << (int)A << "  ";
+	ss << "F: " << std::hex << (int)F << "  ";
+	ss << "B: " << std::hex << (int)B << "  ";
+	ss << "C: " << std::hex << (int)C << "  ";
+	ss << "D: " << std::hex << (int)D << "  ";
+	ss << "E: " << std::hex << (int)E << "  ";
+	ss << "H: " << std::hex << (int)H << "  ";
+	ss << "L: " << std::hex << (int)L << "  ";
+
+	ss << "SP: " << std::hex << (int)sp << "  ";
+	ss << "PC: " << std::hex << (int)pc << "  ";
+
+	ss << std::hex << "(" << (int)memory.readByte(pc) << " " << (int)memory.readByte(pc + 1) << " " << (int)memory.readByte(pc + 2) << " " << (int)memory.readByte(pc + 3) << ")";
+
+	return ss.str();
 }
 
 

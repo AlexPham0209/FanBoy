@@ -12,7 +12,6 @@ void CPU::loadByteIntoRegDecrement(unsigned char& dest, Register16& src) {
 
 //Put byte inside address (AB) into register, then increment the 16 bit register
 void CPU::loadByteIntoRegIncrement(unsigned char& dest, Register16& src) {
-	std::cout << src << std::endl;
 	loadByteIntoReg(dest, memory.readByte(src++));
 }
 
@@ -326,7 +325,7 @@ void CPU::jump(unsigned short address) {
 }
 
 void CPU::jump(char val) {
-	pc += val;
+	pc += val + 1;
 }
 
 void CPU::jump(unsigned short address, bool condition) {
@@ -338,7 +337,7 @@ void CPU::jump(unsigned short address, bool condition) {
 
 void CPU::jump(char val, bool condition) {
 	if (condition)
-		pc += val;
+		pc += val + 1;
 	else
 		pc += 2;
 }

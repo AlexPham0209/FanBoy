@@ -1,4 +1,6 @@
 #include <vector>
+#include <iostream>
+
 
 class MBC {
 protected:
@@ -9,11 +11,11 @@ protected:
 
 public:
 	MBC(unsigned char ramBankSize, unsigned char romBankSize, std::vector<unsigned char> rom, std::vector<unsigned char> ram);
-	virtual unsigned char readByte(unsigned short address) { return 0x0; }
-	virtual unsigned char writeByte(unsigned short address, unsigned char val) { return 0x0; }
-
-	virtual unsigned short readShort(unsigned short address) { return 0x0; }
-	virtual unsigned short writeShort(unsigned short address, unsigned short val) { return 0x0; }
+	virtual unsigned char readByte(unsigned short address) = 0;
+	virtual unsigned char writeByte(unsigned short address, unsigned char val) = 0;
+		
+	virtual unsigned short readShort(unsigned short address) = 0;
+	virtual unsigned short writeShort(unsigned short address, unsigned short val) = 0;
 };
 
 class MBC0 : public MBC {

@@ -29,6 +29,7 @@ class CPU {
 		void push(unsigned short val);
 		void pop(Register16& reg);
 		void pop(unsigned short& val);
+		std::string debug();
 
 	private:
 		Memory& memory;

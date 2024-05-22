@@ -927,7 +927,6 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//JP nn
 		case 0xC3:
-			std::cout << "jump" << std::endl;
 			jump(memory.readShort(pc));
 			break;
 
@@ -955,10 +954,11 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//JR n
 		case 0x18:
-			jump((char)memory.readByte(pc++));
+			jump((char)memory.readByte(pc));
 			break;
 
 		//JR cc, n
+		//BUG?!?!
 		case 0x20:
 			jump((char)memory.readByte(pc), !F.getFlag(ZERO));
 			break;

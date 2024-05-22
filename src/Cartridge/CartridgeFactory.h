@@ -17,7 +17,7 @@ public:
 private:
 	std::vector<unsigned char> loadROM(const char* path);
 	Header generateHeader(std::vector<unsigned char> ROM);
-	MBC generateMBC(std::vector<unsigned char> ROM, Header header);
+	MBC* generateMBC(std::vector<unsigned char> ROM, Header header);
 
 
 };
