@@ -1,11 +1,9 @@
 #include "MBC.h"
 
-MBC::MBC(unsigned char romBankSize, unsigned char ramBankSize, std::vector<unsigned char> rom, std::vector<unsigned char> ram) : 
-	romBankSize(romBankSize), ramBankSize(ramBankSize), rom(rom), ram(ram) {}
+MBC::MBC(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : rom(rom), ram(ram), header(header) {}
 
-MBC0::MBC0(unsigned char romBankSize, unsigned char ramBankSize, std::vector<unsigned char> rom, std::vector<unsigned char> ram) :
-	MBC(romBankSize, ramBankSize, rom, ram) {
-}
+MBC0::MBC0(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : MBC(rom, ram, header) {}
+
 
 unsigned char MBC0::readByte(unsigned short address) {
 	return rom[address];

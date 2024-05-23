@@ -1,17 +1,21 @@
 #include "CartridgeFactory.h"
 
+CartridgeFactory::CartridgeFactory() {}
 
+//Creates a heap-allocated cartridge object 
 Cartridge* CartridgeFactory::createCartridge(const char* path) {
+	//Load in data from binary file 
 	std::vector<unsigned char> rom = this->loadROM(path);
-	std::cout << rom.size() << std::endl;
 
+	//Check if rom is valid 
 	if (rom.size() <= 0)
 		return nullptr;
 
-	Header header = this->generateHeader(rom);
-	MBC* MBC = this->generateMBC(rom, header);
+	//Generate the header data and the memory bank controllers of the string
+	Header* header = this->generateHeader(rom);
+	MBC* MBC = this->generateMBC(rom, *header);
 	
-	Cartridge* cartridge = new Cartridge(header, *MBC);
+	Cartridge* cartridge = new Cartridge(*header, *MBC);
 	return cartridge;
 }
 
@@ -19,6 +23,7 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 	std::cout << "Loading ROM: " << path << std::endl;
 	std::ifstream file(path, std::ios::binary);
 
+	//If file failed to load, return empty vector
 	if (file.fail()) {
 		std::cout << "File failed to load or doesn't exist" << std::endl;
 		std::cout << "Error: " << strerror(errno);
@@ -31,6 +36,7 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 	// get its size:
 	std::streampos fileSize;
 
+	//Read file from start to end to get the file size
 	file.seekg(0, std::ios::end);
 	fileSize = file.tellg();
 	file.seekg(0, std::ios::beg);
@@ -41,14 +47,13 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 	vec.resize(fileSize);
 
 	// read the data:
-	vec.insert(vec.begin(),
-		std::istream_iterator<unsigned char>(file),
-		std::istream_iterator<unsigned char>());
+	vec.insert(vec.begin(), std::istream_iterator<unsigned char>(file), std::istream_iterator<unsigned char>());
 
 	return vec;
 }
 
-Header CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
+//Reads data from Cartridge's header and generates a struct containing all necessary information 
+Header* CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
 	std::cout << "Generating Header" << std::endl;
 
 	std::string title;
@@ -61,7 +66,6 @@ Header CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
 	
 	
 	//Read license codes
-
 	newLicense = std::to_string((int)rom[0x0144]) + std::to_string((int)rom[0x145]);
 	oldLicense = (char)rom[0x014B];
 	
@@ -72,41 +76,39 @@ Header CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
 	
 
 	//Create header object to be injected into resulting cartidge
-	Header header = {title, newLicense, oldLicense, version, SGBFlag, romSize, ramSize};
+	Header* header = new Header {title, newLicense, oldLicense, version, SGBFlag, romSize, ramSize};
 	return header;
 }
 
-MBC* CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header header) {
+
+//Reads address 0x147 in ROM and generate its corresponding Memory Bank Controller
+MBC* CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header& header) {
 	std::cout << "Generating Memory Bank Controller" << std::endl;
 	unsigned char type = rom[0x147];
-	switch (type) {
 
+	switch (type) {
 		//ROM only
 		case 0x00:
-			return new MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
 		
 		//MBC1
 		case 0x01: case 0x02: case 0x03:
-			return new MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
 		
 		//MBC2
 		case 0x05: case 0x06:
-			return new MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
 
 		//MBC3
 		case 0x0F: case 0x10: case 0x11: case 0x12: case 0x13:
-			return new MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
 	}
 
-	return new MBC0(header.romSize, header.ramSize, rom, std::vector<unsigned char>(header.ramSize));
+	return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
 }
 
 CartridgeFactory* CartridgeFactory::getInstance() {
 	if (instance == nullptr)
 		instance = new CartridgeFactory();
 	return instance;
-}
-
-CartridgeFactory::CartridgeFactory()
-{
 }

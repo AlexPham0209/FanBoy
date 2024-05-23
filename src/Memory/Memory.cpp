@@ -4,7 +4,6 @@ Memory::Memory(Cartridge& cartridge) : cartridge(cartridge) {
 	clear();
 }
 
-
 void Memory::loadProgram(std::vector<unsigned char> rom) {
 	for (int i = 0; i < rom.size(); ++i) {
 		this->writeByte(0x100 + i, rom[i]);
@@ -41,9 +40,12 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
 
-
+	//Writing into the r
 	if (address <= 0x7FFF)
-		return NULL;
+		return cartridge.writeByte(address, val);
+
+	if (address >= 0xA000 && address <= 0xBFFF)
+		return cartridge.writeByte(address, val);
 
 	//Invalid region 
 	if (address >= 0x7EA0 && address <= 0x7EFF)

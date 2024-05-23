@@ -1,4 +1,5 @@
 #include "Cartridge.h"
+#include "Header.h"
 #include <map>
 #include <iostream>
 
@@ -16,8 +17,6 @@ public:
 
 private:
 	std::vector<unsigned char> loadROM(const char* path);
-	Header generateHeader(std::vector<unsigned char> ROM);
-	MBC* generateMBC(std::vector<unsigned char> ROM, Header header);
-
-
+	Header* generateHeader(std::vector<unsigned char> ROM);
+	MBC* generateMBC(std::vector<unsigned char> ROM, Header& header);
 };
