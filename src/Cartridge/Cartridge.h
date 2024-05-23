@@ -21,12 +21,12 @@ const std::map<unsigned char, std::string> oldLicenseCode = {
 
 class Cartridge {
 private:
-	std::vector<unsigned char> ROM;
 	MBC& memory;
 	Header& header;
 
 public:
 	Cartridge(Header& header, MBC& memory);
+
 	~Cartridge() {
 		delete &memory;
 		delete &header;
@@ -39,5 +39,4 @@ public:
 	unsigned short writeShort(unsigned short address, unsigned short val);
 
 	std::string getInfo();
-
 };
