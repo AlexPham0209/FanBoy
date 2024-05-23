@@ -1,6 +1,6 @@
 #include "Cartridge.h"
 
-
+Cartridge::Cartridge() : header(*(new Header())), memory(*(new MBC0(0, 0, std::vector<unsigned char>(), std::vector<unsigned char>()))) {}
 Cartridge::Cartridge(Header& header, MBC& memory) : header(header), memory(memory) {
 	std::cout << this->getInfo() << std::endl;
 }

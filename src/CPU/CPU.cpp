@@ -21,7 +21,7 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 
 int CPU::step() {
 	//interrupts.handleInterrupts();
-	std::cout << debug() << std::endl;
+	//std::cout << debug() << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
 	cycles = opcodeCycles[opcode];
@@ -29,8 +29,17 @@ int CPU::step() {
 }
 
 void CPU::run(int iterations) {
-	for (int i = 0; i < iterations; ++i)
+	std::ofstream file;
+	file.open("C:/Users/RedAP/Desktop/Output.txt");
+	for (int i = 0; i < iterations; ++i) {	
+		if (i == 16507)
+			std::cout << std::hex << (int)memory.readByte(0xFF00 + memory.readByte(pc + 1)) << std::dec << std::endl;
+		file << i << ": ";
+		file << debug() << std::endl;
+		//std::cout << debug() << std::endl;
 		step();
+	}
+	file.close();
 }
 
 void CPU::run() {

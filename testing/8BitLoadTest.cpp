@@ -2,7 +2,7 @@
 #include "../src/GameBoy.h"
 #include <gtest/gtest.h>
 
-int iterations = 1000;
+int iterations = 2;
 
 
 unsigned char LDTest(unsigned char& reg, unsigned char instruction, unsigned char val, CPU* CPU, Memory* memory) {

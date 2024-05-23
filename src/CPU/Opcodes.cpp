@@ -325,7 +325,7 @@ void CPU::jump(unsigned short address) {
 }
 
 void CPU::jump(char val) {
-	pc += val + 1;
+	pc += val;
 }
 
 void CPU::jump(unsigned short address, bool condition) {
@@ -337,9 +337,7 @@ void CPU::jump(unsigned short address, bool condition) {
 
 void CPU::jump(char val, bool condition) {
 	if (condition)
-		pc += val + 1;
-	else
-		pc += 2;
+		pc += val;
 }
 
 void CPU::call(unsigned short address) {

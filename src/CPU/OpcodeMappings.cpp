@@ -954,25 +954,25 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//JR n
 		case 0x18:
-			jump((char)memory.readByte(pc));
+			jump((char)memory.readByte(pc++));
 			break;
 
 		//JR cc, n
 		//BUG?!?!
 		case 0x20:
-			jump((char)memory.readByte(pc), !F.getFlag(ZERO));
+			jump((char)memory.readByte(pc++), !F.getFlag(ZERO));
 			break;
 
 		case 0x28:
-			jump((char)memory.readByte(pc), F.getFlag(ZERO));
+			jump((char)memory.readByte(pc++), F.getFlag(ZERO));
 			break;
 
 		case 0x30:
-			jump((char)memory.readByte(pc), !F.getFlag(CARRY));
+			jump((char)memory.readByte(pc++), !F.getFlag(CARRY));
 			break;
 
 		case 0x38:
-			jump((char)memory.readByte(pc), F.getFlag(CARRY));
+			jump((char)memory.readByte(pc++), F.getFlag(CARRY));
 			break;
 
 		//CALL nn
