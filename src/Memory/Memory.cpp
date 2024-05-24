@@ -13,9 +13,10 @@ void Memory::loadProgram(std::vector<unsigned char> rom) {
 
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
+	//Reading external cartridge ROM 
 	if (address <= 0x7FFF)
 		return cartridge.readByte(address);
-
+		
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.readByte(address);
 
@@ -23,11 +24,11 @@ unsigned char Memory::readByte(unsigned short address) {
 	if (address >= 0x7EA0 && address <= 0x7EFF)
 		return NULL;
 
-	//Echo RAM region
+	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
 	if (address >= 0xE000 && address <= 0xFDFF)
-		return this->ram[address - 0x2000];
+		return ram[address - 0x2000];
 
-	return this->ram[address];
+ 	return ram[address];
 }
 
 //Reads byte values inside address i and address i + 1 then merges them into a short (little endian)
@@ -40,10 +41,11 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
 
-	//Writing into the r
+	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
 	if (address <= 0x7FFF)
 		return cartridge.writeByte(address, val);
 
+	//Writing into Cartridge's external RAM
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.writeByte(address, val);
 
@@ -51,27 +53,26 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address >= 0x7EA0 && address <= 0x7EFF)
 		return NULL;
 
-	//Echo RAM region
+	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
 	if (address >= 0xE000 && address <= 0xFDFF) {
 		unsigned char temp = this->ram[address - 0x2000];
-		this->ram[address - 0x2000] = val;
+		ram[address - 0x2000] = val;
 		return temp;
 	}
 
-	//External RAM
-	if (address >= 0xA000 && address <= 0xBFFF)
-		return cartridge.writeShort(address, val);
+	if (address >= 0xFF00)
+		std::cout << std::hex << address << ": " << (int)val << std::dec << std::endl;
 
 	unsigned char temp = this->ram[address];
-	this->ram[address] = val;
+	ram[address] = val;
 	return temp;
 }
 
 //Writes short value into memory address i and i + 1 (little endian)
 unsigned short Memory::writeShort(unsigned short address, unsigned short val) {
 	unsigned short temp = readByte(address) | readByte(address + 1) << 8;
-	this->ram[address] = val & 0x00FF;
-	this->ram[address + 1] = (val & 0xFF00) >> 8;
+	ram[address] = val & 0x00FF;
+	ram[address + 1] = (val & 0xFF00) >> 8;
 	return temp;
 }
 

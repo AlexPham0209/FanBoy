@@ -21,7 +21,6 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 
 int CPU::step() {
 	//interrupts.handleInterrupts();
-	//std::cout << debug() << std::endl;
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
 	cycles = opcodeCycles[opcode];
@@ -32,11 +31,15 @@ void CPU::run(int iterations) {
 	std::ofstream file;
 	file.open("C:/Users/RedAP/Desktop/Output.txt");
 	for (int i = 0; i < iterations; ++i) {	
-		if (i == 16507)
-			std::cout << std::hex << (int)memory.readByte(0xFF00 + memory.readByte(pc + 1)) << std::dec << std::endl;
-		file << i << ": ";
-		file << debug() << std::endl;
-		//std::cout << debug() << std::endl;
+		unsigned char val = memory.readByte(pc);
+		if (val == 0x70 || val == 0x70 || val == 0x71 || val == 0x72 || val == 0x73 || val == 0x74 ||
+			val == 0x75 || val == 0x36 || val == 0x02 || val == 0x12 || val == 0x77 || val == 0xEA ||
+			val == 0xE2 || val == 0x32 || val == 0x22 || val == 0xE0) {
+			
+			file << i << ": ";
+			file << debug() << std::endl;
+			
+		}
 		step();
 	}
 	file.close();
@@ -81,6 +84,8 @@ std::string CPU::debug() {
 	ss << "PC: " << std::hex << (int)pc << "  ";
 
 	ss << std::hex << "(" << (int)memory.readByte(pc) << " " << (int)memory.readByte(pc + 1) << " " << (int)memory.readByte(pc + 2) << " " << (int)memory.readByte(pc + 3) << ")";
+
+	//ss << std::hex << "(" << (int)memory.readByte(pc) << ")" << std::endl;
 
 	return ss.str();
 }

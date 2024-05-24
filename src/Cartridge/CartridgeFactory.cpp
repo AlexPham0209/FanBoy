@@ -5,15 +5,15 @@ CartridgeFactory::CartridgeFactory() {}
 //Creates a heap-allocated cartridge object 
 Cartridge* CartridgeFactory::createCartridge(const char* path) {
 	//Load in data from binary file 
-	std::vector<unsigned char> rom = this->loadROM(path);
+	std::vector<unsigned char> rom = loadROM(path);
 
 	//Check if rom is valid 
 	if (rom.size() <= 0)
 		return nullptr;
 
 	//Generate the header data and the memory bank controllers of the string
-	Header* header = this->generateHeader(rom);
-	MBC* MBC = this->generateMBC(rom, *header);
+	Header* header = generateHeader(rom);
+	MBC* MBC = generateMBC(rom, *header);
 	
 	Cartridge* cartridge = new Cartridge(*header, *MBC);
 	return cartridge;

@@ -19,17 +19,21 @@ void CPU::loadByteIntoRegIncrement(unsigned char& dest, Register16& src) {
 //Load value inside register into memory location
 void CPU::loadByteIntoMemory(const unsigned short& address, const unsigned char& reg) {
 	memory.writeByte(address, reg);
+	std::cout << std::hex << (int)address << ", " << (int)reg << std::dec << std::endl;
+	std::cout << std::hex << (int)memory.readByte(address) << std::dec << "\n" << std::endl;
 }
 
 //Load byte inside register into memory address (AB), then decrement the 16 bit register 
 void CPU::loadByteIntoMemoryDecrement(Register16& dest, unsigned char& src) {
 	loadByteIntoMemory(dest--, src);
+	std::cout << std::hex << (int)memory.readByte(dest + 1) << std::dec << std::endl;
 }
 
 
 //Load byte inside register into memory address (AB), then decrement the 16 bit register 
 void CPU::loadByteIntoMemoryIncrement(Register16& dest, unsigned char& src) {
 	loadByteIntoMemory(dest++, src);
+	std::cout << std::hex << (int)memory.readByte(dest + 1) << std::dec << std::endl;
 }
 
 //Load short into the 16 bit register which is just 2 8 bit registers

@@ -1,7 +1,7 @@
 #include "Cartridge.h"
 
 Cartridge::Cartridge(Header& header, MBC& memory) : header(header), memory(memory) {
-	std::cout << this->getInfo() << std::endl;
+	std::cout << getInfo() << std::endl;
 }
 
 unsigned char Cartridge::readByte(unsigned short address) {

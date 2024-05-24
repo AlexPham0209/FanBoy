@@ -12,7 +12,7 @@ int main() {
 
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
-	mCPU->run(300000);
+	mCPU->run(100);
 
 	delete cartridge;
 	delete memory;

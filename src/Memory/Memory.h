@@ -21,6 +21,6 @@ public:
 	void clear();
 
 private:
-	std::array<unsigned char, 0xFFFF + 1> ram;
+	std::array<unsigned char, (0xFFFF + 1)> ram;
 	Cartridge& cartridge;
 };
