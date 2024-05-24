@@ -10,7 +10,6 @@
 
 class Memory {
 public:
-	Memory(const char* path);
 	Memory(Cartridge& cartridge);
 
 	void loadProgram(std::vector<unsigned char> rom);
@@ -21,6 +20,6 @@ public:
 	void clear();
 
 private:
-	std::array<unsigned char, (0xFFFF + 1)> ram;
 	Cartridge& cartridge;
+	std::vector<unsigned char> ram;
 };

@@ -3,7 +3,7 @@
 #include "OpcodeCycles.h"
 
 CPU::CPU(Memory& memory) : memory(memory), F(FlagRegister()), 
-AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(this->memory, *this)) {
+AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -20,7 +20,7 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 }
 
 int CPU::step() {
-	//interrupts.handleInterrupts();
+	interrupts.handleInterrupts();
 	unsigned char opcode = fetchOpcode();
 	executeOpcode(opcode);
 	cycles = opcodeCycles[opcode];
@@ -31,23 +31,23 @@ void CPU::run(int iterations) {
 	std::ofstream file;
 	file.open("C:/Users/RedAP/Desktop/Output.txt");
 	for (int i = 0; i < iterations; ++i) {	
-		unsigned char val = memory.readByte(pc);
-		if (val == 0x70 || val == 0x70 || val == 0x71 || val == 0x72 || val == 0x73 || val == 0x74 ||
-			val == 0x75 || val == 0x36 || val == 0x02 || val == 0x12 || val == 0x77 || val == 0xEA ||
-			val == 0xE2 || val == 0x32 || val == 0x22 || val == 0xE0) {
-			
-			file << i << ": ";
-			file << debug() << std::endl;
-			
-		}
+		file << i << ": ";
+		file << debug() << std::endl;
 		step();
 	}
 	file.close();
 }
 
 void CPU::run() {
-	while(!halt)
+	std::ofstream file;
+	file.open("C:/Users/RedAP/Desktop/Output.txt");
+
+	while (!halt) {
+		//file << debug() << std::endl;
 		step();
+	}
+
+	file.close();
 }
 
 unsigned char CPU::fetchOpcode() {

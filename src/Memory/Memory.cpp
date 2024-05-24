@@ -1,7 +1,7 @@
 #include "Memory.h"
 
 Memory::Memory(Cartridge& cartridge) : cartridge(cartridge) {
-	clear();
+	ram.resize(0xFFFF + 1);
 }
 
 void Memory::loadProgram(std::vector<unsigned char> rom) {
@@ -77,6 +77,6 @@ unsigned short Memory::writeShort(unsigned short address, unsigned short val) {
 }
 
 //Clears all memory
-void Memory::clear() {
-	memset(&ram, 0x0000, sizeof(ram));
-}
+//void Memory::clear() {
+//	memset(&ram, 0x0000, sizeof(ram));
+//}

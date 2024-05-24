@@ -2,7 +2,7 @@
 #include "Cartridge/Cartridge.h"
 #include <iostream>
 
-GameBoy::GameBoy(const char* file) : memory(Memory(file)), mCPU(CPU(memory)) {}
+GameBoy::GameBoy(Cartridge& cartridge) : memory(Memory(cartridge)), mCPU(CPU(memory)) {}
 
 void GameBoy::emulate() {
 	mCPU.run(7);
