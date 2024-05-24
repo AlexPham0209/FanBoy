@@ -1057,6 +1057,44 @@ void CPU::executeOpcode(unsigned char opcode) {
 			reti();
 			break;
 	}
+}
+
+void CPU::executeCBOpcodes(unsigned char opcode) {
+	switch (opcode) {
+
+		//SWAP n
+		case 0x37:
+			swap(A);
+			break;
+		
+		case 0x30:
+			swap(B);
+			break;
+
+		case 0x31:
+			swap(C);
+			break;
+
+		case 0x32:
+			swap(D);
+			break;
+
+		case 0x33:
+			swap(E);
+			break;
+
+		case 0x34:
+			swap(H);
+			break;
+
+		case 0x35:
+			swap(L);
+			break;
+
+		case 0x36:
+			swap(HL);
+			break;
 
 
+	}
 }

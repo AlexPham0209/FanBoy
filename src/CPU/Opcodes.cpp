@@ -370,3 +370,28 @@ void CPU::reti() {
 	ret();
 	interrupts.setIME(true);
 }
+
+void CPU::swap(unsigned char& reg) {
+	unsigned char upper = (reg & 0xF0) >> 4;
+	unsigned char lower = (reg & 0xF);
+	reg = (lower << 8) | upper;
+
+	F.setFlag(ZERO, reg == 0);
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, false);
+	F.setFlag(CARRY, false);
+}
+
+void CPU::swap(unsigned short address) {
+	unsigned char val = memory.readByte(address);
+	unsigned char upper = (val & 0xF0) >> 4;
+	unsigned char lower = (val & 0xF);
+	unsigned char res = (lower << 8) | upper;
+
+	memory.writeByte(address, res);
+
+	F.setFlag(ZERO, res == 0);
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, false);
+	F.setFlag(CARRY, false);
+}

@@ -14,6 +14,10 @@ void Memory::loadProgram(std::vector<unsigned char> rom) {
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
 	//Reading external cartridge ROM 
+
+	if (address == 0xFF44)
+		return 0x90;
+
 	if (address <= 0x7FFF)
 		return cartridge.readByte(address);
 		
@@ -60,8 +64,8 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		return temp;
 	}
 
-	if (address >= 0xFF00)
-		std::cout << std::hex << address << ": " << (int)val << std::dec << std::endl;
+	/*if (address >= 0xFF00)
+		std::cout << std::hex << address << ": " << (int)val << std::dec << std::endl;*/
 
 	unsigned char temp = this->ram[address];
 	ram[address] = val;

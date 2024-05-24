@@ -35,6 +35,7 @@ class CPU {
 		Memory& memory;
 
 		void executeOpcode(unsigned char opcode);
+		void executeCBOpcodes(unsigned char opcode);
 		unsigned char fetchOpcode();
 
 		void loadByteIntoReg(unsigned char& dest, const unsigned char& src);
@@ -102,4 +103,7 @@ class CPU {
 		void ret();
 		void ret(bool condition);
 		void reti();
+
+		void swap(unsigned char& reg);
+		void swap(unsigned short address);
 };
