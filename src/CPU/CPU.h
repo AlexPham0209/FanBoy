@@ -117,5 +117,15 @@ class CPU {
 		void swap(unsigned char& reg);
 		void swap(unsigned short address);
 
+		unsigned char shiftLeft(unsigned char val);
+		void SLA(unsigned char& reg);
+		void SLA(unsigned short address);
+
+		unsigned char shiftRight(unsigned char val);
+		void SRA(unsigned char& reg);
+		void SRA(unsigned short address);
+
+		void SRL(unsigned char& reg);
+		void SRL(unsigned short address);
 	
 };

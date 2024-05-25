@@ -24,7 +24,10 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 int CPU::step() {
 	interrupts.handleInterrupts();
 	unsigned char opcode = fetchOpcode();
-	executeOpcode(opcode);
+	if (opcode == 0xCB)
+		executeCBOpcodes(fetchOpcode());
+	else
+		executeOpcode(opcode);
 	cycles = opcodeCycles[opcode];
 	return cycles;
 }

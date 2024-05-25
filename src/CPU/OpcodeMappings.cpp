@@ -776,7 +776,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x34:
-			INC(HL);
+			INC((unsigned char)HL);
 			break;
 
 
@@ -810,7 +810,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x35:
-			DEC(HL);
+			DEC((unsigned char)HL);
 			break;
 
 
@@ -1041,15 +1041,15 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0xC8:
-			ret(!F.getFlag(ZERO));
+			ret(F.getFlag(ZERO));
 			break;
 
 		case 0xD0:
-			ret(F.getFlag(CARRY));
+			ret(!F.getFlag(CARRY));
 			break;
 
 		case 0xD8:
-			ret(!F.getFlag(CARRY));
+			ret(F.getFlag(CARRY));
 			break;
 
 		//RETI
@@ -1225,6 +1225,106 @@ void CPU::executeCBOpcodes(unsigned char opcode) {
 
 		case 0x1E:
 			RR(HL);
+			break;
+
+		//SLA n
+		case 0x27:
+			SLA(A);
+			break;
+
+		case 0x20:
+			SLA(B);
+			break;
+
+		case 0x21:
+			SLA(C);
+			break;
+
+		case 0x22:
+			SLA(D);
+			break;
+
+		case 0x23:
+			SLA(E);
+			break;
+
+		case 0x24:
+			SLA(H);
+			break;
+
+		case 0x25:
+			SLA(L);
+			break;
+
+		case 0x26:
+			SLA(HL);
+			break;
+
+
+		//SRA n
+		case 0x2F:
+			SRA(A);
+			break;
+
+		case 0x28:
+			SRA(B);
+			break;
+
+		case 0x29:
+			SRA(C);
+			break;
+
+		case 0x2A:
+			SRA(D);
+			break;
+
+		case 0x2B:
+			SRA(E);
+			break;
+
+		case 0x2C:
+			SRA(H);
+			break;
+
+		case 0x2D:
+			SRA(L);
+			break;
+
+		case 0x2E:
+			SRA(HL);
+			break;
+
+		//SRL n
+		case 0x3F:
+			SRL(A);
+			break;
+
+		case 0x38:
+			SRL(B);
+			break;
+
+		case 0x39:
+			SRL(C);
+			break;
+
+		case 0x3A:
+			SRL(D);
+			break;
+
+		case 0x3B:
+			SRL(E);
+			break;
+
+		case 0x3C:
+			SRL(H);
+			break;
+
+		case 0x3D:
+			SRL(L);
+			break;
+
+		case 0x3E:
+			SRL(HL);
 			break;
 	}
 }
