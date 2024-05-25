@@ -1095,6 +1095,38 @@ void CPU::executeCBOpcodes(unsigned char opcode) {
 			swap(HL);
 			break;
 
+		//RLC n
+		case 0x07:
+			RLC(A);
+			break;
+
+		case 0x00:
+			RLC(B);
+			break;
+
+		case 0x01:
+			RLC(C);
+			break;
+
+		case 0x02:
+			RLC(D);
+			break;
+
+		case 0x03:
+			RLC(E);
+			break;
+
+		case 0x04:
+			RLC(H);
+			break;
+
+		case 0x05:
+			RLC(L);
+			break;
+
+		case 0x06:
+			RLC(HL);
+			break;
 
 	}
 }

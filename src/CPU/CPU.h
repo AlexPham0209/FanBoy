@@ -84,9 +84,11 @@ class CPU {
 		void SCF();
 
 		void RLC(unsigned char& reg);
+		void RLC(unsigned short address);
 		void RL(unsigned char& reg);
 
 		void RRC(unsigned char& reg);
+		void RRC(unsigned short address);
 		void RR(unsigned char& reg);
 
 		void jump(unsigned short address);
@@ -106,4 +108,6 @@ class CPU {
 
 		void swap(unsigned char& reg);
 		void swap(unsigned short address);
+
+	
 };

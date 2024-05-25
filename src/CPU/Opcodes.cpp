@@ -293,6 +293,16 @@ void CPU::RLC(unsigned char& reg) {
 	reg = res;
 }
 
+void CPU::RLC(unsigned short address) {
+	unsigned char val = memory.readByte(address);
+	unsigned char res = (val << 1) | ((val >> 7) & 1);
+	F.setFlag(ZERO, (res == 0));
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, false);
+	F.setFlag(CARRY, (val >> 7) & 1);
+	memory.writeByte(address, res);
+}
+
 void CPU::RL(unsigned char& reg) {
 	unsigned char res = (reg << 1) | F.getFlag(CARRY);
 	F.setFlag(ZERO, (res == 0));
@@ -309,6 +319,16 @@ void CPU::RRC(unsigned char& reg) {
 	F.setFlag(HALF, false);
 	F.setFlag(CARRY, (reg >> 7) & 1);
 	reg = res;
+}
+
+void CPU::RRC(unsigned short address) {
+	unsigned char val = memory.readByte(address);
+	unsigned char res = (val >> 1) | ((val & 1) << 7);
+	F.setFlag(ZERO, (res == 0));
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, false);
+	F.setFlag(CARRY, (val >> 7) & 1);
+	memory.writeByte(address, res);
 }
 
 void CPU::RR(unsigned char& reg) {
@@ -330,7 +350,7 @@ void CPU::jump(char val) {
 
 void CPU::jump(unsigned short address, bool condition) {
 	if (condition)
-		pc += address;
+		pc = address;
 	else
 		pc += 2;
 }
@@ -386,7 +406,7 @@ void CPU::swap(unsigned short address) {
 	unsigned char val = memory.readByte(address);
 	unsigned char upper = (val & 0xF0) >> 4;
 	unsigned char lower = (val & 0xF);
-	unsigned char res = (lower << 8) | upper;
+	unsigned char res = (lower << 4) | upper;
 
 	memory.writeByte(address, res);
 
