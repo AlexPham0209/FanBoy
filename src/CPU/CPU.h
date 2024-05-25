@@ -83,13 +83,21 @@ class CPU {
 		void CCF();
 		void SCF();
 
+		unsigned char rotateLeftCarry(unsigned char val);
 		void RLC(unsigned char& reg);
 		void RLC(unsigned short address);
+		
+		unsigned char rotateLeft(unsigned char val);
 		void RL(unsigned char& reg);
+		void RL(unsigned short address);
 
+		unsigned char rotateRightCarry(unsigned char val);
 		void RRC(unsigned char& reg);
 		void RRC(unsigned short address);
+		
+		unsigned char rotateRight(unsigned char val);
 		void RR(unsigned char& reg);
+		void RR(unsigned short address);
 
 		void jump(unsigned short address);
 		void jump(unsigned short address, bool condition);

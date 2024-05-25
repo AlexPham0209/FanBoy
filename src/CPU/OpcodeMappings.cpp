@@ -1061,7 +1061,6 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 void CPU::executeCBOpcodes(unsigned char opcode) {
 	switch (opcode) {
-
 		//SWAP n
 		case 0x37:
 			swap(A);
@@ -1128,5 +1127,104 @@ void CPU::executeCBOpcodes(unsigned char opcode) {
 			RLC(HL);
 			break;
 
+		//RL n
+		case 0x17:
+			RL(A);
+			break;
+
+		case 0x10:
+			RL(B);
+			break;
+
+		case 0x11:
+			RL(C);
+			break;
+
+		case 0x12:
+			RL(D);
+			break;
+
+		case 0x13:
+			RL(E);
+			break;
+
+		case 0x14:
+			RL(H);
+			break;
+
+		case 0x15:
+			RL(L);
+			break;
+
+		case 0x16:
+			RL(HL);
+			break;
+
+		//RRC n
+		case 0x0F:
+			RRC(A);
+			break;
+
+		case 0x08:
+			RRC(B);
+			break;
+
+		case 0x09:
+			RRC(C);
+			break;
+
+		case 0x0A:
+			RRC(D);
+			break;
+
+		case 0x0B:
+			RRC(E);
+			break;
+
+		case 0x0C:
+			RRC(H);
+			break;
+
+		case 0x0D:
+			RRC(L);
+			break;
+
+		case 0x0E:
+			RRC(HL);
+			break;
+
+
+		//RR n
+		case 0x1F:
+			RR(A);
+			break;
+
+		case 0x18:
+			RR(B);
+			break;
+
+		case 0x19:
+			RR(C);
+			break;
+
+		case 0x1A:
+			RR(D);
+			break;
+
+		case 0x1B:
+			RR(E);
+			break;
+
+		case 0x1C:
+			RR(H);
+			break;
+
+		case 0x1D:
+			RR(L);
+			break;
+
+		case 0x1E:
+			RR(HL);
+			break;
 	}
 }

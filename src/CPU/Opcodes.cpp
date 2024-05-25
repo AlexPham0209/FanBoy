@@ -100,6 +100,7 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 void CPU::add(Register16& reg, const unsigned short val) {
 	int res = reg + val;
 
+	F.setFlag(ZERO, ((unsigned char)res == 0));
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, (reg & 0xFFF) + (val & 0xFFF) > 0xFFF);
 	F.setFlag(CARRY, res > 0xFFFF);
@@ -283,61 +284,76 @@ void CPU::SCF() {
 	F.setFlag(HALF, false);
 }
 
-
-void CPU::RLC(unsigned char& reg) {
-	unsigned char res = (reg << 1) | ((reg >> 7) & 1);
-	F.setFlag(ZERO, (res == 0));
-	F.setFlag(SUB, false);
-	F.setFlag(HALF, false);
-	F.setFlag(CARRY, (reg >> 7) & 1);
-	reg = res;
-}
-
-void CPU::RLC(unsigned short address) {
-	unsigned char val = memory.readByte(address);
+unsigned char CPU::rotateLeftCarry(unsigned char val) {
 	unsigned char res = (val << 1) | ((val >> 7) & 1);
 	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, false);
 	F.setFlag(CARRY, (val >> 7) & 1);
+	return res;
+}
+
+void CPU::RLC(unsigned char& reg) {
+	reg = rotateLeftCarry(reg);
+}
+
+void CPU::RLC(unsigned short address) {
+	unsigned char res = rotateLeftCarry(memory.readByte(address));
 	memory.writeByte(address, res);
 }
 
+unsigned char CPU::rotateLeft(unsigned char val) {
+	unsigned char res = (val << 1) | F.getFlag(CARRY);
+	F.setFlag(ZERO, (res == 0));
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, false);
+	F.setFlag(CARRY, (val >> 7) & 1);
+	return res;
+}
+
 void CPU::RL(unsigned char& reg) {
-	unsigned char res = (reg << 1) | F.getFlag(CARRY);
-	F.setFlag(ZERO, (res == 0));
-	F.setFlag(SUB, false);
-	F.setFlag(HALF, false);
-	F.setFlag(CARRY, (reg >> 7) & 1);
-	reg = res;
+	reg = rotateLeft(reg);
 }
 
-void CPU::RRC(unsigned char& reg) {
-	unsigned char res = (reg >> 1) | ((reg & 1) << 7);
-	F.setFlag(ZERO, (res == 0));
-	F.setFlag(SUB, false);
-	F.setFlag(HALF, false);
-	F.setFlag(CARRY, (reg >> 7) & 1);
-	reg = res;
+void CPU::RL(unsigned short address) {
+	unsigned char res = rotateLeft(memory.readByte(address));
+	memory.writeByte(address, res);
 }
 
-void CPU::RRC(unsigned short address) {
-	unsigned char val = memory.readByte(address);
+unsigned char CPU::rotateRightCarry(unsigned char val) {
 	unsigned char res = (val >> 1) | ((val & 1) << 7);
 	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, false);
 	F.setFlag(CARRY, (val >> 7) & 1);
+	return res;
+}
+
+void CPU::RRC(unsigned char& reg) {
+	reg = rotateRightCarry(reg);
+}
+
+void CPU::RRC(unsigned short address) {
+	unsigned char res = rotateRightCarry(memory.readByte(address));
 	memory.writeByte(address, res);
 }
 
-void CPU::RR(unsigned char& reg) {
-	unsigned char res = (reg >> 1) | (F.getFlag(CARRY) << 7);
+unsigned char CPU::rotateRight(unsigned char val) {
+	unsigned char res = (val >> 1) | (F.getFlag(CARRY) << 7);
 	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, false);
-	F.setFlag(CARRY, (reg >> 7) & 1);
-	reg = res;
+	F.setFlag(CARRY, (val >> 7) & 1);
+	return res;
+}
+
+void CPU::RR(unsigned char& reg) {
+	reg = rotateRight(reg);
+}
+
+void CPU::RR(unsigned short address) {
+	unsigned char res = rotateRight(memory.readByte(address));
+	memory.writeByte(address, res);
 }
 
 void CPU::jump(unsigned short address) {
