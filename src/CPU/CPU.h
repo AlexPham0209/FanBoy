@@ -127,5 +127,16 @@ class CPU {
 
 		void SRL(unsigned char& reg);
 		void SRL(unsigned short address);
-	
+		
+		unsigned char testBit(unsigned char bit, unsigned char val);
+		void BIT(unsigned char bit, unsigned char& reg);
+		void BIT(unsigned char bit, unsigned short address);
+
+		unsigned char setBit(unsigned char bit, unsigned char val);
+		void SET(unsigned char bit, unsigned char& reg);
+		void SET(unsigned char bit, unsigned short address);
+
+		unsigned char resetBit(unsigned char bit, unsigned char val);
+		void RES(unsigned char bit, unsigned char& reg);
+		void RES(unsigned char bit, unsigned short address);
 };

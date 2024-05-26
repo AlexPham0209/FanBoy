@@ -485,3 +485,52 @@ void CPU::SRA(unsigned short address) {
 	memory.writeByte(address, res);
 }
 
+unsigned char CPU::testBit(unsigned char bit, unsigned char val) {
+	if (bit < 0 && bit > 7)
+		return 0x0;
+	unsigned char res = (val >> bit) & 1;
+
+	F.setFlag(ZERO, res);
+	F.setFlag(SUB, false);
+	F.setFlag(HALF, true);
+	return res;
+}
+
+void CPU::BIT(unsigned char bit, unsigned char& reg) {
+	reg = testBit(bit, reg);
+}
+void CPU::BIT(unsigned char bit, unsigned short address) {
+	unsigned char res = testBit(bit, memory.readByte(address));
+	memory.writeByte(address, res);
+}
+
+unsigned char CPU::setBit(unsigned char bit, unsigned char val) {
+	if (bit < 0 && bit > 7)
+		return 0x0;
+	unsigned char res = val | (1 << bit);
+	return res;
+}
+
+void CPU::SET(unsigned char bit, unsigned char& reg) {
+	reg = setBit(bit, reg);
+}
+
+void CPU::SET(unsigned char bit, unsigned short address) {
+	unsigned char res = setBit(bit, memory.readByte(address));
+	memory.writeByte(address, res);
+}
+
+unsigned char CPU::resetBit(unsigned char bit, unsigned char val) {
+	if (bit < 0 && bit > 7)
+		return 0x0;
+	unsigned char res = val & ~(1 << bit);
+	return res;
+}
+
+void CPU::RES(unsigned char bit, unsigned char& reg) {
+	reg = resetBit(bit, reg);
+}
+void CPU::RES(unsigned char bit, unsigned short address) {
+	unsigned char res = resetBit(bit, memory.readByte(address));
+	memory.writeByte(address, res);
+}
