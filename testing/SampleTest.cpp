@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../src/GameBoy.h"
+#include "../src/Cartridge/CartridgeFactory.h"
 
 //TEST(SampleTest, Testing1) {
 //	//Set value at address 0x101B to 0x26.
@@ -35,25 +36,23 @@
 //}
 
 TEST(SampleTest, StackTest) {
-	Cartridge* cartridge = new Cartridge();
+	std::vector<unsigned char> rom = {
+		//Write FF into register H (LD H, n)
+		0x26, 0xFF,
+
+		//Write A in register L (LD L, n)
+		0x2E, 0x0A,
+
+		//Write A2 in register A (LD A, n)
+		0x3E, 0xA2,
+
+		//Load A into memory location (HL) and decrement the HL register (LD (HL), A)
+		0x32
+	};
+
+	Cartridge* cartridge = CartridgeFactory::getInstance()->createCartridge(rom);
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);
-
-	//Write 0xFF into register H
-	memory->writeByte(0x100, 0x26);
-	memory->writeByte(0x101, 0xFF);
-
-	//Write 0xA into register C
-	memory->writeByte(0x102, 0x2E);
-	memory->writeByte(0x103, 0x0A);
-
-	//Write 0xA2 into register A
-	memory->writeByte(0x104, 0x3E);
-	memory->writeByte(0x105, 0xA2);
-
-	//LDD (HL), A instruction
-	memory->writeByte(0x106, 0x32);
-
 	mCPU->run(4);
 
 	EXPECT_EQ(memory->readByte(0xFF0A), 0xA2);

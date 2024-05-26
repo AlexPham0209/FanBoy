@@ -4,11 +4,12 @@
 
 int main() {
 	const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
-	const char* test = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
+	const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
+	const char* loadTest = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
 
 	//Creates Cartridge
 	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(test);
+	Cartridge* cartridge = cartridgeFactory->createCartridge(specialTest);
 
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);

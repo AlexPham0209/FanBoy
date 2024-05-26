@@ -49,7 +49,7 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address <= 0x7FFF)
 		return cartridge.writeByte(address, val);
 
-	//Writing into Cartridge's external RAM
+	//Writing into Cartridge's external RAM (If it has some)
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.writeByte(address, val);
 
@@ -59,6 +59,7 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 
 	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
 	if (address >= 0xE000 && address <= 0xFDFF) {
+		std::cout << "write" << std::endl;
 		unsigned char temp = this->ram[address - 0x2000];
 		ram[address - 0x2000] = val;
 		return temp;

@@ -2,7 +2,7 @@
 
 CartridgeFactory::CartridgeFactory() {}
 
-//Creates a heap-allocated cartridge object 
+//Creates a heap-allocated cartridge object from binary file
 Cartridge* CartridgeFactory::createCartridge(const char* path) {
 	//Load in data from binary file 
 	std::vector<unsigned char> rom = loadROM(path);
@@ -15,6 +15,23 @@ Cartridge* CartridgeFactory::createCartridge(const char* path) {
 	Header* header = generateHeader(rom);
 	MBC* MBC = generateMBC(rom, *header);
 	
+	Cartridge* cartridge = new Cartridge(*header, *MBC);
+	return cartridge;
+}
+
+//Creates a heap-allocated cartridge object from vector object
+Cartridge* CartridgeFactory::createCartridge(std::vector<unsigned char> memory) {
+	//Load in data from binary file 
+	std::vector<unsigned char> rom = loadROM(memory);
+
+	//Check if rom is valid 
+	if (rom.size() <= 0)
+		return nullptr;
+
+	//Generate the header data and the memory bank controllers of the string
+	Header* header = new Header{"Test Cartridge", "F", 0, 0, 0, 0, 0};
+	MBC* MBC = new MBC0(rom, std::vector<unsigned char>(0), *header);
+
 	Cartridge* cartridge = new Cartridge(*header, *MBC);
 	return cartridge;
 }
@@ -48,6 +65,20 @@ std::vector<unsigned char> CartridgeFactory::loadROM(const char* path) {
 
 	// read the data:
 	vec.insert(vec.begin(), std::istream_iterator<unsigned char>(file), std::istream_iterator<unsigned char>());
+
+	return vec;
+}
+
+std::vector<unsigned char> CartridgeFactory::loadROM(std::vector<unsigned char> rom) {
+	std::cout << "Loading ROM" << std::endl;
+	
+	// reserve capacity
+	std::vector<unsigned char> vec;
+	vec.resize(0x8000);
+
+	// read the data:
+	for (int i = 0; i < rom.size(); ++i)
+		vec[0x100 + i] = rom[i];
 
 	return vec;
 }
