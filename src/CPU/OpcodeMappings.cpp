@@ -914,16 +914,19 @@ void CPU::executeOpcode(unsigned char opcode) {
 		//RLCA
 		case 0x07:
 			RLC(A);
+			F.setFlag(ZERO, false);
 			break;
 
 		//RLA
 		case 0x17:
 			RL(A);
+			F.setFlag(ZERO, false);
 			break;
 
 		//RRCA
 		case 0x0F:
 			RRC(A);
+			F.setFlag(ZERO, false);
 			break;
 
 		//RRA

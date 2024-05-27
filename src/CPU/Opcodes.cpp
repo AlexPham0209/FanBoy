@@ -412,7 +412,7 @@ void CPU::reti() {
 void CPU::swap(unsigned char& reg) {
 	unsigned char upper = (reg & 0xF0) >> 4;
 	unsigned char lower = (reg & 0xF);
-	reg = (lower << 8) | upper;
+	reg = (lower << 4) | upper;
 
 	F.setFlag(ZERO, reg == 0);
 	F.setFlag(SUB, false);
@@ -479,11 +479,14 @@ void CPU::SRL(unsigned short address) {
 
 
 void CPU::SRA(unsigned char& reg) {
-	reg = shiftRight(reg);
+	unsigned char res = shiftRight(reg);
+	res = res | (((reg >> 7) & 1) << 7);
+	reg = res;
 }
 
 void CPU::SRA(unsigned short address) {
 	unsigned char res = shiftRight(memory.readByte(address));
+	res = res | (((memory.readByte(address) >> 7) & 1) << 7);
 	memory.writeByte(address, res);
 }
 
