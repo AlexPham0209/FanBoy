@@ -37,7 +37,10 @@ bool Interrupts::getIME() {
 
 
 void Interrupts::handleInterrupts() {
-	if (mCPU.halt)
+	if (memory.readByte(0xFFFF) & memory.readByte(0xFF0F) & 0x0F)
+		mCPU.halt = false;
+
+	if (!getIME())
 		return;
 		
 	if (getInterruptEnabled(VBLANK) && getInterruptFlag(VBLANK))
