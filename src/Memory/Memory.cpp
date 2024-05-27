@@ -32,6 +32,8 @@ unsigned char Memory::readByte(unsigned short address) {
 	if (address >= 0xE000 && address <= 0xFDFF)
 		return ram[address - 0x2000];
 
+	/*if (address == 0xDF7E)
+		std::cout << i << "," << std::hex << (int)ram[address] << std::dec << std::endl;*/
  	return ram[address];
 }
 
@@ -54,8 +56,8 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		return cartridge.writeByte(address, val);
 
 	//Invalid region 
-	if (address >= 0x7EA0 && address <= 0x7EFF)
-		return NULL;
+	//if (address >= 0x7EA0 && address <= 0x7EFF)
+	//	return NULL;
 
 	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
 	if (address >= 0xE000 && address <= 0xFDFF) {
@@ -64,10 +66,8 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		return temp;
 	}
 
-	/*if (address >= 0xFF00)
-		std::cout << std::hex << address << ": " << (int)val << std::dec << std::endl;*/
-	/*if (address == 0xD81B)
-		std::cout << std::hex << (int)val << std::dec << std::endl;*/
+	/*if (address == 0xDF7E)
+		std::cout << i << ", " << std::hex << address << ", " << std::hex << (int)val << std::dec << std::endl;*/
 
 	unsigned char temp = this->ram[address];
 	ram[address] = val;

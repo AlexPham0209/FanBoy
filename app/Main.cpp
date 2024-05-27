@@ -9,7 +9,7 @@ int main() {
 
 	//Creates Cartridge
 	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(specialTest);
+	Cartridge* cartridge = cartridgeFactory->createCartridge("C:/Users/RedAP/Downloads/07-jr,jp,call,ret,rst.gb");
 
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);

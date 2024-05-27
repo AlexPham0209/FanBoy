@@ -71,15 +71,15 @@ void CPU::push(unsigned short val) {
 
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
 void CPU::pop(Register16& reg) {
-	unsigned char n1 = memory.writeByte(sp++, 0);
-	unsigned char n2 = memory.writeByte(sp++, 0);
+	unsigned char n1 = memory.readByte(sp++);
+	unsigned char n2 = memory.readByte(sp++);
 	reg = (n2 << 8) | n1;
 }
 
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
 void CPU::pop(unsigned short& val) {
-	unsigned char n1 = memory.writeByte(sp++, 0);
-	unsigned char n2 = memory.writeByte(sp++, 0);
+	unsigned char n1 = memory.readByte(sp++);
+	unsigned char n2 = memory.readByte(sp++);
 	val = (n2 << 8) | n1;
 }
 
@@ -243,22 +243,26 @@ void CPU::DEC(Register16& reg) {
 }
 
 void CPU::DAA(unsigned char& reg) {
-	if (!F.getFlag(SUB)) {
-		if (F.getFlag(CARRY) || reg > 0x99) {
-			reg += 0x60;
+	unsigned char val = reg;
+	if (F.getFlag(SUB)) {
+		if (F.getFlag(CARRY))
+			val -= 0x60;
+
+		if (F.getFlag(HALF))
+			val -= 0x6;
+
+	}
+	else {
+		if (F.getFlag(CARRY) || val > 0x99) {
+			val += 0x60;
 			F.setFlag(CARRY, true);
 		}
 
-		if (F.getFlag(HALF) || (reg & 0xF) > 0x9)
-			reg += 0x6;
+		if (F.getFlag(HALF) || (val & 0xF) > 0x9)
+			val += 0x6;
 	}
-
-	if (F.getFlag(CARRY))
-		reg -= 0x60;
-
-	if (F.getFlag(HALF))
-		reg -= 0x6;
-
+	
+	reg = val;
 	F.setFlag(ZERO, (reg == 0));
 	F.setFlag(HALF, false);
 }
@@ -387,7 +391,7 @@ void CPU::call(unsigned short address, bool condition) {
 
 void CPU::restart(unsigned char val) {
 	push(pc);
-	jump((char)(0x0000 + val));
+	jump((unsigned short)(0x00 + val));
 }
 
 void CPU::ret() {

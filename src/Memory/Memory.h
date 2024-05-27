@@ -10,6 +10,7 @@
 
 class Memory {
 public:
+	inline static int i = 0;
 	Memory(Cartridge& cartridge);
 
 	void loadProgram(std::vector<unsigned char> rom);
@@ -20,6 +21,7 @@ public:
 	void clear();
 
 private:
+
 	Cartridge& cartridge;
 	std::vector<unsigned char> ram;
 };

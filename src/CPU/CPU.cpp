@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iomanip>
 
+
 CPU::CPU(Memory& memory) : memory(memory), F(FlagRegister()), 
 AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)) {
 	pc = 0x100;
@@ -36,7 +37,7 @@ void CPU::run(int iterations) {
 	std::ofstream file;
 	file.open("C:/Users/RedAP/Desktop/Output.txt");
 	for (int i = 0; i < iterations; ++i) {	
-		file << i << ": ";
+		file << Memory::i << ": ";
 		std::string val = debug();
 		std::transform(val.begin(), val.end(), val.begin(), ::toupper);
 		std::cout << val << std::endl;
@@ -49,17 +50,12 @@ void CPU::run(int iterations) {
 void CPU::run() {
 	std::ofstream file;
 	file.open("C:/Users/RedAP/Desktop/Output.txt");
-	int i = 0;
-
 	while (!halt) {
-		/*if (i == 32509)
-			std::cout << std::hex << (int)memory.readByte(0xD81B) << std::endl;*/
-
 		std::string val = debug();
 		std::transform(val.begin(), val.end(), val.begin(), ::toupper);
 		file << val << std::endl;
 		step();
-		i++;
+		Memory::i++;
 	}
 
 	file.close();

@@ -284,7 +284,8 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0xFA:
-			loadByteIntoReg(A, memory.readByte((memory.readByte(pc++) | memory.readByte(pc++) << 8)));
+			loadByteIntoReg(A, memory.readByte(memory.readShort(pc)));
+			pc += 2;
 			break;
 
 		case 0x3E:
@@ -407,7 +408,8 @@ void CPU::executeOpcode(unsigned char opcode) {
 
 		//LD (nn), SP
 		case 0x08:
-			loadShortIntoMemory(memory.readByte(pc++), sp);
+			loadShortIntoMemory(memory.readShort(pc), sp);
+			pc += 2;
 			break;
 
 
