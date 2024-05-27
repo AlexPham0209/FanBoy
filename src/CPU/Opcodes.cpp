@@ -69,7 +69,6 @@ void CPU::push(unsigned short val) {
 	memory.writeByte(--sp, (val & 0xFF));
 }
 
-
 //Pops the top two bytes off the stack and stores them inside register pair (increments SP twice)
 void CPU::pop(Register16& reg) {
 	unsigned char n1 = memory.writeByte(sp++, 0);
@@ -100,7 +99,6 @@ void CPU::add(unsigned char& reg, const unsigned char val) {
 void CPU::add(Register16& reg, const unsigned short val) {
 	int res = reg + val;
 
-	F.setFlag(ZERO, ((unsigned char)res == 0));
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, (reg & 0xFFF) + (val & 0xFFF) > 0xFFF);
 	F.setFlag(CARRY, res > 0xFFFF);
@@ -193,35 +191,35 @@ void CPU::INC(unsigned char& reg) {
 	unsigned char res = reg + 1;
 	F.setFlag(ZERO, ((unsigned char)res == 0));
 	F.setFlag(SUB, false);
-	F.setFlag(HALF, ((res & 0x0F) == 0x00));
+	F.setFlag(HALF, ((reg & 0x0F) == 0x0F));
 
-	reg = (unsigned char)res;
+	reg = res;
 }
 
 void CPU::INC(const unsigned short address) {
 	unsigned char res = memory.readByte(address) + 1;
-	F.setFlag(ZERO, ((unsigned char)res == 0));
+	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, false);
-	F.setFlag(HALF, ((res & 0x0F) == 0x00));
+	F.setFlag(HALF, ((memory.readByte(address) & 0x0F) == 0x0F));
 
-	memory.writeByte(address, (unsigned char)res);
+	memory.writeByte(address, res);
 }
 
 
 void CPU::DEC(unsigned char& reg) {
 	unsigned char res = reg - 1;
-	F.setFlag(ZERO, ((unsigned char)res == 0));
+	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, true);
-	F.setFlag(HALF, ((res & 0xF) == 0xF));
+	F.setFlag(HALF, !(reg & 0x0F));
 
 	reg = res;
 }
 
 void CPU::DEC(const unsigned short address) {
 	unsigned char res = memory.readByte(address) - 1;
-	F.setFlag(ZERO, ((unsigned char)res == 0));
+	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, true);
-	F.setFlag(HALF, (res & 0xF) == 0xF);
+	F.setFlag(HALF, !(memory.readByte(address) & 0x0F));
 
 	memory.writeByte(address, res);
 }

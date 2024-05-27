@@ -314,7 +314,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x6F:
-			loadByteIntoReg(F, A);
+			loadByteIntoReg(L, A);
 			break;
 
 		case 0x02:
@@ -776,7 +776,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x34:
-			INC((unsigned char)HL);
+			INC((unsigned short)HL);
 			break;
 
 
@@ -810,7 +810,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		case 0x35:
-			DEC((unsigned char)HL);
+			DEC((unsigned short)HL);
 			break;
 
 
@@ -958,7 +958,6 @@ void CPU::executeOpcode(unsigned char opcode) {
 			break;
 
 		//JR cc, n
-		//BUG?!?!
 		case 0x20:
 			jump((char)memory.readByte(pc++), !F.getFlag(ZERO));
 			break;

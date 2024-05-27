@@ -66,6 +66,8 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 
 	/*if (address >= 0xFF00)
 		std::cout << std::hex << address << ": " << (int)val << std::dec << std::endl;*/
+	/*if (address == 0xD81B)
+		std::cout << std::hex << (int)val << std::dec << std::endl;*/
 
 	unsigned char temp = this->ram[address];
 	ram[address] = val;
