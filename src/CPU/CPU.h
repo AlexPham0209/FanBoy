@@ -52,7 +52,7 @@ class CPU {
 		void loadShortIntoMemory(const unsigned short& address, const unsigned short& val);
 
 		void loadRegIntoSP(Register16& reg);
-		void loadHL(unsigned char val);
+		void loadHL(char val);
 
 		void add(unsigned char& reg, const unsigned char val);
 		void add(Register16& reg, const unsigned short val);

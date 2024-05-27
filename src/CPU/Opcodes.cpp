@@ -47,7 +47,7 @@ void CPU::loadRegIntoSP(Register16& reg) {
 	sp = reg;
 };
 
-void CPU::loadHL(unsigned char val) {
+void CPU::loadHL(char val) {
 	unsigned short offset = sp + val;
 	loadShortIntoReg(HL, offset);
 
@@ -227,6 +227,7 @@ void CPU::DEC(const unsigned short address) {
 
 void CPU::addSP(const char val) {
 	int res = sp + val;
+	F.setFlag(ZERO, false);
 	F.setFlag(SUB, false);
 	F.setFlag(HALF, ((sp ^ val ^ (res & 0xFFFF)) & 0x10) == 0x10);
 	F.setFlag(CARRY, ((sp ^ val ^ (res & 0xFFFF)) & 0x100) == 0x100);
