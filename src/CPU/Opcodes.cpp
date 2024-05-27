@@ -210,7 +210,7 @@ void CPU::DEC(unsigned char& reg) {
 	unsigned char res = reg - 1;
 	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, true);
-	F.setFlag(HALF, !(reg & 0x0F));
+	F.setFlag(HALF, (reg & 0x0F) == 0);
 
 	reg = res;
 }
@@ -219,7 +219,7 @@ void CPU::DEC(const unsigned short address) {
 	unsigned char res = memory.readByte(address) - 1;
 	F.setFlag(ZERO, (res == 0));
 	F.setFlag(SUB, true);
-	F.setFlag(HALF, !(memory.readByte(address) & 0x0F));
+	F.setFlag(HALF, (memory.readByte(address) & 0x0F) == 0);
 
 	memory.writeByte(address, res);
 }
@@ -251,7 +251,6 @@ void CPU::DAA(unsigned char& reg) {
 
 		if (F.getFlag(HALF) || (reg & 0xF) > 0x9)
 			reg += 0x6;
-		return;
 	}
 
 	if (F.getFlag(CARRY))
@@ -260,7 +259,7 @@ void CPU::DAA(unsigned char& reg) {
 	if (F.getFlag(HALF))
 		reg -= 0x6;
 
-	F.setFlag(ZERO, (A == 0));
+	F.setFlag(ZERO, (reg == 0));
 	F.setFlag(HALF, false);
 }
 

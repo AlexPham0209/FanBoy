@@ -432,6 +432,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		//POP nn
 		case 0xF1:
 			pop(AF);
+			F = F & 0xF0;
 			break;
 
 		case 0xC1:
@@ -923,6 +924,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		//RRA
 		case 0x1F:
 			RR(A);
+			F.setFlag(ZERO, false);
 			break;
 
 		//JP nn
