@@ -8,10 +8,11 @@ int main() {
 	const char* loadTest = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
 	const char* jumpTest = "C:/Users/RedAP/Downloads/07-jr,jp,call,ret,rst.gb";
 	const char* opSPTest = "C:/Users/RedAP/Downloads/03-op sp,hl.gb";
+	const char* opRTest = "C:/Users/RedAP/Downloads/04-op r,imm.gb";
 
 	//Creates Cartridge
 	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(opSPTest);
+	Cartridge* cartridge = cartridgeFactory->createCartridge(opRTest);
 
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);

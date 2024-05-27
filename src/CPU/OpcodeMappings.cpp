@@ -597,6 +597,9 @@ void CPU::executeOpcode(unsigned char opcode) {
 			subBorrow(A, memory.readByte(HL));
 			break;
 
+		case 0xDE:
+			subBorrow(A, memory.readByte(pc++));
+			break;
 
 		//AND n 
 		case 0xA7:
