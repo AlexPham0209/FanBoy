@@ -18,16 +18,11 @@ int main() {
 	const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
 	const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
 
-	//Creates Cartridge
-	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(hlTest);
 
-	Memory* memory = new Memory(*cartridge);
-	CPU* mCPU = new CPU(*memory);
-	mCPU->run();
+	GameBoy* gameboy = new GameBoy(hlTest);
+	while (true) 
+		gameboy->step();
 
-	delete cartridge;
-	delete memory;
-	delete mCPU;
+	delete gameboy;
 	return 0;
 }

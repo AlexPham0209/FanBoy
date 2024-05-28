@@ -30,3 +30,14 @@ public:
 	unsigned short readShort(unsigned short address) override;
 	unsigned short writeShort(unsigned short address, unsigned short val) override;
 };
+
+//Memory Bank Controller 1 Cartridge type
+
+class MBC1 : public MBC {
+	MBC1(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
+	unsigned char readByte(unsigned short address) override;
+	unsigned char writeByte(unsigned short address, unsigned char val) override;
+
+	unsigned short readShort(unsigned short address) override;
+	unsigned short writeShort(unsigned short address, unsigned short val) override;
+};

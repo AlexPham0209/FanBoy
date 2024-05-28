@@ -5,8 +5,38 @@
 #include <iomanip>
 
 
-CPU::CPU(Memory& memory) : memory(memory), F(FlagRegister()), 
-AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)), timer(Timer(memory, interrupts)) {
+CPU::CPU(Memory& memory, Interrupts& interrupts) : memory(memory), F(FlagRegister()), 
+AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(interrupts) {
+	reset();
+}
+
+//Executes for a single frame
+int CPU::step() {
+	//If system is halted, stop execution of CPU (takes 1 cycles)
+	if (halt)
+		return 1;
+
+	unsigned char opcode = fetchOpcode();
+
+	//Execute extended CB prefixed instructions
+	if (opcode == 0xCB) {	
+		unsigned char extended = fetchOpcode();
+		executeCBOpcodes(extended);
+		return opcodeCyclesCB[extended];
+	}
+	
+	//Execute regular instructions
+	executeOpcode(opcode);
+	return opcodeCycles[opcode];
+}
+
+//Fetches opcode from memory at address stated inside of program counter
+unsigned char CPU::fetchOpcode() {
+	return memory.readByte(pc++);
+}
+
+//Reset CPU to original values (after boot rom)
+void CPU::reset() {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -22,62 +52,7 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 	cycles = 0;
 }
 
-int CPU::step() {
-	if (halt)
-		return 1;
-
-	unsigned char opcode = fetchOpcode();
-	if (opcode == 0xCB) {	
-		unsigned char extended = fetchOpcode();
-		executeCBOpcodes(extended);
-		cycles = opcodeCyclesCB[extended];
-		return cycles;
-	}
-	executeOpcode(opcode);
-	cycles = opcodeCycles[opcode];
-	return cycles;
-}
-
-void CPU::run(int iterations) {
-	std::ofstream file;
-	file.open("C:/Users/RedAP/Desktop/Output.txt");
-	for (int i = 0; i < iterations; ++i) {	
-		file << Memory::i << ": ";
-		std::string val = debug();
-		std::transform(val.begin(), val.end(), val.begin(), ::toupper);
-		std::cout << val << std::endl;
-		file << val << std::endl;
-		step();
-	}
-	file.close();
-}
-
-void CPU::run() {
-	while (true) {
-		interrupts.handleInterrupts();
-		int cycles = step();
-		timer.step(cycles);
-	}
-}
-
-unsigned char CPU::fetchOpcode() {
-	return memory.readByte(pc++);
-}
-
-void CPU::reset() {
-	pc = 0x100;
-	sp = 0xFFFE;
-
-	A = 0x0000;
-	B = 0x0000;
-	C = 0x0000;
-	D = 0x0000;
-	E = 0x0000;
-	F = 0x0000;
-	H = 0x0000;
-	L = 0x0000;
-}
-
+//Prints current register values in hex as well as the current and next 4 instructions in memory
 std::string CPU::debug() {
 	std::stringstream ss;
 

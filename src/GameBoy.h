@@ -1,17 +1,22 @@
 #pragma once
 #include "CPU/CPU.h"
 #include "Memory/Memory.h"
+#include "Cartridge/Cartridge.h"
 
 class GameBoy {
 	public:
-
+		GameBoy(const char* path);
 		GameBoy(Cartridge& cartridge);
-		void emulate();
-		void emulate(int iterations);
-		void write(unsigned short address, unsigned char val);
-		void clear();
-		unsigned char read(unsigned short address);
+		~GameBoy();
+		void step();
+		
+
 	private:
-		CPU mCPU;
+		Cartridge& cartridge;
 		Memory memory;
+		Interrupts interrupts;
+		Timer timer;
+		CPU mCPU;
+
+		Cartridge& generateCartridge(const char* path);
 };

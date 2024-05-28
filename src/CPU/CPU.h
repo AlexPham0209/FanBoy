@@ -9,9 +9,7 @@ class CPU {
 		//General purpose registers
 		unsigned char A, B, C, D, E, H, L;
 		FlagRegister F;
-		Interrupts interrupts;
-		Timer timer;
-
+		
 		Register16 AF, BC, DE, HL;
 
 		unsigned char IF;
@@ -20,10 +18,8 @@ class CPU {
 
 		bool halt = false;
 
-		CPU(Memory& memory);
+		CPU(Memory& memory, Interrupts& interrupts);
 		int step();
-		void run(int iterations);
-		void run();
 		void reset();
 
 		//Stack operation
@@ -35,6 +31,7 @@ class CPU {
 
 	private:
 		Memory& memory;
+		Interrupts& interrupts;
 
 		void executeOpcode(unsigned char opcode);
 		void executeCBOpcodes(unsigned char opcode);

@@ -11,12 +11,11 @@ enum IFLAGS {
 class CPU;
 class Interrupts {
 private:
-	CPU& mCPU;
 	bool IME;
 	Memory& memory;
 	
 public:
-	Interrupts(Memory& memory, CPU& mCPU);
+	Interrupts(Memory& memory);
 
 	void setInterruptFlag(unsigned char flag, bool condition);
 
@@ -30,8 +29,7 @@ public:
 
 	bool getIME();
 
+	void handleInterrupts(CPU& mCPU);
 
-	void handleInterrupts();
-
-	bool triggerInterrupt(unsigned char flag, unsigned short address);
+	bool triggerInterrupt(unsigned char flag, unsigned short address, CPU& mCPU);
 };

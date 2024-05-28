@@ -1,7 +1,7 @@
 #include "CPU.h"
 #include "Interrupts.h"
 
-Interrupts::Interrupts(Memory& memory, CPU& mCPU) : memory(memory), mCPU(mCPU), IME(0) {}
+Interrupts::Interrupts(Memory& memory) : memory(memory), IME(0) {}
 
 //Used to request an interrupt routine to be run
 void Interrupts::setInterruptFlag(unsigned char flag, bool condition) {
@@ -38,31 +38,39 @@ bool Interrupts::getIME() {
 	return IME;
 }
 
-
-void Interrupts::handleInterrupts() {
+//At the beginning of every step, the system checks if any events/interrupts were requested
+void Interrupts::handleInterrupts(CPU& mCPU) {
 	if (memory.readByte(0xFFFF) & memory.readByte(0xFF0F) & 0x0F)
 		mCPU.halt = false;
 
+	//If master interrupt flag is disabled, then the interrupts aren't handled
 	if (!getIME())
 		return;
 
+	//VBlank interrupt routine
 	if (getInterruptEnabled(VBLANK) && getInterruptFlag(VBLANK))
-		triggerInterrupt(VBLANK, 0x40);
+		triggerInterrupt(VBLANK, 0x40, mCPU);
 
+	//LCD interrupt routine
 	if (getInterruptEnabled(LCD) && getInterruptFlag(LCD))
-		triggerInterrupt(LCD, 0x48);
+		triggerInterrupt(LCD, 0x48, mCPU);
 
+	//Timer interrupt routine
 	if (getInterruptEnabled(TIMER) && getInterruptFlag(TIMER))
-		triggerInterrupt(TIMER, 0x50);
+		triggerInterrupt(TIMER, 0x50, mCPU);
 
+	//Serial port interrupt routine
 	if (getInterruptEnabled(SERIAL) && getInterruptFlag(SERIAL))
-		triggerInterrupt(SERIAL, 0x58);
+		triggerInterrupt(SERIAL, 0x58, mCPU);
 
+	//Joypad input serial routine
 	if (getInterruptEnabled(JOYPAD) && getInterruptFlag(JOYPAD))
-		triggerInterrupt(JOYPAD, 0x60);
+		triggerInterrupt(JOYPAD, 0x60, mCPU);
 }
 
-bool Interrupts::triggerInterrupt(unsigned char flag, unsigned short address) {
+//Interrupts CPU's execution, pushes current instruction on the stack and jumps to sections dedicated to individual interrupt routine
+//
+bool Interrupts::triggerInterrupt(unsigned char flag, unsigned short address, CPU& mCPU) {
 	mCPU.push(mCPU.pc);
 	setIME(false);
 	setInterruptFlag(flag, false);
