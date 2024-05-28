@@ -20,7 +20,7 @@ int main() {
 
 	//Creates Cartridge
 	CartridgeFactory* cartridgeFactory = CartridgeFactory::getInstance();
-	Cartridge* cartridge = cartridgeFactory->createCartridge(interruptTest);
+	Cartridge* cartridge = cartridgeFactory->createCartridge(hlTest);
 
 	Memory* memory = new Memory(*cartridge);
 	CPU* mCPU = new CPU(*memory);

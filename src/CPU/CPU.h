@@ -2,6 +2,7 @@
 #include "../Memory/Memory.h"
 #include "Register.h"
 #include "Interrupts.h"
+#include "Timer.h"
 
 class CPU {
 	public:
@@ -9,6 +10,7 @@ class CPU {
 		unsigned char A, B, C, D, E, H, L;
 		FlagRegister F;
 		Interrupts interrupts;
+		Timer timer;
 
 		Register16 AF, BC, DE, HL;
 

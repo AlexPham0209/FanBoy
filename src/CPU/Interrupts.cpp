@@ -3,6 +3,7 @@
 
 Interrupts::Interrupts(Memory& memory, CPU& mCPU) : memory(memory), mCPU(mCPU), IME(0) {}
 
+//Used to request an interrupt routine to be run
 void Interrupts::setInterruptFlag(unsigned char flag, bool condition) {
 	unsigned char IF = memory.readByte(0xFF0F);
 	unsigned char val = condition ? IF | (1 << flag) : IF & ~(1 << flag);
@@ -15,6 +16,7 @@ bool Interrupts::getInterruptFlag(unsigned char flag) {
 	return val;
 }
 
+//Turn on and off event or interrupt
 void Interrupts::setInterruptEnabled(unsigned char flag, bool condition) {
 	unsigned char IF = memory.readByte(0xFFFF);
 	unsigned char val = condition ? IF | (1 << flag) : IF & ~(1 << flag);
@@ -27,6 +29,7 @@ bool Interrupts::getInterruptEnabled(unsigned char flag) {
 	return val;
 }
 
+//Turn on and off all events/interrupts
 void Interrupts::setIME(bool val) {
 	IME = val;
 }

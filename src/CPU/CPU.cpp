@@ -6,7 +6,7 @@
 
 
 CPU::CPU(Memory& memory) : memory(memory), F(FlagRegister()), 
-AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)) {
+AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(Interrupts(memory, *this)), timer(Timer(memory, interrupts)) {
 	pc = 0x100;
 	sp = 0xFFFE;
 
@@ -55,7 +55,6 @@ void CPU::run() {
 		std::transform(val.begin(), val.end(), val.begin(), ::toupper);
 		file << val << std::endl;
 		step();
-		Memory::i++;
 	}
 
 	file.close();
