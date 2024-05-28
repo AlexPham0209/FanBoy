@@ -7,8 +7,8 @@ private:
 	Memory& memory;
 	Interrupts& interrupts;
 	int clockRate = 4194304;
-	int freq;
-	int clock;
+	int freq = 0;
+	int clock = 0;
 
 
 public:

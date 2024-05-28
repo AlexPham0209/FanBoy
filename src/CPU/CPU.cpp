@@ -23,12 +23,17 @@ AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(
 }
 
 int CPU::step() {
-	interrupts.handleInterrupts();
+	if (halt)
+		return 1;
+
 	unsigned char opcode = fetchOpcode();
-	if (opcode == 0xCB)
-		executeCBOpcodes(fetchOpcode());
-	else
-		executeOpcode(opcode);
+	if (opcode == 0xCB) {	
+		unsigned char extended = fetchOpcode();
+		executeCBOpcodes(extended);
+		cycles = opcodeCyclesCB[extended];
+		return cycles;
+	}
+	executeOpcode(opcode);
 	cycles = opcodeCycles[opcode];
 	return cycles;
 }
@@ -48,16 +53,11 @@ void CPU::run(int iterations) {
 }
 
 void CPU::run() {
-	std::ofstream file;
-	file.open("C:/Users/RedAP/Desktop/Output.txt");
-	while (!halt) {
-		std::string val = debug();
-		std::transform(val.begin(), val.end(), val.begin(), ::toupper);
-		file << val << std::endl;
-		step();
+	while (true) {
+		interrupts.handleInterrupts();
+		int cycles = step();
+		timer.step(cycles);
 	}
-
-	file.close();
 }
 
 unsigned char CPU::fetchOpcode() {

@@ -45,7 +45,7 @@ void Interrupts::handleInterrupts() {
 
 	if (!getIME())
 		return;
-		
+
 	if (getInterruptEnabled(VBLANK) && getInterruptFlag(VBLANK))
 		triggerInterrupt(VBLANK, 0x40);
 

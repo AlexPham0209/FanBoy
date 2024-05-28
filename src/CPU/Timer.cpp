@@ -1,15 +1,16 @@
 #include "Timer.h"
 
-Timer::Timer(Memory& memory, Interrupts& interrupts) : memory(memory), interrupts(interrupts) {}
+Timer::Timer(Memory& memory, Interrupts& interrupts) : memory(memory), interrupts(interrupts) {
+	this->select();
+}
 
 void Timer::step(int cycles) {
 	//Increment Divider Register
 	memory.writeByte(0xFF04, memory.readByte(0xFF04) + (clockRate/16384));
-
 	//Return if interrupt is not valid 
 	if (!interrupts.getInterruptEnabled(TIMER))
 		return;
-	
+
 	this->clock += cycles * 4;
 	this->select();
 
