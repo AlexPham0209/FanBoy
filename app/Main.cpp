@@ -18,8 +18,8 @@ int main() {
 	const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
 	const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
 
-
 	GameBoy* gameboy = new GameBoy(hlTest);
+
 	while (true) 
 		gameboy->step();
 
