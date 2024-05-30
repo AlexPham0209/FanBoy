@@ -7,11 +7,13 @@ struct Color {
 
 class PixelBuffer {
 private:
-	unsigned char width, height;
 	std::vector<Color> buffer;
 
 public:
+	unsigned char width, height;
+
 	PixelBuffer(unsigned char width, unsigned char height);
 	bool setPixel(unsigned char x, unsigned char y, Color color);
 	Color getPixel(unsigned char x, unsigned char y);
+	void renderScanline(unsigned char scanline, std::vector<Color> data);
 };
