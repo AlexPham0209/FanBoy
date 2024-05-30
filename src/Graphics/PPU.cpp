@@ -2,9 +2,9 @@
 
 std::map<unsigned char, Color> palette = {
 	{0x00, Color{0, 0, 0}},
-	{0x01, Color{0, 0, 0}},
-	{0x10, Color{0, 0, 0}},
-	{0x11, Color{0, 0, 0}}
+	{0x01, Color{84, 84, 84}},
+	{0x10, Color{169, 169, 169}},
+	{0x11, Color{255, 255, 255}}
 };
 
 PPU::PPU(PixelBuffer& buffer, Memory& memory) : buffer(buffer), memory(memory) {}
@@ -75,15 +75,14 @@ void PPU::renderWindow(unsigned char scanline, std::vector<Color>& buffer) {
 
 	//Get background tile Y position
 	unsigned char scrollingY = memory.readByte(0xFF42);
-	unsigned char tileY = ((windowY + scrollingY) / 8);
+	unsigned char tileY = (windowY / 8);
 
 	//Iterate through all tiles in current scanline
 	for (int x = 0; x < 160; ++x) {
 		if (x < memory.readByte(0xFFB) - 7)
 			continue;
 
-		unsigned char windowX = x - memory.readByte(0xFF4B) - 7;
-		unsigned char scrollingX = memory.readByte(0xFF43);
+		unsigned char windowX = x + memory.readByte(0xFF4B) - 7;
 		unsigned char tileX = (windowX / 8);
 
 		//Retrieving which tile to render at background tile i
@@ -91,14 +90,14 @@ void PPU::renderWindow(unsigned char scanline, std::vector<Color>& buffer) {
 		
 		//Get address of specfic tile in either $8000 unsigned or $8800 signed method
 		unsigned char tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
-		tileAddress += 2 * ((scanline + scrollingY) % 8);
+		tileAddress += 2 * (windowY % 8);
 
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress);
 		unsigned char high = memory.readByte(tileAddress + 1);
 
 		//Retrieve specific color bit
-		unsigned char index = (7 - (x + scrollingX)) % 8;
+		unsigned char index = (7 - windowX) % 8;
 		unsigned char lowCol = (low >> index) & 1;
 		unsigned char highCol = (high >> index) & 1;
 
