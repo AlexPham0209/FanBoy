@@ -109,6 +109,43 @@ void PPU::renderWindow(unsigned char scanline, std::vector<Color>& buffer) {
 }
 
 void PPU::renderSprite(unsigned char scanline, std::vector<Color>& buffer) {
+	
+	//Iterate through all sprites in OAM
+	for (int i = 0xFE00; i <= 0xFE9F; i += 4) {
+		//Get sprite data
+		unsigned char yPosition = memory.readByte(i) + 16;
+		unsigned char xPosition = memory.readByte(i + 1) + 8;
+		unsigned char id = memory.readByte(i + 2);
+		unsigned char flags = memory.readByte(i + 3);
 
+		//If sprite doesn't intersect the scanline, then we don't render it
+		if (scanline < yPosition || scanline > yPosition + 16)
+			continue;
+
+		//If out of bounds, don't render
+		if (xPosition < 0 || xPosition > 160 || yPosition < 0 || yPosition > 44)
+			continue;
+
+		unsigned char tileAddress = 0x8000 + (id * 16);
+		tileAddress += 2 * (yPosition % 8);
+		
+		//Get high and low tile data from memory for specific scanline
+		bool yFlip = (flags >> 6) & 1;
+		int yIndex = yFlip ? 15 - ((scanline - yPosition) * 2) : ((scanline - yPosition) * 2);
+		unsigned char low = memory.readByte(tileAddress + yIndex);
+		unsigned char high = memory.readByte(tileAddress + yIndex);
+			
+		bool xFlip = (flags >> 5) & 1;
+
+		//Iterate through all pixels of sprite in current row/scanline
+		for (int i = 0; i < 8; ++i) {
+			int index = xFlip ? i : 7 - i;
+			unsigned char lowCol = (low >> index) & 1;
+			unsigned char highCol = (high >> index) & 1;
+
+			unsigned color = highCol << 1 | lowCol;
+			buffer[yPosition * 160 + xPosition + i] = palette[color];
+		}
+	}
 }
 
