@@ -5,7 +5,7 @@
 
 enum PPUMode {
 	HBLANK,
-	VBLANK,
+	VBlank,
 	DRAWING,
 	OAMSCAN
 };

@@ -21,6 +21,13 @@ Color PixelBuffer::getPixel(unsigned char x, unsigned char y) {
 	return buffer[index];
 }
 
+void PixelBuffer::reset() {
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x)
+			setPixel(x, y, Color{255, 255, 255});
+	}
+}
+
 void PixelBuffer::renderScanline(unsigned char scanline, std::vector<Color> data) {
 	for (int i = 0; i < width; ++i)
 		this->setPixel(scanline, i, data[scanline * width + i]);

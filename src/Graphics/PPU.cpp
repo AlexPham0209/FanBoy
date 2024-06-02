@@ -12,24 +12,77 @@ PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(b
 void PPU::step(int cycles) {
 	this->cycles += cycles;
 
+	//If bit 7 in LCD enable register (FF40) is false, then stop PPU execution
+	bool lcdEnable = (memory.readByte(0xFF40) >> 7) & 1;
+	if (!lcdEnable)
+		return;
+
 	//State machine that controls the mode the PPU is in
 	switch (mode) {
-		case HBLANK:
-			hBlank();
-			break;
-
-		case VBLANK:
-			vBlank();
+		case OAMSCAN:
+			OAMScan();
 			break;
 
 		case DRAWING:
 			drawing();
 			break;
 
-		case OAMSCAN:
-			OAMScan();
-			break;	
+		case HBLANK:
+			hBlank();
+			break;
+
+		case VBlank:
+			vBlank();
+			break;
 	}
+}
+
+
+//For 80 cycles, the PPU scans through memory and puts all objects that follow certain conditions into a buffer
+//The sprites in the buffer are then rendered in the drawing state
+//However since the rendering functions themselves filter out the invalid sprites, so this phase essentially does nothing
+void PPU::OAMScan() {
+	if (cycles < 80)
+		return;
+
+	cycles %= 80;
+
+	//Switch to Drawing mode (Sets first 2 bits of LCD Status register to mode)
+	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
+	memory.writeByte(0xFF41, prev | 3);
+	this->mode = DRAWING;
+}
+
+//For 172 cycles, the PPU draws all layers for one row/scanline
+void PPU::drawing() {
+	if (cycles < 172)
+		return;
+	
+	cycles %= 172;
+
+	//Render current row
+	renderScanline();
+
+	//Switch to HBlank mode
+	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
+	memory.writeByte(0xFF41, prev | 0);
+	this->mode = HBLANK;
+
+	//Initiate LCD interrupt if HBlank mode condition is true
+	bool interrupt = (memory.readByte(0xFF41) >> 3) & 1;
+	if (interrupt)
+		interrupts.setInterruptFlag(LCD, true);
+
+	//Checks if LY register (current scanline number) is equal to LYC register
+	bool lyCoincidence = memory.readByte(0xFF44) == memory.readByte(0xFF45);
+	bool lyEnable = (memory.readByte(0xFF41) >> 6) & 1;
+
+	if (lyCoincidence && lyEnable) {
+		memory.writeByte(0xFF41, memory.readByte(0xFF41 | (1 << 2)));
+		interrupts.setInterruptFlag(LCD, true);
+	}
+
+		
 }
 
 //After a line finishes drawing, the PPU essentially pauses for 376 cycles (In actual hardware, the PPU waits until all pixels are transfers to the LCD)
@@ -40,75 +93,56 @@ void PPU::hBlank() {
 
 	cycles %= 376;
 
+	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
+
 	//If current scanline is at row 144, then switch to VBlank phase
 	if (memory.readByte(0xFF44) == 144) {
-		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 		memory.writeByte(0xFF41, prev | 1);
-		this->mode = VBLANK;
+		this->mode = VBlank;
 	}
 
 	//If current scanline is not in row 144, then we switch back to the OAM scan state
 	else {
-		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 		memory.writeByte(0xFF41, prev | 3);
-		this->mode = VBLANK;
+		this->mode = OAMSCAN;
 	}
-
-	
 }
 
-//After the entire screen is drawn, the PPU waits for 10 scanlines until the next frame 
+
+//After the entire screen is drawn, the PPU waits for 10 scanlines (4560 cycles) until the next frame 
 void PPU::vBlank() {
 	if (cycles < 4560)
 		return;
 
+	cycles %= 4560;
+
 	//Switch to VBlank mode
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 	memory.writeByte(0xFF41, prev | 2);
-	cycles %= 4560;
 
 	this->mode = OAMSCAN;
 }
 
-//For 172 cycles, the PPU draws all layers for one row/scanline
-void PPU::drawing() {
-	if (cycles < 172)
-		return;
 
-	renderScanline();
 
-	//Switch to HBlank mode
-	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
-	memory.writeByte(0xFF41, prev | 0);
-	cycles %= 172;
-
-	this->mode = HBLANK;
-}
-
-//For 80 cycles, the PPU scans through memory and puts all objects that follow certain conditions into a buffer
-//The sprites in the buffer are then rendered in the drawing state
-//However since the rendering functions themselves filter out the invalid sprites, so this phase essentially does nothing
-void PPU::OAMScan() {
-	if (cycles < 80)
-		return;
-
-	//Switch to Drawing mode
-	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
-	memory.writeByte(0xFF41, prev | 3);
-	cycles %= 80;
-	
-	this->mode = DRAWING;
-}
 
 //Renders all 3 layers, background, window, and object, for one scanline, specified by the LY register in memory
 //The LY register is then incremented, which represents it going to the next scanline
 void PPU::renderScanline() {
 	unsigned char y = memory.readByte(0xFF44);
 
-	renderBackground(y);
-	renderSprite(y);
-	renderWindow(y);
+	//If 0th bit in LCD display shader is 0, then the background and window layers are not rendered and replaced with white
+	bool bgwEnable = memory.readByte(0xFF40) & 1;
+	if (bgwEnable) {
+		renderBackground(y);
+		renderWindow(y);
+	}
 
+	else
+		buffer.reset();
+	
+	renderSprite(y);
+	
 	memory.writeByte(0xFF44, y + 1);
 }
 
@@ -206,7 +240,7 @@ void PPU::renderSprite(unsigned char y) {
 	//Iterate through all sprites in OAM
 	for (int i = 0xFE00; i <= 0xFE9F; i += 4) {
 		//Get sprite data
-		unsigned char yPosition = memory.readByte(i) - 16;
+		unsigned char yPosition = memory.readByte(i) - height;
 		unsigned char xPosition = memory.readByte(i + 1) - 8;
 		unsigned char id = memory.readByte(i + 2);
 		unsigned char flags = memory.readByte(i + 3);
