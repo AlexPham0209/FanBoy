@@ -15,8 +15,12 @@ void Memory::loadProgram(std::vector<unsigned char> rom) {
 unsigned char Memory::readByte(unsigned short address) {
 	//Reading external cartridge ROM 
 
-	if (address == 0xFF44)
-		return 0x90;
+	/*if (address == 0xFF44)
+		return 0x90;*/
+
+	if (address == 0xFF00)
+		return 0xFF;
+
 
 	if (address <= 0x7FFF)
 		return cartridge.readByte(address);
@@ -44,6 +48,9 @@ unsigned short Memory::readShort(unsigned short address) {
 
 //Writes byte value into memory address
 unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
+	if (address == 0xFF00)
+		return 0;
+
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
 

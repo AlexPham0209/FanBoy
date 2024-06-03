@@ -1,4 +1,5 @@
 #pragma once
+#include "../Memory/Memory.h"
 
 enum IFLAGS {
 	VBLANK = 0,

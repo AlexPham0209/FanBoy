@@ -1,8 +1,101 @@
 #include <iostream>
 #include "../src/GameBoy.h"
 #include "../src/Cartridge/CartridgeFactory.h"
+#include <chrono>
+#define SDL_MAIN_HANDLED 
+#include <SDL2/SDL.h>
 
-int main() {
+
+const int DELAY = 0;
+int videoPitch;
+const int SCALE = 4;
+bool running = true;
+
+GameBoy* gameboy;
+SDL_Window* window;
+SDL_Renderer* renderer;
+SDL_Texture* texture;
+
+bool initWindow() {
+	SDL_Init(SDL_INIT_EVERYTHING);
+	window = SDL_CreateWindow("Gameboy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 160 * SCALE, 144 * SCALE, SDL_WINDOW_SHOWN);
+	if (window == nullptr) {
+		std::cout << "Failed to open window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" << std::endl;
+		return false;
+	}
+	std::cout << "Window Created" << std::endl;
+
+	renderer = SDL_CreateRenderer(window, -1, 0);
+
+	if (renderer == nullptr) {
+		std::cout << "Failed to create renderer" << std::endl;
+		return false;
+	}
+	std::cout << "Renderer Created" << std::endl;
+
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, 160, 144);
+	if (texture == nullptr) {
+		std::cout << "Failed to create texture" << std::endl;
+		return false;
+	}
+	std::cout << "Texture Created" << std::endl;
+
+	return true;
+}
+
+void render(void const* buffer, int pitch) {
+	SDL_UpdateTexture(texture, nullptr, buffer, pitch);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+	SDL_RenderPresent(renderer);
+}
+
+void input() {
+	SDL_Event e;
+	while (SDL_PollEvent(&e) > 0) {
+		if (e.type == SDL_QUIT)
+			running = false;
+
+		// Process keydown events
+		if (e.type == SDL_KEYDOWN) {
+			if (e.key.keysym.sym == SDLK_ESCAPE)
+				running = false;
+		}
+		// Process keyup events
+
+	}
+}
+
+void run() {
+	auto lastCycleTime = std::chrono::high_resolution_clock::now();
+	while (running) {
+		auto currentTime = std::chrono::high_resolution_clock::now();
+		float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
+
+		if (dt > DELAY) {
+			lastCycleTime = currentTime;
+			gameboy->step();
+			int* frame = gameboy->getFrame();
+			int pitch = sizeof(frame[0]) * 160;
+			render(frame, pitch);
+			input();
+		}
+	}
+}
+
+bool init() {
+	gameboy = new GameBoy("C:/Users/RedAP/Desktop/Tetris.gb");
+
+	if (!initWindow()) {
+		std::cout << "Failed to initialize window" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+int main(int argc, char* args[]) {
+	//SDL_SetMainReady();
 	const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 
 	//PASSED ALL OF THESE ROMS
@@ -18,10 +111,10 @@ int main() {
 	const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
 	const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
 
-	GameBoy* gameboy = new GameBoy(hlTest);
+	if (!init())
+		return -1;
 
-	while (true) 
-		gameboy->step();
+	run();
 
 	delete gameboy;
 	return 0;

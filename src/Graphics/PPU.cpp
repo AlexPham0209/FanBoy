@@ -7,15 +7,15 @@ std::map<unsigned char, Color> palette = {
 	{0x11, Color{255, 255, 255}}
 };
 
-PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(buffer), memory(memory), interrupts(interrupts) {}
+PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(buffer), memory(memory), interrupts(interrupts), mode(OAMSCAN) {}
 
 void PPU::step(int cycles) {
 	this->cycles += cycles;
 
 	//If bit 7 in LCD enable register (FF40) is false, then stop PPU execution
-	bool lcdEnable = (memory.readByte(0xFF40) >> 7) & 1;
+	/*bool lcdEnable = (memory.readByte(0xFF40) >> 7) & 1;
 	if (!lcdEnable)
-		return;
+		return;*/
 
 	//State machine that controls the mode the PPU is in
 	switch (mode) {
@@ -44,7 +44,6 @@ void PPU::step(int cycles) {
 void PPU::OAMScan() {
 	if (cycles < 80)
 		return;
-
 	cycles %= 80;
 
 	//Switch to Drawing mode (Sets first 2 bits of LCD Status register to mode)
@@ -81,8 +80,6 @@ void PPU::drawing() {
 		memory.writeByte(0xFF41, memory.readByte(0xFF41 | (1 << 2)));
 		interrupts.setInterruptFlag(LCD, true);
 	}
-
-		
 }
 
 //After a line finishes drawing, the PPU essentially pauses for 376 cycles (In actual hardware, the PPU waits until all pixels are transfers to the LCD)
@@ -90,6 +87,7 @@ void PPU::drawing() {
 void PPU::hBlank() {
 	if (cycles < 376)
 		return;
+
 
 	cycles %= 376;
 
@@ -99,6 +97,7 @@ void PPU::hBlank() {
 	if (memory.readByte(0xFF44) == 144) {
 		memory.writeByte(0xFF41, prev | 1);
 		this->mode = VBlank;
+		interrupts.setInterruptFlag(VBLANK, true);
 	}
 
 	//If current scanline is not in row 144, then we switch back to the OAM scan state
@@ -116,10 +115,13 @@ void PPU::vBlank() {
 
 	cycles %= 4560;
 
+	//Reset screen and scanline register
+	memory.writeByte(0xFF44, 0);
+	buffer.reset();
+
 	//Switch to VBlank mode
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 	memory.writeByte(0xFF41, prev | 2);
-
 	this->mode = OAMSCAN;
 }
 
@@ -158,7 +160,7 @@ void PPU::renderBackground(unsigned char y) {
 	unsigned char scrollingY = memory.readByte(0xFF42);
 	unsigned char tileY = ((y + scrollingY) / 8) % 32;
 
-	//Iterate through all tiles in current scanline
+	//Iterate through all pixels in current scanline
 	for (int x = 0; x < 160; ++x) {
 
 		//From the current pixel in the row, get the specific 8x8 tile
@@ -177,7 +179,7 @@ void PPU::renderBackground(unsigned char y) {
 		unsigned char high = memory.readByte(tileAddress + yIndex + 1);
 
 		//Retrieve specific color bit
-		unsigned char index = (7 - (x + scrollingX)) % 8;
+		unsigned char index = (7 - ((x + scrollingX) % 8));
 		unsigned char lowCol = (low >> index) & 1;
 		unsigned char highCol = (high >> index) & 1;
 		
@@ -206,7 +208,7 @@ void PPU::renderWindow(unsigned char y) {
 		if (x < memory.readByte(0xFFB) - 7)
 			continue;
 
-		unsigned char windowX = x + memory.readByte(0xFF4B) - 7;
+		unsigned char windowX = x - (memory.readByte(0xFF4B) - 7);
 		unsigned char tileX = (windowX / 8);
 
 		//Retrieving which tile to render at background tile i
@@ -254,9 +256,9 @@ void PPU::renderSprite(unsigned char y) {
 			continue;
 
 		//Get specific address for the current row of the tile
-		unsigned char tileAddress = 0x8000 + (id * (2 * height));
+		unsigned char tileAddress = 0x8000 + (id * 16);
 		bool yFlip = (flags >> 6) & 1;
-		int yIndex = yFlip ? ((2 * height) - 1) - ((y - yPosition) * 2) : ((y - yPosition) * 2);
+		int yIndex = yFlip ? 2 * ((height - 1) - (y - yPosition)) : 2 * (y - yPosition);
 
 		//Get high and low tile data from memory for specific scanline		
 		unsigned char low = memory.readByte(tileAddress + yIndex);

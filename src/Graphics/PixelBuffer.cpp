@@ -9,7 +9,7 @@ bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 	if (index < 0 || index >= width * height)
 		return false;
 
-	buffer[index] = color;
+	buffer[index] = color.r << 16 | color.g << 8 | color.b;
 	return true;
 }
 
@@ -18,7 +18,12 @@ Color PixelBuffer::getPixel(unsigned char x, unsigned char y) {
 	if (index < 0 || index >= width * height)
 		return Color{0, 0, 0};
 
-	return buffer[index];
+	int color = buffer[index];
+	unsigned char r = (color & 0xFF0000) >> 16;
+	unsigned char g = (color & 0xFF00) >> 8;
+	unsigned char b = (color & 0xFF);
+
+	return Color{r, g, b};
 }
 
 void PixelBuffer::reset() {
@@ -28,7 +33,6 @@ void PixelBuffer::reset() {
 	}
 }
 
-void PixelBuffer::renderScanline(unsigned char scanline, std::vector<Color> data) {
-	for (int i = 0; i < width; ++i)
-		this->setPixel(scanline, i, data[scanline * width + i]);
+int* PixelBuffer::getFrame() {
+	return &buffer[0];
 }
