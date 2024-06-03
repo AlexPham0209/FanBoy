@@ -24,6 +24,7 @@ class GameBoy {
 
 		~GameBoy();
 		void step();
+		bool canRender();
 		
 
 	private:

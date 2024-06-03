@@ -18,6 +18,9 @@ unsigned char Memory::readByte(unsigned short address) {
 	/*if (address == 0xFF44)
 		return 0x90;*/
 
+	if (address < 0x100)
+		return bootDMG[address];
+
 	if (address == 0xFF00)
 		return 0xFF;
 

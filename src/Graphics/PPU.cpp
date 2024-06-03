@@ -20,6 +20,7 @@ void PPU::step(int cycles) {
 	//State machine that controls the mode the PPU is in
 	switch (mode) {
 		case OAMSCAN:
+			canRender = false;
 			OAMScan();
 			break;
 
@@ -117,7 +118,7 @@ void PPU::vBlank() {
 
 	//Reset screen and scanline register
 	memory.writeByte(0xFF44, 0);
-	buffer.reset();
+	canRender = true;
 
 	//Switch to VBlank mode
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
@@ -141,7 +142,7 @@ void PPU::renderScanline() {
 
 void PPU::renderBackground(unsigned char y) {
 	//Controls which BG map to use
-	unsigned char bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
+	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
 
 	//Chooses which addressing mode to use for the window and background
 	bool wOffset = ((memory.readByte(0xFF40) >> 4) & 1);
@@ -161,8 +162,10 @@ void PPU::renderBackground(unsigned char y) {
 		unsigned char id = memory.readByte(bgOffset + ((tileY * 32) + tileX));
 
 		//Get address of specfic tile in either $8000 unsigned or $8800 signed method
-		unsigned char tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
-		unsigned char yIndex = 2 * ((y + scrollingY) % 8);
+		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
+		unsigned short yIndex = 2 * ((y + scrollingY) % 8);
+
+		std::cout << (int)(tileAddress + yIndex) << std::endl;
 		
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress + yIndex);
@@ -184,7 +187,7 @@ void PPU::renderWindow(unsigned char y) {
 	//Controls which BG map to use
 	unsigned char windowY = y - memory.readByte(0xFF4A);
 
-	unsigned char bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
+	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
 
 	//Chooses which addressing mode to use for the window and background
 	bool wOffset = ((memory.readByte(0xFF40) >> 4) & 1);
@@ -205,8 +208,8 @@ void PPU::renderWindow(unsigned char y) {
 		unsigned char id = memory.readByte(bgOffset + ((tileY * 32) + tileX));
 		
 		//Get address of specfic tile in either $8000 unsigned or $8800 signed method
-		unsigned char tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
-		unsigned char yIndex = 2 * ((y + scrollingY) % 8);
+		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
+		unsigned short yIndex = 2 * ((y + scrollingY) % 8);
 
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress + yIndex);
@@ -246,9 +249,9 @@ void PPU::renderSprite(unsigned char y) {
 			continue;
 
 		//Get specific address for the current row of the tile
-		unsigned char tileAddress = 0x8000 + (id * 16);
+		unsigned short tileAddress = 0x8000 + (id * 16);
 		bool yFlip = (flags >> 6) & 1;
-		int yIndex = yFlip ? 2 * ((height - 1) - (y - yPosition)) : 2 * (y - yPosition);
+		unsigned short yIndex = yFlip ? 2 * ((height - 1) - (y - yPosition)) : 2 * (y - yPosition);
 
 		//Get high and low tile data from memory for specific scanline		
 		unsigned char low = memory.readByte(tileAddress + yIndex);

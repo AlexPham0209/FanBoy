@@ -31,9 +31,9 @@ private:
 	void renderWindow(unsigned char y);
 
 public:
+	bool canRender = false;
 	PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts);
 	void step(int cycles);
-
-
+	
 
 };

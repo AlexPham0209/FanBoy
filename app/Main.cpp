@@ -72,12 +72,15 @@ void run() {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
 		input();
-		if (dt > DELAY) {
+		if (dt >= DELAY) {
 			lastCycleTime = currentTime;
 			gameboy->step();
-			unsigned int* frame = gameboy->getFrame();
-			int pitch = sizeof(frame[0]) * 160;
-			render(frame, pitch);
+
+			if (gameboy->canRender()) {
+				unsigned int* frame = gameboy->getFrame();
+				int pitch = sizeof(frame[0]) * 160;
+				render(frame, pitch);
+			}
 		}
 	}
 }

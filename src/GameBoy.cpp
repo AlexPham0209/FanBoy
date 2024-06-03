@@ -83,3 +83,6 @@ Cartridge& GameBoy::generateCartridge(const char* path) {
 }
 
 
+bool GameBoy::canRender() {
+	return mPPU.canRender;
+}
