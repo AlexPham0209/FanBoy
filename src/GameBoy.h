@@ -20,7 +20,7 @@ class GameBoy {
 		GameBoy(const char* path);
 		GameBoy(Cartridge& cartridge);
 		void setInput(INPUT input);
-		int* getFrame();
+		unsigned int* getFrame();
 
 		~GameBoy();
 		void step();

@@ -70,7 +70,7 @@ void GameBoy::setInput(INPUT input) {
 	interrupts.setInterruptFlag(JOYPAD, true);
 }
 
-int* GameBoy::getFrame() {
+unsigned int* GameBoy::getFrame() {
 	return buffer.getFrame();
 }
 

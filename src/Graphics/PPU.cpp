@@ -125,9 +125,6 @@ void PPU::vBlank() {
 	this->mode = OAMSCAN;
 }
 
-
-
-
 //Renders all 3 layers, background, window, and object, for one scanline, specified by the LY register in memory
 //The LY register is then incremented, which represents it going to the next scanline
 void PPU::renderScanline() {
@@ -135,16 +132,9 @@ void PPU::renderScanline() {
 
 	//If 0th bit in LCD display shader is 0, then the background and window layers are not rendered and replaced with white
 	bool bgwEnable = memory.readByte(0xFF40) & 1;
-	if (bgwEnable) {
-		renderBackground(y);
-		renderWindow(y);
-	}
-
-	else
-		buffer.reset();
-	
+	renderBackground(y);
+	renderWindow(y);
 	renderSprite(y);
-	
 	memory.writeByte(0xFF44, y + 1);
 }
 
