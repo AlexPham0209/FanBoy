@@ -1,10 +1,10 @@
 #include "PPU.h"
 
 std::map<unsigned char, Color> palette = {
-	{0x00, Color{0, 0, 0}},
-	{0x01, Color{84, 84, 84}},
-	{0x10, Color{169, 169, 169}},
-	{0x11, Color{255, 255, 255}}
+	{0x00, Color{255, 255, 255}},
+	{0x01, Color{169, 169, 169}},
+	{0x10, Color{84, 84, 84}},
+	{0x11, Color{0, 0, 0}}
 };
 
 PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(buffer), memory(memory), interrupts(interrupts), mode(OAMSCAN) {}
@@ -165,8 +165,6 @@ void PPU::renderBackground(unsigned char y) {
 		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
 		unsigned short yIndex = 2 * ((y + scrollingY) % 8);
 
-		std::cout << (int)(tileAddress + yIndex) << std::endl;
-		
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress + yIndex);
 		unsigned char high = memory.readByte(tileAddress + yIndex + 1);

@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 
 
-const int DELAY = 0;
+const double DELAY = 0.005;
 int videoPitch;
 const int SCALE = 4;
 bool running = true;
@@ -67,12 +67,15 @@ void input() {
 }
 
 void run() {
+	float time = 0;
 	auto lastCycleTime = std::chrono::high_resolution_clock::now();
 	while (running) {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
+		time += dt;
 		input();
-		if (dt >= DELAY) {
+		if (time >= DELAY) {
+			time = 0;
 			lastCycleTime = currentTime;
 			gameboy->step();
 

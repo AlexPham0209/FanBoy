@@ -21,6 +21,7 @@ class CPU {
 		CPU(Memory& memory, Interrupts& interrupts);
 		int step();
 		void reset();
+		void resetBoot();
 
 		//Stack operation
 		void push(Register16& reg);

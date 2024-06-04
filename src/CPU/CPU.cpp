@@ -7,7 +7,7 @@
 
 CPU::CPU(Memory& memory, Interrupts& interrupts) : memory(memory), F(FlagRegister()), 
 AF(Register16(A, F)), BC(Register16(B, C)), DE(Register16(D, E)), HL(Register16(H, L)), interrupts(interrupts) {
-	reset();
+	resetBoot();
 }
 
 //Executes for a single frame
@@ -15,7 +15,7 @@ int CPU::step() {
 	//If system is halted, stop execution of CPU (takes 1 cycles)
 	if (halt)
 		return 1;
-
+	std::cout << debug() << std::endl;
 	unsigned char opcode = fetchOpcode();
 
 	//Execute extended CB prefixed instructions
@@ -48,6 +48,22 @@ void CPU::reset() {
 	F = 0xB0;
 	H = 0x01;
 	L = 0x4D;
+
+	cycles = 0;
+}
+
+void CPU::resetBoot() {
+	pc = 0;
+	sp = 0;
+
+	A = 0;
+	B = 0;
+	C = 0;
+	D = 0;
+	E = 0;
+	F = 0;
+	H = 0;
+	L = 0;
 
 	cycles = 0;
 }
