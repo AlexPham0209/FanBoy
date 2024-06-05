@@ -15,7 +15,7 @@ int CPU::step() {
 	//If system is halted, stop execution of CPU (takes 1 cycles)
 	if (halt)
 		return 1;
-	std::cout << debug() << std::endl;
+	branchTaken = false;
 	unsigned char opcode = fetchOpcode();
 
 	//Execute extended CB prefixed instructions
@@ -27,7 +27,7 @@ int CPU::step() {
 	
 	//Execute regular instructions
 	executeOpcode(opcode);
-	return opcodeCycles[opcode];
+	return branchTaken ? opcodeCyclesBranch[opcode] : opcodeCycles[opcode];
 }
 
 //Fetches opcode from memory at address stated inside of program counter

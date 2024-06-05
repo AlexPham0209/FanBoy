@@ -10,6 +10,7 @@ enum IFLAGS {
 };
 
 class CPU;
+class Memory;
 class Interrupts {
 private:
 	bool IME;

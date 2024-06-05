@@ -17,6 +17,7 @@ class CPU {
 		int cycles;
 
 		bool halt = false;
+		bool branchTaken = false;
 
 		CPU(Memory& memory, Interrupts& interrupts);
 		int step();

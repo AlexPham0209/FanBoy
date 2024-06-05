@@ -76,7 +76,7 @@ void PPU::drawing() {
 	//Checks if LY register (current scanline number) is equal to LYC register
 	bool lyCoincidence = memory.readByte(0xFF44) == memory.readByte(0xFF45);
 	bool lyEnable = (memory.readByte(0xFF41) >> 6) & 1;
-
+				
 	if (lyCoincidence && lyEnable) {
 		memory.writeByte(0xFF41, memory.readByte(0xFF41 | (1 << 2)));
 		interrupts.setInterruptFlag(LCD, true);
@@ -111,19 +111,20 @@ void PPU::hBlank() {
 
 //After the entire screen is drawn, the PPU waits for 10 scanlines (4560 cycles) until the next frame 
 void PPU::vBlank() {
-	if (cycles < 4560)
+	if (cycles < 172)
 		return;
 
-	cycles %= 4560;
+	cycles %= 172;
+	memory.writeByte(0xFF44, memory.readByte(0xFF44) + 1);
 
-	//Reset screen and scanline register
-	memory.writeByte(0xFF44, 0);
-	canRender = true;
-
-	//Switch to VBlank mode
-	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
-	memory.writeByte(0xFF41, prev | 2);
-	this->mode = OAMSCAN;
+	if (memory.readByte(0xFF44) == 154) {
+		//Reset screen and scanline register
+		canRender = true;
+		memory.writeByte(0xFF44, 0);
+		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
+		memory.writeByte(0xFF41, prev | 2);
+		this->mode = OAMSCAN;
+	}
 }
 
 //Renders all 3 layers, background, window, and object, for one scanline, specified by the LY register in memory

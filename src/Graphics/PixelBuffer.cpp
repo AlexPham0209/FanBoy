@@ -8,14 +8,14 @@ PixelBuffer::PixelBuffer(unsigned char width, unsigned char height) : width(widt
 
 bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 	unsigned short index = y * width + x;
-	/*if (index < 0 || index >= width * height)
-		return false;*/
+	if (index < 0 || index >= width * height)
+		return false;
 
 	//std::cout << (int)x << ", " << (int)y << ", " << std::endl;
 	//std::cout << (int)index << ", " << (int)color.r << ", " << (int)color.g << ", " << (int)color.b << "\n" << std::endl;
 	buffer[index] = color.r << 16 | color.g << 8 | color.b;
 	return true;
-}
+} 
 
 Color PixelBuffer::getPixel(unsigned char x, unsigned char y) {
 	unsigned short index = y * width + x;

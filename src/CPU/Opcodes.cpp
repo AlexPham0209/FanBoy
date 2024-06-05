@@ -367,6 +367,7 @@ void CPU::jump(char val) {
 }
 
 void CPU::jump(unsigned short address, bool condition) {
+	branchTaken = condition;
 	if (condition)
 		pc = address;
 	else
@@ -374,6 +375,7 @@ void CPU::jump(unsigned short address, bool condition) {
 }
 
 void CPU::jump(char val, bool condition) {
+	branchTaken = condition;
 	if (condition)
 		pc += val;
 }
@@ -384,6 +386,7 @@ void CPU::call(unsigned short address) {
 }
 
 void CPU::call(unsigned short address, bool condition) {
+	branchTaken = condition;
 	if (condition)
 		call(address);
 	else
@@ -400,6 +403,7 @@ void CPU::ret() {
 }
 
 void CPU::ret(bool condition) {
+	branchTaken = condition;
 	if (condition)
 		ret();
 }

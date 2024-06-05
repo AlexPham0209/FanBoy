@@ -750,7 +750,7 @@ void CPU::executeOpcode(unsigned char opcode) {
 		case 0xFE:
 			CP(A, memory.readByte(pc++));
 			break;
-
+					
 
 		//INC n
 		case 0x3C:

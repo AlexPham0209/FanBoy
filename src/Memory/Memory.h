@@ -7,11 +7,11 @@
 #include "../Cartridge/Cartridge.h"
 #include <map>
 
-
+class Joypad;
 class Memory {
 public:
 	inline static int i = 0;
-	Memory(Cartridge& cartridge);
+	Memory(Cartridge& cartridge, Joypad& joypad);
 
 	void loadProgram(std::vector<unsigned char> rom);
 	unsigned char readByte(unsigned short address);
@@ -41,5 +41,6 @@ private:
     };
 
 	Cartridge& cartridge;
+    Joypad& joypad;
 	std::vector<unsigned char> ram;
 };

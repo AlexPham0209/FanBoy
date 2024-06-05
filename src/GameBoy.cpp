@@ -3,10 +3,10 @@
 #include <iostream>
 #include "Cartridge/CartridgeFactory.h"
 
-GameBoy::GameBoy(Cartridge& cartridge) : cartridge(cartridge), memory(Memory(cartridge)), 
+GameBoy::GameBoy(Cartridge& cartridge) : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Memory(cartridge, joypad)),
 interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
 
-GameBoy::GameBoy(const char* path) : cartridge(this->generateCartridge(path)), memory(cartridge), 
+GameBoy::GameBoy(const char* path) : cartridge(this->generateCartridge(path)), joypad(Joypad(interrupts)), memory(Memory(cartridge, joypad)),
 interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
 
 GameBoy::~GameBoy() {
@@ -20,55 +20,14 @@ void GameBoy::step() {
 	mPPU.step(cycles);
 }
 
-void GameBoy::setInput(INPUT input) {
-	unsigned char joypad = memory.readByte(0xFF00);
-	joypad |= 0xF;
-
-	switch (input) {
-		case START:
-			joypad = joypad &  ~(1 << 5);
-			joypad = joypad & ~(1 << 3);
-			break;
-		
-		case SELECT:
-			joypad = joypad & ~(1 << 5);
-			joypad = joypad & ~(1 << 2);
-			break;
-
-		case A:
-			joypad = joypad & ~(1 << 5);
-			joypad = joypad & ~(1 << 1);
-			break;
-
-		case B:
-			joypad = joypad & ~(1 << 5);
-			joypad = joypad & ~1;
-			break;
-
-		case DOWN:
-			joypad = joypad & ~(1 << 4);
-			joypad = joypad & ~(1 << 3);
-			break;
-
-		case UP:
-			joypad = joypad & ~(1 << 4);
-			joypad = joypad & ~(1 << 2);
-			break;
-
-		case LEFT:
-			joypad = joypad & ~(1 << 4);
-			joypad = joypad & ~(1 << 1);
-			break;
-
-		case RIGHT:
-			joypad = joypad & ~(1 << 4);
-			joypad = joypad & ~1;
-			break;
-	}
-
-	memory.writeByte(0xFF00, joypad);
-	interrupts.setInterruptFlag(JOYPAD, true);
+void GameBoy::pressButton(unsigned char input, SELECT mode) {
+	joypad.pressButton(input, mode);
 }
+
+void GameBoy::releaseButton(unsigned char input, SELECT mode) {
+	joypad.releaseButton(input, mode);
+}
+
 
 unsigned int* GameBoy::getFrame() {
 	return buffer.getFrame();

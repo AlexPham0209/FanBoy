@@ -6,10 +6,26 @@
 #include <SDL2/SDL.h>
 
 
-const double DELAY = 0.005;
+const double DELAY = 0.0025;
 int videoPitch;
 const int SCALE = 4;
 bool running = true;
+
+std::map<int, std::pair<unsigned char, SELECT>> keyMap;
+const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
+
+//PASSED ALL OF THESE ROMS
+const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
+const char* interruptTest = "C:/Users/RedAP/Downloads/02-interrupts.gb";
+const char* opSPTest = "C:/Users/RedAP/Downloads/03-op sp,hl.gb";
+const char* opRTest = "C:/Users/RedAP/Downloads/04-op r,imm.gb";
+const char* op5Test = "C:/Users/RedAP/Downloads/05-op rp.gb";
+const char* loadTest = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
+const char* jumpTest = "C:/Users/RedAP/Downloads/07-jr,jp,call,ret,rst.gb";
+const char* miscTest = "C:/Users/RedAP/Downloads/08-misc instrs.gb";
+const char* opRRTest = "C:/Users/RedAP/Downloads/09-op r,r.gb";
+const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
+const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
 
 GameBoy* gameboy;
 SDL_Window* window;
@@ -60,9 +76,15 @@ void input() {
 		if (e.type == SDL_KEYDOWN) {
 			if (e.key.keysym.sym == SDLK_ESCAPE)
 				running = false;
+
+			if (keyMap.count(e.key.keysym.sym)) {
+				gameboy->pressButton(keyMap[e.key.keysym.sym].first, keyMap[e.key.keysym.sym].second);
+			}
 		}
 		// Process keyup events
 
+		if (e.type == SDL_KEYUP && keyMap.count(e.key.keysym.sym))
+			gameboy->releaseButton(keyMap[e.key.keysym.sym].first, keyMap[e.key.keysym.sym].second);
 	}
 }
 
@@ -89,7 +111,16 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy("C:/Users/RedAP/Desktop/Tetris.gb");
+	gameboy = new GameBoy(tetris);
+	keyMap[SDLK_LEFT] = {GAMEBOY_LEFT, DPAD};
+	keyMap[SDLK_RIGHT] = {GAMEBOY_RIGHT, DPAD};
+	keyMap[SDLK_DOWN] = {GAMEBOY_DOWN, DPAD};
+	keyMap[SDLK_UP] = {GAMEBOY_UP, DPAD};
+
+	keyMap[SDLK_z] = {GAMEBOY_A, BUTTON};
+	keyMap[SDLK_x] = {GAMEBOY_B, BUTTON};
+	keyMap[SDLK_c] = {GAMEBOY_START, BUTTON};
+	keyMap[SDLK_v] = {GAMEBOY_SELECT, BUTTON};
 
 	if (!initWindow()) {
 		std::cout << "Failed to initialize window" << std::endl;
@@ -101,21 +132,6 @@ bool init() {
 
 int main(int argc, char* args[]) {
 	//SDL_SetMainReady();
-	const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
-
-	//PASSED ALL OF THESE ROMS
-	const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
-	const char* interruptTest = "C:/Users/RedAP/Downloads/02-interrupts.gb";
-	const char* opSPTest = "C:/Users/RedAP/Downloads/03-op sp,hl.gb";
-	const char* opRTest = "C:/Users/RedAP/Downloads/04-op r,imm.gb";
-	const char* op5Test = "C:/Users/RedAP/Downloads/05-op rp.gb";
-	const char* loadTest = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
-	const char* jumpTest = "C:/Users/RedAP/Downloads/07-jr,jp,call,ret,rst.gb";
-	const char* miscTest = "C:/Users/RedAP/Downloads/08-misc instrs.gb";
-	const char* opRRTest = "C:/Users/RedAP/Downloads/09-op r,r.gb";
-	const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
-	const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
-
 	if (!init())
 		return -1;
 

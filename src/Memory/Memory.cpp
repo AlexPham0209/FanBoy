@@ -1,6 +1,7 @@
 #include "Memory.h"
+#include "../Joypad.h"
 
-Memory::Memory(Cartridge& cartridge) : cartridge(cartridge) {
+Memory::Memory(Cartridge& cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
 	ram.resize(0xFFFF + 1);
 }
 
@@ -13,21 +14,18 @@ void Memory::loadProgram(std::vector<unsigned char> rom) {
 
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
-	//Reading external cartridge ROM 
-
-	/*if (address == 0xFF44)
-		return 0x90;*/
-
-	if (address < 0x100)
+	//Read Boot ROM 
+	if (address < 0x100 && !(readByte(0xFF50) & 1))
 		return bootDMG[address];
 
-	if (address == 0xFF00)
-		return 0xFF;
-
-
+	//Reading external cartridge ROM 
 	if (address <= 0x7FFF)
 		return cartridge.readByte(address);
-		
+
+	if (address == 0xFF00) 
+		return joypad.readByte();
+	
+
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.readByte(address);
 
@@ -51,11 +49,14 @@ unsigned short Memory::readShort(unsigned short address) {
 
 //Writes byte value into memory address
 unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
-	if (address == 0xFF00)
-		return 0;
-
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
+
+	//If writing into Joypad register, then only write into bits 5 and 6
+	if (address == 0xFF00) {
+		return joypad.writeByte(val);
+	}
+
 
 	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
 	if (address <= 0x7FFF)
