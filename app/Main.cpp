@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 
 
-const double DELAY = 0.0025;
+const double DELAY = 0.001;
 int videoPitch;
 const int SCALE = 4;
 bool running = true;

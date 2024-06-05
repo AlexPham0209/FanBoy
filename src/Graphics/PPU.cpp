@@ -135,7 +135,7 @@ void PPU::renderScanline() {
 	//If 0th bit in LCD display shader is 0, then the background and window layers are not rendered and replaced with white
 	bool bgwEnable = memory.readByte(0xFF40) & 1;
 	renderBackground(y);
-	renderWindow(y);
+	//renderWindow(y);
 	renderSprite(y);
 	memory.writeByte(0xFF44, y + 1);
 }
@@ -197,9 +197,6 @@ void PPU::renderWindow(unsigned char y) {
 
 	//Iterate through all tiles in current scanline
 	for (int x = 0; x < 160; ++x) {
-		if (x < memory.readByte(0xFFB) - 7)
-			continue;
-
 		unsigned char windowX = x - (memory.readByte(0xFF4B) - 7);
 		unsigned char tileX = (windowX / 8);
 
@@ -234,7 +231,7 @@ void PPU::renderSprite(unsigned char y) {
 	//Iterate through all sprites in OAM
 	for (int i = 0xFE00; i <= 0xFE9F; i += 4) {
 		//Get sprite data
-		unsigned char yPosition = memory.readByte(i) - height;
+		unsigned char yPosition = memory.readByte(i) - 16;
 		unsigned char xPosition = memory.readByte(i + 1) - 8;
 		unsigned char id = memory.readByte(i + 2);
 		unsigned char flags = memory.readByte(i + 3);
@@ -244,7 +241,7 @@ void PPU::renderSprite(unsigned char y) {
 			continue;
 
 		//If out of bounds, don't render
-		if (xPosition < 0 || xPosition > 160 || yPosition < 0 || yPosition > 144)
+		if (yPosition < 0 || yPosition > 144)
 			continue;
 
 		//Get specific address for the current row of the tile
@@ -263,6 +260,9 @@ void PPU::renderSprite(unsigned char y) {
 			int index = xFlip ? x : 7 - x;
 			unsigned char lowCol = (low >> index) & 1;
 			unsigned char highCol = (high >> index) & 1;
+
+			if (x + xPosition < 0 || x + xPosition > 144)
+				continue;
 
 			unsigned color = highCol << 1 | lowCol;
 			this->buffer.setPixel(xPosition + x, y, palette[color]);

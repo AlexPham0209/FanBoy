@@ -25,7 +25,6 @@ unsigned char Memory::readByte(unsigned short address) {
 	if (address == 0xFF00) 
 		return joypad.readByte();
 	
-
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.readByte(address);
 
@@ -53,8 +52,15 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		std::cout << readByte(0xFF01);
 
 	//If writing into Joypad register, then only write into bits 5 and 6
-	if (address == 0xFF00) {
+	if (address == 0xFF00) 
 		return joypad.writeByte(val);
+	
+	//OAM DAA transfer
+	if (address == 0xFF46) {
+		for (int i = 0; i < 0xA0; ++i) {
+			unsigned short temp = readByte((val << 8) + i);
+			writeByte(0xFE00 + i, temp);
+		}
 	}
 
 
@@ -77,6 +83,9 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		return temp;
 	}
 
+	/*if (address >= 0xFE00 && address <= 0xFE9F && (readByte(0xFF50) & 1)) 
+		std::cout << std::hex << address << ", " << std::hex << (int)val << std::endl;*/
+	
 	/*if (address == 0xDF7E)
 		std::cout << i << ", " << std::hex << address << ", " << std::hex << (int)val << std::dec << std::endl;*/
 
