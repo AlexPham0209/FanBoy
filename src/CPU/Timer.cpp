@@ -6,7 +6,8 @@ Timer::Timer(Memory& memory, Interrupts& interrupts) : memory(memory), interrupt
 
 void Timer::step(int cycles) {
 	//Increment Divider Register
-	memory.writeByte(0xFF04, memory.readByte(0xFF04) + (clockRate/16384));
+	memory.writeByte(0xFF04, memory.readByte(0xFF04) + cycles);
+
 	//Return if interrupt is not valid 
 	if (!interrupts.getInterruptEnabled(TIMER))
 		return;
