@@ -13,6 +13,7 @@ bool running = true;
 
 std::map<int, std::pair<unsigned char, SELECT>> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
+const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (World).gb";
 
 //PASSED ALL OF THESE ROMS
 const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
@@ -111,7 +112,7 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy("C:/Users/RedAP/Downloads/Dr. Mario (World).gb");
+	gameboy = new GameBoy(tetris);
 	keyMap[SDLK_LEFT] = {GAMEBOY_LEFT, DPAD};
 	keyMap[SDLK_RIGHT] = {GAMEBOY_RIGHT, DPAD};
 	keyMap[SDLK_DOWN] = {GAMEBOY_DOWN, DPAD};

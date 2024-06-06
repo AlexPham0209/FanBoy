@@ -1,10 +1,10 @@
 #include "PPU.h"
 
 std::map<unsigned char, Color> palette = {
-	{0x00, Color{255, 255, 255}},
-	{0x01, Color{169, 169, 169}},
-	{0x10, Color{84, 84, 84}},
-	{0x11, Color{0, 0, 0}}
+	{0, Color{255, 255, 255}},
+	{1, Color{169, 169, 169}},
+	{2, Color{84, 84, 84}},
+	{3, Color{0, 0, 0}}
 };
 
 PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(buffer), memory(memory), interrupts(interrupts), mode(OAMSCAN) {}
