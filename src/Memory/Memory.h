@@ -10,15 +10,12 @@
 class Joypad;
 class Memory {
 public:
-	inline static int i = 0;
 	Memory(Cartridge& cartridge, Joypad& joypad);
 
-	void loadProgram(std::vector<unsigned char> rom);
 	unsigned char readByte(unsigned short address);
 	unsigned short readShort(unsigned short address);
 	unsigned char writeByte(unsigned short address, unsigned char val);
 	unsigned short writeShort(unsigned short address, unsigned short val);
-	void clear();
 
 private:
     const std::array<unsigned char, 256> bootDMG = {
@@ -42,5 +39,10 @@ private:
 
 	Cartridge& cartridge;
     Joypad& joypad;
-	std::vector<unsigned char> ram;
+	std::vector<unsigned char> wRam;
+    std::vector<unsigned char> vRam;
+    std::vector<unsigned char> oam;
+    std::vector<unsigned char> io;
+    std::vector<unsigned char> hRam;
+    unsigned char interruptEnable;
 };

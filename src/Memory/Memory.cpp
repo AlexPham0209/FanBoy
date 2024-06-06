@@ -2,60 +2,117 @@
 #include "../Joypad.h"
 
 Memory::Memory(Cartridge& cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
-	ram.resize(0xFFFF + 1);
-}
-
-void Memory::loadProgram(std::vector<unsigned char> rom) {
-	for (int i = 0; i < rom.size(); ++i) {
-		this->writeByte(0x100 + i, rom[i]);
-		std::cout << std::hex << (int)readByte(0x100 + i) << std::endl;
-	}
+	wRam.resize(0x1FFF + 1);
+	vRam.resize(0x1FFF + 1);
+	io.resize(0x7F + 1);
+	hRam.resize(0x7F + 1);
+	oam.resize(0xFF + 1);
 }
 
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
-	//Read Boot ROM 
+	//Boot ROM (Only reads from boot rom during the beginning)
 	if (address < 0x100 && !(readByte(0xFF50) & 1))
 		return bootDMG[address];
 
-	//Reading external cartridge ROM 
-	if (address <= 0x7FFF)
+	//External Cartridge ROM 
+	if (address <= 0x7FFF) 
 		return cartridge.readByte(address);
-
-	if (address == 0xFF00) 
-		return joypad.readByte();
 	
+	//8 KB of Video RAM
+	if (address >= 0x8000 && address <= 0x9FFF)
+		return vRam[address - 0x8000];
+
+	//External cartridge RAM
 	if (address >= 0xA000 && address <= 0xBFFF)
 		return cartridge.readByte(address);
 
-	//Invalid region 
-	if (address >= 0x7EA0 && address <= 0x7EFF)
-		return NULL;
+	//8 KB of Work RAM (Combined two WRAM components into one vector data structure)
+	if (address >= 0xC000 && address <= 0xDFFF)
+		return wRam[address - 0xC000];
 
 	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
 	if (address >= 0xE000 && address <= 0xFDFF)
-		return ram[address - 0x2000];
+		return wRam[address - 0xE000];
 
-	/*if (address == 0xDF7E)
-		std::cout << i << "," << std::hex << (int)ram[address] << std::dec << std::endl;*/
- 	return ram[address];
-}
+	//Object Attribute Memory 
+	if (address >= 0xFE00 && address <= 0xFEFF)
+		return oam[address - 0xFE00];
 
-//Reads byte values inside address i and address i + 1 then merges them into a short (little endian)
-unsigned short Memory::readShort(unsigned short address) {
-	return readByte(address) | (readByte(address + 1) << 8);
+	//Invalid region 
+	if (address >= 0xFEA0 && address <= 0xFEFF)
+		return NULL;
+
+	//Joypad input register data
+	if (address == 0xFF00)
+		return joypad.readByte();
+	
+	//Mapped IO registers (Memory address space shared between the CPU and IO devices like joypads and PPU)
+	if (address >= 0xFF00 && address <= 0xFF7F)
+		return io[address - 0xFF00];
+
+	//High RAM (Allows for faster access to memory from the CPU)
+	if (address >= 0xFF80 && address <= 0xFFFE)
+		return hRam[address - 0xFF80];
+		
+	if (address == 0xFFFF)
+		return interruptEnable;
+
+ 	return NULL;
 }
 
 //Writes byte value into memory address
 unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
+	//Printing out data written in Serial Port
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
 
-	//If writing into Joypad register, then only write into bits 5 and 6
-	if (address == 0xFF00) 
+	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
+	if (address <= 0x7FFF)
+		return cartridge.writeByte(address, val);
+
+	//8 KB of Video RAM
+	if (address >= 0x8000 && address <= 0x9FFF) {
+		unsigned char temp = vRam[address - 0x8000];
+		vRam[address - 0x8000] = val;
+		return temp;
+	}
+
+	//Writing into Cartridge's external RAM (If it has some)
+	if (address >= 0xA000 && address <= 0xBFFF)
+		return cartridge.writeByte(address, val);
+
+
+	//8 KB of Work RAM (Combined two WRAM components into one vector data structure)
+	if (address >= 0xC000 && address <= 0xDFFF) {
+		unsigned char temp = wRam[address - 0xC000];
+		wRam[address - 0xC000] = val;
+		return temp;
+	}
+
+	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
+	if (address >= 0xE000 && address <= 0xFDFF) {
+		unsigned char temp = wRam[address - 0xE000];
+		wRam[address - 0xE000] = val;
+		return temp;
+	}
+
+	//Object Attribute Memory 
+	if (address >= 0xFE00 && address <= 0xFEFF) {
+		unsigned char temp = oam[address - 0xFE00];
+		oam[address - 0xFE00] = val;
+		return temp;
+	}
+
+	//Invalid region 
+	if (address >= 0xFEA0 && address <= 0xFEFF)
+		return NULL;
+
+	//Writing in Joypad IO register (only in bits 5 and 6) 
+	if (address == 0xFF00)
 		return joypad.writeByte(val);
-	
-	//OAM DAA transfer
+
+	//OAM DAA transfer (Transfers 160 bytes of data in Work RAM to OAM)
 	if (address == 0xFF46) {
 		for (int i = 0; i < 0xA0; ++i) {
 			unsigned short temp = readByte((val << 8) + i);
@@ -63,46 +120,40 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		}
 	}
 
-
-	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
-	if (address <= 0x7FFF)
-		return cartridge.writeByte(address, val);
-
-	//Writing into Cartridge's external RAM (If it has some)
-	if (address >= 0xA000 && address <= 0xBFFF)
-		return cartridge.writeByte(address, val);
-
-	//Invalid region 
-	//if (address >= 0x7EA0 && address <= 0x7EFF)
-	//	return NULL;
-
-	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
-	if (address >= 0xE000 && address <= 0xFDFF) {
-		unsigned char temp = this->ram[address - 0x2000];
-		ram[address - 0x2000] = val;
+	//Mapped IO registers (Memory address space shared between the CPU and IO devices like joypads and PPU)
+	if (address >= 0xFF00 && address <= 0xFF7F) {
+		unsigned char temp = io[address - 0xFF00];
+		io[address - 0xFF00] = val;
 		return temp;
 	}
 
-	/*if (address >= 0xFE00 && address <= 0xFE9F && (readByte(0xFF50) & 1)) 
-		std::cout << std::hex << address << ", " << std::hex << (int)val << std::endl;*/
-	
-	/*if (address == 0xDF7E)
-		std::cout << i << ", " << std::hex << address << ", " << std::hex << (int)val << std::dec << std::endl;*/
+	//High RAM (Allows for faster access to memory from the CPU)
+	if (address >= 0xFF80 && address <= 0xFFFE) {
+		unsigned char temp = hRam[address - 0xFF80];
+		hRam[address - 0xFF80] = val;
+		return temp;
+	}
 
-	unsigned char temp = this->ram[address];
-	ram[address] = val;
-	return temp;
+	//Interrupt Enable Register
+	if (address == 0xFFFF) {
+		unsigned char temp = interruptEnable;
+		interruptEnable = val;
+		return temp;
+	}
+		 
+	return NULL;
+}
+
+//Reads byte values inside address i and address i + 1 then merges them into a short (little endian)
+unsigned short Memory::readShort(unsigned short address) {
+	return readByte(address) | (readByte(address + 1) << 8);
 }
 
 //Writes short value into memory address i and i + 1 (little endian)
 unsigned short Memory::writeShort(unsigned short address, unsigned short val) {
 	unsigned short temp = readByte(address) | readByte(address + 1) << 8;
-	ram[address] = val & 0x00FF;
-	ram[address + 1] = (val & 0xFF00) >> 8;
+	writeByte(address, val & 0x00FF);
+	writeByte(address + 1, (val & 0xFF00) >> 8);
 	return temp;
 }
 
-//Clears all memory
-//void Memory::clear() {
-//	memset(&ram, 0x0000, sizeof(ram));
-//}

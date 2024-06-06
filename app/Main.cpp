@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 
 
-const double DELAY = 0.001;
+const double DELAY = 0;
 int videoPitch;
 const int SCALE = 4;
 bool running = true;
@@ -117,8 +117,8 @@ bool init() {
 	keyMap[SDLK_DOWN] = {GAMEBOY_DOWN, DPAD};
 	keyMap[SDLK_UP] = {GAMEBOY_UP, DPAD};
 
-	keyMap[SDLK_z] = {GAMEBOY_A, BUTTON};
-	keyMap[SDLK_x] = {GAMEBOY_B, BUTTON};
+	keyMap[SDLK_z] = {GAMEBOY_B, BUTTON};
+	keyMap[SDLK_x] = {GAMEBOY_A, BUTTON}; 
 	keyMap[SDLK_c] = {GAMEBOY_START, BUTTON};
 	keyMap[SDLK_v] = {GAMEBOY_SELECT, BUTTON};
 

@@ -134,9 +134,18 @@ void PPU::renderScanline() {
 
 	//If 0th bit in LCD display shader is 0, then the background and window layers are not rendered and replaced with white
 	bool bgwEnable = memory.readByte(0xFF40) & 1;
-	renderBackground(y);
-	//renderWindow(y);
-	renderSprite(y);
+	bool windowEnable = (memory.readByte(0xFF40) >> 5) & 1;
+	bool spriteEnable = (memory.readByte(0xFF40) >> 1) & 1;
+
+	if (bgwEnable)
+		renderBackground(y);
+	
+	if (windowEnable && bgwEnable)
+		renderWindow(y);
+
+	if (spriteEnable)
+		renderSprite(y);
+
 	memory.writeByte(0xFF44, y + 1);
 }
 
@@ -168,7 +177,7 @@ void PPU::renderBackground(unsigned char y) {
 
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress + yIndex);
-		unsigned char high = memory.readByte(tileAddress + yIndex + 1);
+		unsigned char high = memory.readByte((unsigned short)(tileAddress + yIndex + 1));
 
 		//Retrieve specific color bit
 		unsigned char index = (7 - ((x + scrollingX) % 8));
@@ -176,6 +185,7 @@ void PPU::renderBackground(unsigned char y) {
 		unsigned char highCol = (high >> index) & 1;
 		
 		unsigned char color = (highCol << 1) | lowCol;
+
 
 		//Based on 2 bit color value, convert it to RGB struct by inputting it into palette map and retrieving color object
 		this->buffer.setPixel(x, y, palette[color]);
@@ -185,6 +195,9 @@ void PPU::renderBackground(unsigned char y) {
 void PPU::renderWindow(unsigned char y) {
 	//Controls which BG map to use
 	unsigned char windowY = y - memory.readByte(0xFF4A);
+
+	if (windowY < 0)
+		return;
 
 	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
 
@@ -198,6 +211,10 @@ void PPU::renderWindow(unsigned char y) {
 	//Iterate through all tiles in current scanline
 	for (int x = 0; x < 160; ++x) {
 		unsigned char windowX = x - (memory.readByte(0xFF4B) - 7);
+
+		if (windowX < 0)
+			break;
+
 		unsigned char tileX = (windowX / 8);
 
 		//Retrieving which tile to render at background tile i
@@ -264,7 +281,7 @@ void PPU::renderSprite(unsigned char y) {
 			if (x + xPosition < 0 || x + xPosition > 144)
 				continue;
 
-			unsigned color = highCol << 1 | lowCol;
+			unsigned char color = highCol << 1 | lowCol;
 			this->buffer.setPixel(xPosition + x, y, palette[color]);
 		}
 	}
