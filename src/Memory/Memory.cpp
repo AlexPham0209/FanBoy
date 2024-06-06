@@ -1,6 +1,8 @@
 #include "Memory.h"
 #include "../Joypad.h"
 
+//This class represents the Memory Management Unit inside of the Gameboy.  
+//The Memory Management Unit is a component that translates virtual memory address stored inside of a register into the physical location on the various Memory units in the Gameboy
 Memory::Memory(Cartridge& cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
 	wRam.resize(0x1FFF + 1);
 	vRam.resize(0x1FFF + 1);
@@ -11,9 +13,9 @@ Memory::Memory(Cartridge& cartridge, Joypad& joypad) : cartridge(cartridge), joy
 
 //Reads byte value at address
 unsigned char Memory::readByte(unsigned short address) {
-	//Boot ROM (Only reads from boot rom during the beginning)
+	//Boot ROM (Only reads from boot rom during the beginning when Boot Rom Register (FF50) is set to 0)
 	if (address < 0x100 && !(readByte(0xFF50) & 1))
-		return bootDMG[address];
+		return bootRom[address];
 
 	//External Cartridge ROM 
 	if (address <= 0x7FFF) 
@@ -36,7 +38,7 @@ unsigned char Memory::readByte(unsigned short address) {
 		return wRam[address - 0xE000];
 
 	//Object Attribute Memory 
-	if (address >= 0xFE00 && address <= 0xFEFF)
+	if (address >= 0xFE00 && address <= 0xFE9F)
 		return oam[address - 0xFE00];
 
 	//Invalid region 
@@ -54,7 +56,8 @@ unsigned char Memory::readByte(unsigned short address) {
 	//High RAM (Allows for faster access to memory from the CPU)
 	if (address >= 0xFF80 && address <= 0xFFFE)
 		return hRam[address - 0xFF80];
-		
+	
+	//Interrupt register
 	if (address == 0xFFFF)
 		return interruptEnable;
 
@@ -90,15 +93,15 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 		return temp;
 	}
 
-	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF)
+	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF in WRAM)
 	if (address >= 0xE000 && address <= 0xFDFF) {
 		unsigned char temp = wRam[address - 0xE000];
 		wRam[address - 0xE000] = val;
 		return temp;
 	}
 
-	//Object Attribute Memory 
-	if (address >= 0xFE00 && address <= 0xFEFF) {
+	//Object Attribute Memory (Section of memory inside of )
+	if (address >= 0xFE00 && address <= 0xFE9F) {
 		unsigned char temp = oam[address - 0xFE00];
 		oam[address - 0xFE00] = val;
 		return temp;
@@ -112,7 +115,7 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	if (address == 0xFF00)
 		return joypad.writeByte(val);
 
-	//OAM DAA transfer (Transfers 160 bytes of data in Work RAM to OAM)
+	//OAM DAA transfer (Transfers 160 bytes of data in Work RAM starting at XX00 to OAM)
 	if (address == 0xFF46) {
 		for (int i = 0; i < 0xA0; ++i) {
 			unsigned short temp = readByte((val << 8) + i);

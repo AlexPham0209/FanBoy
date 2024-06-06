@@ -111,7 +111,7 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy(tetris);
+	gameboy = new GameBoy("C:/Users/RedAP/Downloads/Dr. Mario (World).gb");
 	keyMap[SDLK_LEFT] = {GAMEBOY_LEFT, DPAD};
 	keyMap[SDLK_RIGHT] = {GAMEBOY_RIGHT, DPAD};
 	keyMap[SDLK_DOWN] = {GAMEBOY_DOWN, DPAD};

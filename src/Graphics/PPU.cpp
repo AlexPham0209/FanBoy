@@ -171,8 +171,9 @@ void PPU::renderBackground(unsigned char y) {
 		//Retrieving which tile to render at background tile i
 		unsigned char id = memory.readByte(bgOffset + ((tileY * 32) + tileX));
 
+
 		//Get address of specfic tile in either $8000 unsigned or $8800 signed method
-		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
+		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + ((char(id) + 128) * 16);
 		unsigned short yIndex = 2 * ((y + scrollingY) % 8);
 
 		//Get high and low tile data from memory
