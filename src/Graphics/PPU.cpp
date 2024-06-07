@@ -44,7 +44,7 @@ void PPU::step(int cycles) {
 void PPU::OAMScan() {
 	if (cycles < 80)
 		return;
-	cycles %= 80;
+	cycles -= 80;
 
 	//Switch to Drawing mode (Sets first 2 bits of LCD Status register to mode)
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
@@ -57,7 +57,7 @@ void PPU::drawing() {
 	if (cycles < 172)
 		return;
 	
-	cycles %= 172;
+	cycles -= 172;
 
 	//Render current row
 	renderScanline();
@@ -76,19 +76,18 @@ void PPU::drawing() {
 	bool lyCoincidence = memory.readByte(0xFF44) == memory.readByte(0xFF45);
 	bool lyEnable = (memory.readByte(0xFF41) >> 6) & 1;
 				
-	if (lyCoincidence && lyEnable) {
-		memory.writeByte(0xFF41, memory.readByte(0xFF41 | (1 << 2)));
+	if (lyCoincidence && lyEnable) 
 		interrupts.setInterruptFlag(LCD, true);
-	}
+	memory.writeByte(0xFF41, memory.readByte(0xFF41) | (1 << 2));
 }
 
 //After a line finishes drawing, the PPU essentially pauses for 376 cycles (In actual hardware, the PPU waits until all pixels are transfers to the LCD)
 //After this pause, if the scanline is currently at row 144, then we go to the VBlank state, otherwise we restart the process
 void PPU::hBlank() {
-	if (cycles < 376)
+	if (cycles < 204)
 		return;
 
-	cycles %= 376;
+	cycles -= 204;
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 
 	//If current scanline is at row 144, then switch to VBlank phase
@@ -113,14 +112,14 @@ void PPU::vBlank() {
 	if (cycles < 172)
 		return;
 
-	cycles %= 172;
+	cycles -= 172;
 	memory.writeByte(0xFF44, memory.readByte(0xFF44) + 1);
 
 	//Once scanline reaches 155, exit VBlank
-	if (memory.readByte(0xFF44) == 154) {
+	if (memory.readByte(0xFF44) == 153) {
 		//Reset screen and scanline register
 		memory.writeByte(0xFF44, 0);
-		buffer.reset();
+		//buffer.reset();
 
 		//Change to OAM Scan mode
 		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
@@ -142,8 +141,8 @@ void PPU::renderScanline() {
 	if (bgwEnable)
 		renderBackground(y);
 	
-	/*if (windowEnable && bgwEnable)
-		renderWindow(y);*/
+	if (windowEnable && bgwEnable)
+		renderWindow(y);
 
 	if (spriteEnable)
 		renderSprite(y);
@@ -203,18 +202,17 @@ void PPU::renderWindow(unsigned char y) {
 	if (windowY < 0)
 		return;
 
-	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 3) & 1) ? 0x9C00 : 0x9800;
+	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 6) & 1) ? 0x9C00 : 0x9800;
 
 	//Chooses which addressing mode to use for the window and background
 	bool wOffset = ((memory.readByte(0xFF40) >> 4) & 1);
 
 	//Get background tile Y position
-	unsigned char scrollingY = memory.readByte(0xFF42);
 	unsigned char tileY = (windowY / 8);
 
 	//Iterate through all tiles in current scanline
 	for (int x = 0; x < 160; ++x) {
-		unsigned char windowX = x - (memory.readByte(0xFF4B) - 7);
+		unsigned char windowX = x + (memory.readByte(0xFF4B) - 7);
 
 		if (windowX < 0)
 			break;
@@ -225,8 +223,8 @@ void PPU::renderWindow(unsigned char y) {
 		unsigned char id = memory.readByte(bgOffset + ((tileY * 32) + tileX));
 		
 		//Get address of specfic tile in either $8000 unsigned or $8800 signed method
-		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + (char)(id * 16);
-		unsigned short yIndex = 2 * ((y + scrollingY) % 8);
+		unsigned short tileAddress = wOffset ? 0x8000 + (id * 16) : 0x8800 + ((char(id) + 128) * 16);
+		unsigned short yIndex = 2 * (windowY % 8);
 
 		//Get high and low tile data from memory
 		unsigned char low = memory.readByte(tileAddress + yIndex);
@@ -283,7 +281,7 @@ void PPU::renderSprite(unsigned char y) {
 			unsigned char lowCol = (low >> index) & 1;
 			unsigned char highCol = (high >> index) & 1;
 
-			if (x + xPosition < 0 || x + xPosition > 144)
+			if (x + xPosition < -7 || x + xPosition > 160)
 				continue;
 
 			Color other = buffer.getPixel(x + xPosition, y + yPosition);
@@ -295,8 +293,8 @@ void PPU::renderSprite(unsigned char y) {
 			unsigned short dmgPalette = !((flags >> 4) & 1) ? 0xFF48 : 0xFF49;
 			unsigned char mappedColor = (memory.readByte(dmgPalette) >> (color * 2)) & 0x3;
 
-			if (priority && existingPixel != 0xFFFFFF)
-				continue;
+			/*if (priority && existingPixel != 0xFFFFFF)
+				continue;*/
 
 			if (color == 0)
 				continue;

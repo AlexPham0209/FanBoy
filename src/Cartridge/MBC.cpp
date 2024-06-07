@@ -60,8 +60,8 @@ void MBC1::writeByte(unsigned short address, unsigned char val) {
 	
 	//Set RAM Bank Number or Upper Bits of ROM Bank
 	if (address >= 0x4000 && address <= 0x5FFF) {
-		int bank = (val & 0xC0) >> 6;
-		ramBank = bank;
+		ramBank = val & 0x03;
+		return;
 	}
 	//Select Banking Mode
 	//0 - Locked to bank 0 

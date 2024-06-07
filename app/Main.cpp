@@ -15,20 +15,10 @@ std::map<int, unsigned char> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (JU) (V1.1).gb";
 const char* mario = "C:/Users/RedAP/Downloads/Super Mario Land (JUE) (V1.1) [!].gb";
+const char* link = "C:/Users/RedAP/Downloads/Legend of Zelda, The - Link's Awakening (G) [!].gb";
 
 //PASSED ALL OF THESE ROMS
 const char* cpuInstructions = "C:/Users/RedAP/Downloads/cpu_instrs.gb";
-const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
-const char* interruptTest = "C:/Users/RedAP/Downloads/02-interrupts.gb";
-const char* opSPTest = "C:/Users/RedAP/Downloads/03-op sp,hl.gb";
-const char* opRTest = "C:/Users/RedAP/Downloads/04-op r,imm.gb";
-const char* op5Test = "C:/Users/RedAP/Downloads/05-op rp.gb";
-const char* loadTest = "C:/Users/RedAP/Downloads/06-ld r,r.gb";
-const char* jumpTest = "C:/Users/RedAP/Downloads/07-jr,jp,call,ret,rst.gb";
-const char* miscTest = "C:/Users/RedAP/Downloads/08-misc instrs.gb";
-const char* opRRTest = "C:/Users/RedAP/Downloads/09-op r,r.gb";
-const char* bitTest = "C:/Users/RedAP/Downloads/10-bit ops.gb";
-const char* hlTest = "C:/Users/RedAP/Downloads/11-op a,(hl).gb";
 
 GameBoy* gameboy;
 SDL_Window* window;
@@ -92,28 +82,20 @@ void input() {
 
 void run() {
 	float time = 0;
-	auto lastCycleTime = std::chrono::high_resolution_clock::now();
 	while (running) {
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
-		time += dt;
 		input();
-		if (time >= DELAY) {
-			time = 0;
-			lastCycleTime = currentTime;
-			gameboy->step();
+		gameboy->step();
 
-			if (gameboy->canRender()) {
-				unsigned int* frame = gameboy->getFrame();
-				int pitch = sizeof(frame[0]) * 160;
-				render(frame, pitch);
-			}
+		if (gameboy->canRender()) {
+			unsigned int* frame = gameboy->getFrame();
+			int pitch = sizeof(frame[0]) * 160;
+			render(frame, pitch);
 		}
 	}
 }
 
 bool init() {
-	gameboy = new GameBoy(mario);
+	gameboy = new GameBoy(tetris);
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;
