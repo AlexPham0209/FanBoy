@@ -14,8 +14,8 @@ public:
 
 	unsigned char readByte(unsigned short address);
 	unsigned short readShort(unsigned short address);
-	unsigned char writeByte(unsigned short address, unsigned char val);
-	unsigned short writeShort(unsigned short address, unsigned short val);
+	void writeByte(unsigned short address, unsigned char val);
+	void writeShort(unsigned short address, unsigned short val);
 
 private:
     Cartridge& cartridge;

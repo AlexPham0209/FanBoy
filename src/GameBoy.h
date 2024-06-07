@@ -9,8 +9,8 @@ class GameBoy {
 	public:
 		GameBoy(const char* path);
 		GameBoy(Cartridge& cartridge);
-		void pressButton(unsigned char input, SELECT mode);
-		void releaseButton(unsigned char input, SELECT mode);
+		void pressButton(unsigned char input);
+		void releaseButton(unsigned char input);
 		unsigned int* getFrame();
 
 		~GameBoy();

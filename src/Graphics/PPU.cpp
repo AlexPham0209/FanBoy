@@ -20,7 +20,6 @@ void PPU::step(int cycles) {
 	//State machine that controls the mode the PPU is in
 	switch (mode) {
 		case OAMSCAN:
-			canRender = false;
 			OAMScan();
 			break;
 
@@ -91,11 +90,11 @@ void PPU::hBlank() {
 
 
 	cycles %= 376;
-
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 
 	//If current scanline is at row 144, then switch to VBlank phase
 	if (memory.readByte(0xFF44) == 144) {
+		canRender = true;
 		memory.writeByte(0xFF41, prev | 1);
 		this->mode = VBlank;
 		interrupts.setInterruptFlag(VBLANK, true);
@@ -111,6 +110,7 @@ void PPU::hBlank() {
 
 //After the entire screen is drawn, the PPU waits for 10 scanlines (4560 cycles) until the next frame 
 void PPU::vBlank() {
+	canRender = false;
 	if (cycles < 172)
 		return;
 
@@ -119,7 +119,6 @@ void PPU::vBlank() {
 
 	if (memory.readByte(0xFF44) == 154) {
 		//Reset screen and scanline register
-		canRender = true;
 		memory.writeByte(0xFF44, 0);
 		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 		memory.writeByte(0xFF41, prev | 2);
@@ -282,7 +281,13 @@ void PPU::renderSprite(unsigned char y) {
 			if (x + xPosition < 0 || x + xPosition > 144)
 				continue;
 
+			Color other = buffer.getPixel(x + xPosition, y + yPosition);
+			int existingPixel = (other.r << 16) | (other.g << 8) | other.b;
+			bool priority = (flags >> 7) & 1;
+
 			unsigned char color = highCol << 1 | lowCol;
+
+			//if (color != 0 && (!priority || existingPixel == 0xFFFFFF))
 			this->buffer.setPixel(xPosition + x, y, palette[color]);
 		}
 	}

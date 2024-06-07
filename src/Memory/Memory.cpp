@@ -65,55 +65,42 @@ unsigned char Memory::readByte(unsigned short address) {
 }
 
 //Writes byte value into memory address
-unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
+void Memory::writeByte(unsigned short address, unsigned char val) {
 	//Printing out data written in Serial Port
 	if (address == 0xFF02 && val == 0x81)
 		std::cout << readByte(0xFF01);
 
 	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
 	if (address <= 0x7FFF)
-		return cartridge.writeByte(address, val);
+		cartridge.writeByte(address, val);
 
 	//8 KB of Video RAM
-	if (address >= 0x8000 && address <= 0x9FFF) {
-		unsigned char temp = vRam[address - 0x8000];
+	if (address >= 0x8000 && address <= 0x9FFF) 
 		vRam[address - 0x8000] = val;
-		return temp;
-	}
 
 	//Writing into Cartridge's external RAM (If it has some)
 	if (address >= 0xA000 && address <= 0xBFFF)
-		return cartridge.writeByte(address, val);
-
+		cartridge.writeByte(address, val);
 
 	//8 KB of Work RAM (Combined two WRAM components into one vector data structure)
-	if (address >= 0xC000 && address <= 0xDFFF) {
-		unsigned char temp = wRam[address - 0xC000];
+	if (address >= 0xC000 && address <= 0xDFFF) 
 		wRam[address - 0xC000] = val;
-		return temp;
-	}
 
 	//Echo RAM region (Memory from regions E000-FDFF are mirrored in regions C000-DDFF in WRAM)
-	if (address >= 0xE000 && address <= 0xFDFF) {
-		unsigned char temp = wRam[address - 0xE000];
+	if (address >= 0xE000 && address <= 0xFDFF) 
 		wRam[address - 0xE000] = val;
-		return temp;
-	}
 
 	//Object Attribute Memory (Section of memory inside of )
-	if (address >= 0xFE00 && address <= 0xFE9F) {
-		unsigned char temp = oam[address - 0xFE00];
+	if (address >= 0xFE00 && address <= 0xFE9F) 
 		oam[address - 0xFE00] = val;
-		return temp;
-	}
 
 	//Invalid region 
 	if (address >= 0xFEA0 && address <= 0xFEFF)
-		return NULL;
+		return;
 
 	//Writing in Joypad IO register (only in bits 5 and 6) 
 	if (address == 0xFF00)
-		return joypad.writeByte(val);
+		joypad.writeByte(val);
 
 	//OAM DAA transfer (Transfers 160 bytes of data in Work RAM starting at XX00 to OAM)
 	if (address == 0xFF46) {
@@ -124,27 +111,17 @@ unsigned char Memory::writeByte(unsigned short address, unsigned char val) {
 	}
 
 	//Mapped IO registers (Memory address space shared between the CPU and IO devices like joypads and PPU)
-	if (address >= 0xFF00 && address <= 0xFF7F) {
-		unsigned char temp = io[address - 0xFF00];
+	if (address >= 0xFF00 && address <= 0xFF7F) 
 		io[address - 0xFF00] = val;
-		return temp;
-	}
 
 	//High RAM (Allows for faster access to memory from the CPU)
-	if (address >= 0xFF80 && address <= 0xFFFE) {
-		unsigned char temp = hRam[address - 0xFF80];
+	if (address >= 0xFF80 && address <= 0xFFFE)
 		hRam[address - 0xFF80] = val;
-		return temp;
-	}
 
 	//Interrupt Enable Register
-	if (address == 0xFFFF) {
-		unsigned char temp = interruptEnable;
+	if (address == 0xFFFF)
 		interruptEnable = val;
-		return temp;
-	}
-		 
-	return NULL;
+
 }
 
 //Reads byte values inside address i and address i + 1 then merges them into a short (little endian)
@@ -153,10 +130,9 @@ unsigned short Memory::readShort(unsigned short address) {
 }
 
 //Writes short value into memory address i and i + 1 (little endian)
-unsigned short Memory::writeShort(unsigned short address, unsigned short val) {
+void Memory::writeShort(unsigned short address, unsigned short val) {
 	unsigned short temp = readByte(address) | readByte(address + 1) << 8;
 	writeByte(address, val & 0x00FF);
 	writeByte(address + 1, (val & 0xFF00) >> 8);
-	return temp;
 }
 

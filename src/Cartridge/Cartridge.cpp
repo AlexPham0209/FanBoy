@@ -8,16 +8,16 @@ unsigned char Cartridge::readByte(unsigned short address) {
 	return memory.readByte(address);
 }
 
-unsigned char Cartridge::writeByte(unsigned short address, unsigned char val) {
-	return memory.writeByte(address, val);
+void Cartridge::writeByte(unsigned short address, unsigned char val) {
+	memory.writeByte(address, val);
 }
 
 unsigned short Cartridge::readShort(unsigned short address) {
 	return memory.readShort(address);
 }
 
-unsigned short Cartridge::writeShort(unsigned short address, unsigned short val) {
-	return memory.writeShort(address, val);
+void Cartridge::writeShort(unsigned short address, unsigned short val) {
+	memory.writeShort(address, val);
 }
 
 std::string Cartridge::getInfo() {

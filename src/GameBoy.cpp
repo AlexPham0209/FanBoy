@@ -20,20 +20,17 @@ void GameBoy::step() {
 	mPPU.step(cycles);
 }
 
-void GameBoy::pressButton(unsigned char input, SELECT mode) {
-	joypad.pressButton(input, mode);
+void GameBoy::pressButton(unsigned char input) {
+	joypad.pressButton(input);
 }
 
-void GameBoy::releaseButton(unsigned char input, SELECT mode) {
-	joypad.releaseButton(input, mode);
+void GameBoy::releaseButton(unsigned char input) {
+	joypad.releaseButton(input);
 }
-
 
 unsigned int* GameBoy::getFrame() {
 	return buffer.getFrame();
 }
-
-
 
 Cartridge& GameBoy::generateCartridge(const char* path) {
 	CartridgeFactory* factory = CartridgeFactory::getInstance();

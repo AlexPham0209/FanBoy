@@ -10,8 +10,8 @@ unsigned char MBC0::readByte(unsigned short address) {
 }
 
 //Since There is no writable external RAM, we return null
-unsigned char MBC0::writeByte(unsigned short address, unsigned char val) {
-	return NULL;
+void MBC0::writeByte(unsigned short address, unsigned char val) {
+	return;
 }
 
 //For ROM only Cartridges, the MMU directly maps the address between 0000 - 7FFF given to the ROM on the cartridge
@@ -20,6 +20,6 @@ unsigned short MBC0::readShort(unsigned short address) {
 };
 
 //Since There is no writable external RAM, we return null
-unsigned short MBC0::writeShort(unsigned short address, unsigned short val) {
-	return NULL;
+void MBC0::writeShort(unsigned short address, unsigned short val) {
+	return;
 };

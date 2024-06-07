@@ -11,7 +11,7 @@ int videoPitch;
 const int SCALE = 4;
 bool running = true;
 
-std::map<int, std::pair<unsigned char, SELECT>> keyMap;
+std::map<int, unsigned char> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (World).gb";
 
@@ -79,13 +79,13 @@ void input() {
 				running = false;
 
 			if (keyMap.count(e.key.keysym.sym)) {
-				gameboy->pressButton(keyMap[e.key.keysym.sym].first, keyMap[e.key.keysym.sym].second);
+				gameboy->pressButton(keyMap[e.key.keysym.sym]);
 			}
 		}
 		// Process keyup events
 
 		if (e.type == SDL_KEYUP && keyMap.count(e.key.keysym.sym))
-			gameboy->releaseButton(keyMap[e.key.keysym.sym].first, keyMap[e.key.keysym.sym].second);
+			gameboy->releaseButton(keyMap[e.key.keysym.sym]);
 	}
 }
 
@@ -113,15 +113,15 @@ void run() {
 
 bool init() {
 	gameboy = new GameBoy(tetris);
-	keyMap[SDLK_LEFT] = {GAMEBOY_LEFT, DPAD};
-	keyMap[SDLK_RIGHT] = {GAMEBOY_RIGHT, DPAD};
-	keyMap[SDLK_DOWN] = {GAMEBOY_DOWN, DPAD};
-	keyMap[SDLK_UP] = {GAMEBOY_UP, DPAD};
+	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
+	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
+	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;
+	keyMap[SDLK_UP] = GAMEBOY_UP;
 
-	keyMap[SDLK_z] = {GAMEBOY_B, BUTTON};
-	keyMap[SDLK_x] = {GAMEBOY_A, BUTTON}; 
-	keyMap[SDLK_c] = {GAMEBOY_START, BUTTON};
-	keyMap[SDLK_v] = {GAMEBOY_SELECT, BUTTON};
+	keyMap[SDLK_z] = GAMEBOY_B;
+	keyMap[SDLK_x] = GAMEBOY_A; 
+	keyMap[SDLK_c] = GAMEBOY_START;
+	keyMap[SDLK_v] = GAMEBOY_SELECT;
 
 	if (!initWindow()) {
 		std::cout << "Failed to initialize window" << std::endl;
