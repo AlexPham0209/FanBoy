@@ -117,9 +117,13 @@ void PPU::vBlank() {
 	cycles %= 172;
 	memory.writeByte(0xFF44, memory.readByte(0xFF44) + 1);
 
+	//Once scanline reaches 155, exit VBlank
 	if (memory.readByte(0xFF44) == 154) {
 		//Reset screen and scanline register
 		memory.writeByte(0xFF44, 0);
+		buffer.reset();
+
+		//Change to OAM Scan mode
 		unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 		memory.writeByte(0xFF41, prev | 2);
 		this->mode = OAMSCAN;
@@ -185,10 +189,11 @@ void PPU::renderBackground(unsigned char y) {
 		unsigned char highCol = (high >> index) & 1;
 		
 		unsigned char color = (highCol << 1) | lowCol;
+		unsigned char mappedColor = (memory.readByte(0xFF47) >> (color * 2)) & 0x3;
 
 
 		//Based on 2 bit color value, convert it to RGB struct by inputting it into palette map and retrieving color object
-		this->buffer.setPixel(x, y, palette[color]);
+		this->buffer.setPixel(x, y, palette[mappedColor]);
 	}
 }
 
@@ -234,9 +239,10 @@ void PPU::renderWindow(unsigned char y) {
 		unsigned char highCol = (high >> index) & 1;
 
 		unsigned char color = (highCol << 1) | lowCol;
+		unsigned char mappedColor = (memory.readByte(0xFF47) >> (color * 2)) & 0x3;
 
 		//Based on 2 bit color value, convert it to RGB struct by inputting it into palette map and retrieving color object
-		this->buffer.setPixel(x, y, palette[color]);
+		this->buffer.setPixel(x, y, palette[mappedColor]);
 	}
 }
 
@@ -287,8 +293,14 @@ void PPU::renderSprite(unsigned char y) {
 
 			unsigned char color = highCol << 1 | lowCol;
 
+			unsigned short dmgPalette = !((flags >> 4) & 1) ? 0xFF48 : 0xFF49;
+			unsigned char mappedColor = (memory.readByte(dmgPalette) >> (color * 2)) & 0x3;
+
+			if (color == 0)
+				continue;
+
 			//if (color != 0 && (!priority || existingPixel == 0xFFFFFF))
-			this->buffer.setPixel(xPosition + x, y, palette[color]);
+			this->buffer.setPixel(xPosition + x, y, palette[mappedColor]);
 		}
 	}
 }

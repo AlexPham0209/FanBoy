@@ -13,7 +13,7 @@ bool running = true;
 
 std::map<int, unsigned char> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
-const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (World).gb";
+const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (JU) (V1.1).gb";
 
 //PASSED ALL OF THESE ROMS
 const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
@@ -83,7 +83,6 @@ void input() {
 			}
 		}
 		// Process keyup events
-
 		if (e.type == SDL_KEYUP && keyMap.count(e.key.keysym.sym))
 			gameboy->releaseButton(keyMap[e.key.keysym.sym]);
 	}
@@ -112,7 +111,7 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy(tetris);
+	gameboy = new GameBoy(doctor);
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;
