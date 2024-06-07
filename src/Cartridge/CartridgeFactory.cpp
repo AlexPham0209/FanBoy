@@ -102,8 +102,32 @@ Header* CartridgeFactory::generateHeader(std::vector<unsigned char> rom) {
 	
 	unsigned char version = rom[0x14C];
 	unsigned char SGBFlag = rom[0x0146];
+
 	int romSize = 32 * (1 << rom[0x0148]);
-	int ramSize = rom[0x149] <= 0x01 ? 0 : 8 * pow(4,(rom[0x149] - 2));
+
+	int ramSize = 0;
+
+	switch (rom[0x0149]) {
+		case 0x00:
+			ramSize = 0;
+			break;
+
+		case 0x02:
+			ramSize = 8;
+			break;
+
+		case 0x03:
+			ramSize = 32;
+			break;
+
+		case 0x04:
+			ramSize = 128;
+			break;
+
+		case 0x05:
+			ramSize = 64;
+			break;
+	}
 	
 
 	//Create header object to be injected into resulting cartidge
@@ -117,22 +141,26 @@ MBC* CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header& heade
 	std::cout << "Generating Memory Bank Controller" << std::endl;
 	unsigned char type = rom[0x147];
 
+	//Resizes the ROM and RAM to ensure that its the right size
+	//rom.resize(header.romSize * 1024);
+
 	switch (type) {
 		//ROM only
 		case 0x00:
-			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 		
 		//MBC1
 		case 0x01: case 0x02: case 0x03:
-			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
+			std::cout << "MBC 1" << std::endl;
+			return new MBC1(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 		
 		//MBC2
 		case 0x05: case 0x06:
-			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 
 		//MBC3
 		case 0x0F: case 0x10: case 0x11: case 0x12: case 0x13:
-			return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);
+			return new MBC0(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 	}
 
 	return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);

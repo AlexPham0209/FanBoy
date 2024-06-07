@@ -14,8 +14,10 @@ bool running = true;
 std::map<int, unsigned char> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (JU) (V1.1).gb";
+const char* mario = "C:/Users/RedAP/Downloads/Super Mario Land (JUE) (V1.1) [!].gb";
 
 //PASSED ALL OF THESE ROMS
+const char* cpuInstructions = "C:/Users/RedAP/Downloads/cpu_instrs.gb";
 const char* specialTest = "C:/Users/RedAP/Desktop/01-special.gb";
 const char* interruptTest = "C:/Users/RedAP/Downloads/02-interrupts.gb";
 const char* opSPTest = "C:/Users/RedAP/Downloads/03-op sp,hl.gb";
@@ -111,7 +113,7 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy(doctor);
+	gameboy = new GameBoy(mario);
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;

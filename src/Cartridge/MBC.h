@@ -34,10 +34,17 @@ public:
 //Memory Bank Controller 1 Cartridge type
 
 class MBC1 : public MBC {
+public:
 	MBC1(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
 	unsigned char readByte(unsigned short address) override;
 	void writeByte(unsigned short address, unsigned char val) override;
 
 	unsigned short readShort(unsigned short address) override;
 	void writeShort(unsigned short address, unsigned short val) override;
+
+private:
+	unsigned short romBank = 1;
+	unsigned short ramBank = 1;
+	bool ramEnable = false;
+	bool bankingMode = true;
 };

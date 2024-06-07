@@ -88,7 +88,6 @@ void PPU::hBlank() {
 	if (cycles < 376)
 		return;
 
-
 	cycles %= 376;
 	unsigned char prev = memory.readByte(0xFF41) & 0xFC;
 
@@ -143,8 +142,8 @@ void PPU::renderScanline() {
 	if (bgwEnable)
 		renderBackground(y);
 	
-	if (windowEnable && bgwEnable)
-		renderWindow(y);
+	/*if (windowEnable && bgwEnable)
+		renderWindow(y);*/
 
 	if (spriteEnable)
 		renderSprite(y);
@@ -295,6 +294,9 @@ void PPU::renderSprite(unsigned char y) {
 
 			unsigned short dmgPalette = !((flags >> 4) & 1) ? 0xFF48 : 0xFF49;
 			unsigned char mappedColor = (memory.readByte(dmgPalette) >> (color * 2)) & 0x3;
+
+			if (priority && existingPixel != 0xFFFFFF)
+				continue;
 
 			if (color == 0)
 				continue;
