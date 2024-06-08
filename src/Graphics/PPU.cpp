@@ -246,8 +246,8 @@ void PPU::renderSprite(unsigned char y) {
 	//Iterate through all sprites in OAM
 	for (int i = 0xFE00; i <= 0xFE9F; i += 4) {
 		//Get sprite data
-		unsigned char yPosition = memory.readByte(i) - 16;
-		unsigned char xPosition = memory.readByte(i + 1) - 8;
+		char yPosition = memory.readByte(i) - 16;
+		char xPosition = memory.readByte(i + 1) - 8;
 		unsigned char id = memory.readByte(i + 2);
 		unsigned char flags = memory.readByte(i + 3);
 
