@@ -73,7 +73,7 @@ void PPU::drawing() {
 		interrupts.setInterruptFlag(LCD, true);
 
 	//Checks if LY register (current scanline number) is equal to LYC register
-	bool lyCoincidence = memory.readByte(0xFF44) == memory.readByte(0xFF45);
+	bool lyCoincidence = memory.readByte(0xFF44) == memory.readByte(0xFF45) + 1;
 	bool lyEnable = (memory.readByte(0xFF41) >> 6) & 1;
 				
 	if (lyCoincidence && lyEnable) 
@@ -199,7 +199,7 @@ void PPU::renderWindow(unsigned char y) {
 	//Controls which BG map to use
 	unsigned char windowY = y - memory.readByte(0xFF4A);
 
-	if (windowY < 0)
+	if (y < memory.readByte(0xFF4A))
 		return;
 
 	unsigned short bgOffset = ((memory.readByte(0xFF40) >> 6) & 1) ? 0x9C00 : 0x9800;
@@ -212,11 +212,11 @@ void PPU::renderWindow(unsigned char y) {
 
 	//Iterate through all tiles in current scanline
 	for (int x = 0; x < 160; ++x) {
-		unsigned char windowX = x + (memory.readByte(0xFF4B) - 7);
+		if (x < (memory.readByte(0xFF4B) - 7))
+			continue;
 
-		if (windowX < 0)
-			break;
-
+		unsigned char windowX = x - (memory.readByte(0xFF4B) - 7);
+			
 		unsigned char tileX = (windowX / 8);
 
 		//Retrieving which tile to render at background tile i
@@ -231,7 +231,7 @@ void PPU::renderWindow(unsigned char y) {
 		unsigned char high = memory.readByte(tileAddress + yIndex + 1);
 
 		//Retrieve specific color bit
-		unsigned char index = (7 - windowX) % 8;
+		unsigned char index = (7 - (windowX % 8));
 		unsigned char lowCol = (low >> index) & 1;
 		unsigned char highCol = (high >> index) & 1;
 
@@ -281,7 +281,7 @@ void PPU::renderSprite(unsigned char y) {
 			unsigned char lowCol = (low >> index) & 1;
 			unsigned char highCol = (high >> index) & 1;
 
-			if (x + xPosition < -7 || x + xPosition > 160)
+			if (x + xPosition < 0 || x + xPosition > 160)
 				continue;
 
 			Color other = buffer.getPixel(x + xPosition, y + yPosition);

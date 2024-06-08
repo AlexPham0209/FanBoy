@@ -95,7 +95,7 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy(tetris);
+	gameboy = new GameBoy(mario);
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;
