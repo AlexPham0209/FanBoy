@@ -284,17 +284,24 @@ void PPU::renderSprite(unsigned char y) {
 			if (x + xPosition < 0 || x + xPosition > 160)
 				continue;
 
-			Color other = buffer.getPixel(x + xPosition, y + yPosition);
-			int existingPixel = (other.r << 16) | (other.g << 8) | other.b;
 			bool priority = (flags >> 7) & 1;
+
+			//Getting color that is already in the background
+			Color other = buffer.getPixel(x + xPosition, y);
+			int existingPixel = (other.r << 16) | (other.g << 8) | other.b;
+
+			//Getting the color for index 0
+			int temp = (memory.readByte(0xFF47)) & 0x3;
+			int tempColor = (palette[temp].r << 16) | (palette[temp].g << 8) | palette[temp].b;
+
+			//If Background/window priority flag is set and background color at pixel is not transparent, then we don't render pixel
+			if (priority && existingPixel != tempColor)
+				continue;
 
 			unsigned char color = highCol << 1 | lowCol;
 
 			unsigned short dmgPalette = !((flags >> 4) & 1) ? 0xFF48 : 0xFF49;
 			unsigned char mappedColor = (memory.readByte(dmgPalette) >> (color * 2)) & 0x3;
-
-			/*if (priority && existingPixel != 0xFFFFFF)
-				continue;*/
 
 			if (color == 0)
 				continue;

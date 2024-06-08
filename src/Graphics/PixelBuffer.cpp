@@ -19,8 +19,6 @@ bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 
 Color PixelBuffer::getPixel(unsigned char x, unsigned char y) {
 	unsigned short index = y * width + x;
-	if (index < 0 || index >= width * height)
-		return Color{0, 0, 0};
 
 	int color = buffer[index];
 	unsigned char r = (color & 0xFF0000) >> 16;

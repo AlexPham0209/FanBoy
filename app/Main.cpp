@@ -15,7 +15,7 @@ std::map<int, unsigned char> keyMap;
 const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
 const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (JU) (V1.1).gb";
 const char* mario = "C:/Users/RedAP/Downloads/Super Mario Land (JUE) (V1.1) [!].gb";
-const char* link = "C:/Users/RedAP/Downloads/Legend of Zelda, The - Link's Awakening (G) [!].gb";
+const char* link = "C:/Users/RedAP/Downloads/Legend of Zelda, The - Link's Awakening (USA, Europe).gb";
 
 //PASSED ALL OF THESE ROMS
 const char* cpuInstructions = "C:/Users/RedAP/Downloads/cpu_instrs.gb";
