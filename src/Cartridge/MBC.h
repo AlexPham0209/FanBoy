@@ -34,7 +34,7 @@ public:
 
 private:
 	unsigned short romBank = 1;
-	unsigned short ramBank = 1;
+	unsigned short ramBank = 0;
 	bool ramEnable = false;
 	bool bankingMode = true;
 };
@@ -47,7 +47,7 @@ public:
 
 private:
 	unsigned short romBank = 1;
-	unsigned short ramBank = 1;
+	unsigned short ramBank = 0;
 	bool ramEnable = false;
 	bool bankingMode = true;
 };
@@ -61,7 +61,7 @@ public:
 
 private:
 	unsigned short romBank = 1;
-	unsigned short ramBank = 1;
+	unsigned short ramBank = 0;
 	unsigned short rtc = 0;
 	bool ramEnable = false;
 	bool bankingMode = true;
