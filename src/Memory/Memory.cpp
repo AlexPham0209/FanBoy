@@ -136,3 +136,15 @@ void Memory::writeShort(unsigned short address, unsigned short val) {
 	writeByte(address + 1, (val & 0xFF00) >> 8);
 }
 
+void Memory::loadCartridge(Cartridge& cartridge) {
+	if (&cartridge != nullptr)
+		this->cartridge = cartridge;
+}
+
+void Memory::reset() {
+	wRam.clear();
+	vRam.clear();
+	io.clear();
+	hRam.clear();
+	oam.clear();
+}

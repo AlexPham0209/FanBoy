@@ -16,5 +16,5 @@ public:
 
 	void step(int cycles);
 	void select();
-
+	void reset();
 };

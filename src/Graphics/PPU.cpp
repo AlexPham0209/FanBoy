@@ -302,3 +302,8 @@ void PPU::renderSprite(unsigned char y) {
 	}
 }
 
+void PPU::reset() {
+	mode = OAMSCAN;
+	cycles = 0;
+	canRender = false;
+}

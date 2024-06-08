@@ -34,4 +34,6 @@ public:
 	void handleInterrupts(CPU& mCPU);
 
 	bool triggerInterrupt(unsigned char flag, unsigned short address, CPU& mCPU);
+
+	void reset();
 };

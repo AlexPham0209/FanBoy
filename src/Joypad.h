@@ -25,4 +25,5 @@ public:
 	unsigned char readByte();
 	void setButton(unsigned char state, bool val);
 	void setDirections(unsigned char state, bool set);
+	void reset();
 };

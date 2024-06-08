@@ -77,3 +77,7 @@ bool Interrupts::triggerInterrupt(unsigned char flag, unsigned short address, CP
 	mCPU.pc = address;
 	return false;
 }
+
+void Interrupts::reset() {
+	IME = false;
+}

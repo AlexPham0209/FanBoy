@@ -29,11 +29,11 @@ private:
 	void renderBackground(unsigned char y);
 	void renderSprite(unsigned char y);
 	void renderWindow(unsigned char y);
-
+	
 public:
 	bool canRender = false;
 	PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts);
 	void step(int cycles);
-	
+	void reset();
 
 };

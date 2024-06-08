@@ -35,5 +35,9 @@ public:
 	unsigned char readByte(unsigned short address);
 	void writeByte(unsigned short address, unsigned char val);
 
+	Cartridge& operator=(const Cartridge& src) {
+		return *this;
+	}
+
 	std::string getInfo();
 };

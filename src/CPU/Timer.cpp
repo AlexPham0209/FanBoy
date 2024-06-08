@@ -52,3 +52,8 @@ void Timer::select() {
 			break;
 	}
 }
+
+
+void Timer::reset() {
+	clock = 0;
+}

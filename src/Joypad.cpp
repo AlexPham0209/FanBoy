@@ -63,3 +63,9 @@ void Joypad::setDirections(unsigned char state, bool set) {
 	directions = val;
 	interrupts.setInterruptFlag(JOYPAD, true);
 }
+
+void Joypad::reset() {
+	this->selects = 0x3F;
+	this->buttons = 0xF;
+	this->directions = 0xF;
+}

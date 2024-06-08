@@ -16,6 +16,9 @@ public:
 	unsigned short readShort(unsigned short address);
 	void writeByte(unsigned short address, unsigned char val);
 	void writeShort(unsigned short address, unsigned short val);
+    void loadCartridge(Cartridge& cartridge);
+
+    void reset();
 
 private:
     Cartridge& cartridge;
