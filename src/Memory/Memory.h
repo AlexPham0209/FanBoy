@@ -10,18 +10,19 @@
 class Joypad;
 class Memory {
 public:
-	Memory(Cartridge& cartridge, Joypad& joypad);
+	Memory(Cartridge* cartridge, Joypad& joypad);
+    Memory(Joypad& joypad);
 
 	unsigned char readByte(unsigned short address);
 	unsigned short readShort(unsigned short address);
 	void writeByte(unsigned short address, unsigned char val);
 	void writeShort(unsigned short address, unsigned short val);
-    void loadCartridge(Cartridge& cartridge);
+    void loadCartridge(Cartridge* cartridge);
 
     void reset();
 
 private:
-    Cartridge& cartridge;
+    Cartridge* cartridge;
     Joypad& joypad;
 
     std::vector<unsigned char> bootRom = {

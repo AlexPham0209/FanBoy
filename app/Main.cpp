@@ -97,7 +97,8 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy(megaman);
+	gameboy = new GameBoy();
+	gameboy->loadGame(doctor);
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;

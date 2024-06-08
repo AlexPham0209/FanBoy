@@ -3,7 +3,15 @@
 
 //This class represents the Memory Management Unit inside of the Gameboy.  
 //The Memory Management Unit is a component that translates virtual memory address stored inside of a register into the physical location on the various Memory units in the Gameboy
-Memory::Memory(Cartridge& cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
+Memory::Memory(Cartridge* cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
+	wRam.resize(0x1FFF + 1);
+	vRam.resize(0x1FFF + 1);
+	io.resize(0x7F + 1);
+	hRam.resize(0x7F + 1);
+	oam.resize(0xFF + 1);
+}
+
+Memory::Memory(Joypad& joypad) : cartridge(nullptr), joypad(joypad) {
 	wRam.resize(0x1FFF + 1);
 	vRam.resize(0x1FFF + 1);
 	io.resize(0x7F + 1);
@@ -19,7 +27,7 @@ unsigned char Memory::readByte(unsigned short address) {
 
 	//External Cartridge ROM 
 	if (address <= 0x7FFF) 
-		return cartridge.readByte(address);
+		return cartridge->readByte(address);
 	
 	//8 KB of Video RAM
 	if (address >= 0x8000 && address <= 0x9FFF)
@@ -27,7 +35,7 @@ unsigned char Memory::readByte(unsigned short address) {
 
 	//External cartridge RAM
 	if (address >= 0xA000 && address <= 0xBFFF)
-		return cartridge.readByte(address);
+		return cartridge->readByte(address);
 
 	//8 KB of Work RAM (Combined two WRAM components into one vector data structure)
 	if (address >= 0xC000 && address <= 0xDFFF)
@@ -72,7 +80,7 @@ void Memory::writeByte(unsigned short address, unsigned char val) {
 
 	//Writing into the ROM (Invalid but is handled by individual Cartridge MBC)
 	if (address <= 0x7FFF)
-		cartridge.writeByte(address, val);
+		cartridge->writeByte(address, val);
 
 	//8 KB of Video RAM
 	if (address >= 0x8000 && address <= 0x9FFF) 
@@ -80,7 +88,7 @@ void Memory::writeByte(unsigned short address, unsigned char val) {
 
 	//Writing into Cartridge's external RAM (If it has some)
 	if (address >= 0xA000 && address <= 0xBFFF)
-		cartridge.writeByte(address, val);
+		cartridge->writeByte(address, val);
 
 	//8 KB of Work RAM (Combined two WRAM components into one vector data structure)
 	if (address >= 0xC000 && address <= 0xDFFF) 
@@ -136,9 +144,8 @@ void Memory::writeShort(unsigned short address, unsigned short val) {
 	writeByte(address + 1, (val & 0xFF00) >> 8);
 }
 
-void Memory::loadCartridge(Cartridge& cartridge) {
-	if (&cartridge != nullptr)
-		this->cartridge = cartridge;
+void Memory::loadCartridge(Cartridge* cartridge) {
+	this->cartridge = cartridge;
 }
 
 void Memory::reset() {

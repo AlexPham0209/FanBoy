@@ -8,23 +8,23 @@
 class GameBoy {
 	public:
 		GameBoy(const char* path);
-		GameBoy(Cartridge& cartridge);
+		GameBoy(Cartridge* cartridge);
 		GameBoy();
 		~GameBoy();
 
 		void step();
-		Cartridge& loadCartridge(const char* path);
-		void removeCartridge();
-
 		void pressButton(unsigned char input);
 		void releaseButton(unsigned char input);
+
+		void loadGame(const char* path);
+		void unloadGame();
 		unsigned int* getFrame();
 		bool canRender();
 		
 
 	private:
 		bool running = false;
-		Cartridge& cartridge;
+		Cartridge* cartridge;
 		Joypad joypad;
 		Memory memory;
 		Interrupts interrupts;
@@ -32,5 +32,6 @@ class GameBoy {
 		PixelBuffer buffer;
 		CPU mCPU;
 		PPU mPPU;
-	
+		
+		Cartridge* loadCartridge(const char* path);
 };

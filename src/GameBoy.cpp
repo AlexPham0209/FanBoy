@@ -3,14 +3,21 @@
 #include <iostream>
 #include "Cartridge/CartridgeFactory.h"
 
-GameBoy::GameBoy(Cartridge& cartridge) : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Memory(cartridge, joypad)),
-interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
+GameBoy::GameBoy(Cartridge* cartridge) : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Memory(cartridge, joypad)),
+interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {
+	running = true;
+}
 
 GameBoy::GameBoy(const char* path) : cartridge(this->loadCartridge(path)), joypad(Joypad(interrupts)), memory(Memory(cartridge, joypad)),
+interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {
+	running = true;
+}
+
+GameBoy::GameBoy() : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Memory(joypad)),
 interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
 
 GameBoy::~GameBoy() {
-	delete &cartridge;
+	delete cartridge;
 }
 
 void GameBoy::step() {
@@ -35,20 +42,27 @@ unsigned int* GameBoy::getFrame() {
 	return buffer.getFrame();
 }
 
-Cartridge& GameBoy::loadCartridge(const char* path) {
-	running = true;
+Cartridge* GameBoy::loadCartridge(const char* path) {
 	CartridgeFactory* factory = CartridgeFactory::getInstance();
 	Cartridge* cartridge = factory->createCartridge(path);
-	return *cartridge;
+	return cartridge;
 }
 
-void GameBoy::removeCartridge() {
-	delete& cartridge;
+void GameBoy::loadGame(const char* path) {
+	running = true;
+	Cartridge* cartridge = loadCartridge(path);
+	this->cartridge = cartridge;
+	memory.loadCartridge(cartridge);
+}
+
+void GameBoy::unloadGame() {
+	delete cartridge;
 	buffer.reset();
-	mCPU.reset();
+	mCPU.resetBoot();
 	mPPU.reset();
 	timer.reset();
 	interrupts.reset();
+	memory.reset();
 	joypad.reset();
 
 	running = false;
