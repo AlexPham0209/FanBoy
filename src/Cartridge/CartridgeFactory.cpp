@@ -142,7 +142,7 @@ MBC* CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header& heade
 	unsigned char type = rom[0x147];
 
 	//Resizes the ROM and RAM to ensure that its the right size
-	//rom.resize(header.romSize * 1024);
+	rom.resize(header.romSize * 1024);
 
 	switch (type) {
 		//ROM only

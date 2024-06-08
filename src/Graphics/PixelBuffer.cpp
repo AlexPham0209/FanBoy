@@ -11,8 +11,6 @@ bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 	if (index < 0 || index >= width * height)
 		return false;
 
-	//std::cout << (int)x << ", " << (int)y << ", " << std::endl;
-	//std::cout << (int)index << ", " << (int)color.r << ", " << (int)color.g << ", " << (int)color.b << "\n" << std::endl;
 	buffer[index] = color.r << 16 | color.g << 8 | color.b;
 	return true;
 } 
