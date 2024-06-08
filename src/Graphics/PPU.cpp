@@ -255,7 +255,6 @@ void PPU::renderSprite(unsigned char y) {
 		if (y < yPosition || y >= yPosition + height)
 			continue;
 
-
 		//Get specific address for the current row of the tile
 		unsigned short tileAddress = 0x8000 + (id * 16);
 		bool yFlip = (flags >> 6) & 1;

@@ -51,3 +51,18 @@ private:
 	bool ramEnable = false;
 	bool bankingMode = true;
 };
+
+
+class MBC3 : public MBC {
+public:
+	MBC3(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
+	unsigned char readByte(unsigned short address) override;
+	void writeByte(unsigned short address, unsigned char val) override;
+
+private:
+	unsigned short romBank = 1;
+	unsigned short ramBank = 1;
+	unsigned short rtc = 0;
+	bool ramEnable = false;
+	bool bankingMode = true;
+};
