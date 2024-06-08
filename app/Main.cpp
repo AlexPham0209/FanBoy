@@ -12,19 +12,6 @@ const int SCALE = 4;
 bool running = true;
 
 std::map<int, unsigned char> keyMap;
-const char* tetris = "C:/Users/RedAP/Desktop/Tetris.gb";
-const char* doctor = "C:/Users/RedAP/Downloads/Dr. Mario (JU) (V1.1).gb";
-const char* mario = "C:/Users/RedAP/Downloads/Super Mario Land (JUE) (V1.1) [!].gb";
-const char* link = "C:/Users/RedAP/Downloads/Legend of Zelda, The - Link's Awakening (USA, Europe).gb";
-const char* tennis = "C:/Users/RedAP/Downloads/Tennis (World).gb";
-const char* megaman = "C:/Users/RedAP/Downloads/Mega Man V (U) [S][!].gb";
-const char* mario2 = "C:/Users/RedAP/Downloads/Super Mario Land 2 - 6 Golden Coins (UE) (V1.2) [!].gb";
-const char* wario = "C:/Users/RedAP/Downloads/Wario Land - Super Mario Land 3 (World).gb";
-const char* pokemon = "C:/Users/RedAP/Downloads/Pokemon Red (UE) [S][!].gb";
-const char* donkeyKong = "C:/Users/RedAP/Downloads/Pokemon Red (UE) [S][!].gb";
-
-//PASSED ALL OF THESE ROMS
-const char* cpuInstructions = "C:/Users/RedAP/Downloads/cpu_instrs.gb";
 
 GameBoy* gameboy;
 SDL_Window* window;
@@ -102,7 +89,13 @@ void run() {
 
 bool init() {
 	gameboy = new GameBoy();
-	gameboy->loadGame(donkeyKong);
+
+	std::string path;
+	std::cout << "Enter file path: ";
+	std::getline(std::cin, path);
+
+	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
+	gameboy->loadGame(path.c_str());
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;

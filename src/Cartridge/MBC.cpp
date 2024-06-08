@@ -153,7 +153,6 @@ void MBC3::writeByte(unsigned short address, unsigned char val) {
 		if (val <= 0x3) {
 			bankingMode = true;
 			ramBank = val;
-			return;
 		}
 
 		else if (val >= 0x8 && val <= 0xC) 
