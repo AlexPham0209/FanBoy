@@ -151,16 +151,17 @@ MBC* CartridgeFactory::generateMBC(std::vector<unsigned char> rom, Header& heade
 		
 		//MBC1
 		case 0x01: case 0x02: case 0x03:
-			std::cout << "MBC 1" << std::endl;
 			return new MBC1(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 		
 		//MBC2
 		case 0x05: case 0x06:
-			return new MBC0(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
+			return new MBC2(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
 
 		//MBC3
 		case 0x0F: case 0x10: case 0x11: case 0x12: case 0x13:
 			return new MBC0(rom, std::vector<unsigned char>(header.ramSize * 1024), header);
+
+		//MBC5
 	}
 
 	return new MBC0(rom, std::vector<unsigned char>(header.ramSize), header);

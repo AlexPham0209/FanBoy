@@ -35,8 +35,5 @@ public:
 	unsigned char readByte(unsigned short address);
 	void writeByte(unsigned short address, unsigned char val);
 
-	unsigned short readShort(unsigned short address);
-	void writeShort(unsigned short address, unsigned short val);
-
 	std::string getInfo();
 };

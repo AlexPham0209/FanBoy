@@ -4,9 +4,9 @@ MBC::MBC(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header&
 
 MBC0::MBC0(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : MBC(rom, ram, header) {}
 
-MBC1::MBC1(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : MBC(rom, ram, header) {
+MBC1::MBC1(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : MBC(rom, ram, header) {}
 
-}
+MBC2::MBC2(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header) : MBC(rom, ram, header) {}
 
 //For ROM only Cartridges, the MMU directly maps the address between 0000 - 7FFF given to the ROM on the cartridge
 unsigned char MBC0::readByte(unsigned short address) {
@@ -17,16 +17,6 @@ unsigned char MBC0::readByte(unsigned short address) {
 void MBC0::writeByte(unsigned short address, unsigned char val) {
 	return;
 }
-
-//For ROM only Cartridges, the MMU directly maps the address between 0000 - 7FFF given to the ROM on the cartridge
-unsigned short MBC0::readShort(unsigned short address) {
-	return rom[address] | (rom[address + 1] << 8);
-};
-
-//Since There is no writable external RAM, we return null
-void MBC0::writeShort(unsigned short address, unsigned short val) {
-	return;
-};
 
 unsigned char MBC1::readByte(unsigned short address) {
 	//ROM Bank 0 
@@ -79,11 +69,44 @@ void MBC1::writeByte(unsigned short address, unsigned char val) {
 	}
 }
 
-void MBC1::writeShort(unsigned short address, unsigned short val) {
-	writeByte(address, val & 0x00FF);
-	writeByte(address + 1, (val & 0xFF00) >> 8);
+
+unsigned char MBC2::readByte(unsigned short address) {
+	//ROM Bank 0 
+	if (address <= 0x3FFF)
+		return rom[address];
+
+	//ROM Banks 1 - 7F
+	if (address >= 0x4000 && address <= 0x7FFF) {
+		int target = (romBank * 0x4000) + (address - 0x4000);
+		return rom[target];
+	}
+
+	//RAM Banks
+	if (address >= 0xA000 && address <= 0xA1FF) {
+		if (!ramEnable)
+			return 0xFF;
+
+		return ram[address];
+	}
 }
 
-unsigned short MBC1::readShort(unsigned short address) {
-	return readByte(address) | (readByte(address + 1) << 8);
+void MBC2::writeByte(unsigned short address, unsigned char val) {
+	//Set RAM Enable
+	if (address <= 0x3FFF) {
+		bool enable = (address >> 8) & 1;
+
+		if (!enable) {
+			ramEnable = (val == 0x0A);
+			return;
+		}
+		
+		romBank = std::max(1, (val & 0xF));
+	}
+	
+	//Write into RAM Bank
+	if (address >= 0xA000 && address <= 0xA1FF) {
+		if (!ramEnable)
+			return;
+		ram[address] = val;
+	}
 }

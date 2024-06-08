@@ -12,11 +12,6 @@ PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(b
 void PPU::step(int cycles) {
 	this->cycles += cycles;
 
-	//If bit 7 in LCD enable register (FF40) is false, then stop PPU execution
-	/*bool lcdEnable = (memory.readByte(0xFF40) >> 7) & 1;
-	if (!lcdEnable)
-		return;*/
-
 	//State machine that controls the mode the PPU is in
 	switch (mode) {
 		case OAMSCAN:
@@ -260,9 +255,6 @@ void PPU::renderSprite(unsigned char y) {
 		if (y < yPosition || y >= yPosition + height)
 			continue;
 
-		//If out of bounds, don't render
-		if (yPosition < 0 || yPosition > 144)
-			continue;
 
 		//Get specific address for the current row of the tile
 		unsigned short tileAddress = 0x8000 + (id * 16);
@@ -280,9 +272,6 @@ void PPU::renderSprite(unsigned char y) {
 			int index = xFlip ? x : 7 - x;
 			unsigned char lowCol = (low >> index) & 1;
 			unsigned char highCol = (high >> index) & 1;
-
-			if (x + xPosition < 0 || x + xPosition > 160)
-				continue;
 
 			bool priority = (flags >> 7) & 1;
 
@@ -303,6 +292,7 @@ void PPU::renderSprite(unsigned char y) {
 			unsigned short dmgPalette = !((flags >> 4) & 1) ? 0xFF48 : 0xFF49;
 			unsigned char mappedColor = (memory.readByte(dmgPalette) >> (color * 2)) & 0x3;
 
+			//Don't render if set to transparent color which is index 0
 			if (color == 0)
 				continue;
 

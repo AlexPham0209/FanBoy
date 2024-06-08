@@ -12,14 +12,6 @@ void Cartridge::writeByte(unsigned short address, unsigned char val) {
 	memory.writeByte(address, val);
 }
 
-unsigned short Cartridge::readShort(unsigned short address) {
-	return memory.readShort(address);
-}
-
-void Cartridge::writeShort(unsigned short address, unsigned short val) {
-	memory.writeShort(address, val);
-}
-
 std::string Cartridge::getInfo() {
 	std::stringstream ss;
 

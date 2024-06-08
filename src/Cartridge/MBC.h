@@ -14,9 +14,6 @@ public:
 	MBC(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
 	virtual unsigned char readByte(unsigned short address) = 0;
 	virtual void writeByte(unsigned short address, unsigned char val) = 0;
-		
-	virtual unsigned short readShort(unsigned short address) = 0;
-	virtual void writeShort(unsigned short address, unsigned short val) = 0;
 };
 
 //ROM Only Cartridge type
@@ -26,21 +23,27 @@ public:
 	MBC0(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
 	unsigned char readByte(unsigned short address) override;
 	void writeByte(unsigned short address, unsigned char val) override;
-
-	unsigned short readShort(unsigned short address) override;
-	void writeShort(unsigned short address, unsigned short val) override;
 };
 
 //Memory Bank Controller 1 Cartridge type
-
 class MBC1 : public MBC {
 public:
 	MBC1(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
 	unsigned char readByte(unsigned short address) override;
 	void writeByte(unsigned short address, unsigned char val) override;
 
-	unsigned short readShort(unsigned short address) override;
-	void writeShort(unsigned short address, unsigned short val) override;
+private:
+	unsigned short romBank = 1;
+	unsigned short ramBank = 1;
+	bool ramEnable = false;
+	bool bankingMode = true;
+};
+
+class MBC2 : public MBC {
+public:
+	MBC2(std::vector<unsigned char> rom, std::vector<unsigned char> ram, Header& header);
+	unsigned char readByte(unsigned short address) override;
+	void writeByte(unsigned short address, unsigned char val) override;
 
 private:
 	unsigned short romBank = 1;
