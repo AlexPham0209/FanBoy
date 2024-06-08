@@ -8,7 +8,7 @@ PixelBuffer::PixelBuffer(unsigned char width, unsigned char height) : width(widt
 
 bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 	unsigned short index = y * width + x;
-	if (index < 0 || index >= width * height)
+	if (index < 0 || index >= buffer.size())
 		return false;
 
 	buffer[index] = color.r << 16 | color.g << 8 | color.b;

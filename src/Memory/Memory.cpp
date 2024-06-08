@@ -6,8 +6,8 @@
 Memory::Memory(Cartridge* cartridge, Joypad& joypad) : cartridge(cartridge), joypad(joypad) {
 	wRam.resize(0x1FFF + 1);
 	vRam.resize(0x1FFF + 1);
-	io.resize(0x7F + 1);
-	hRam.resize(0x7F + 1);
+	io.resize(0xFF + 1);
+	hRam.resize(0xFF + 1);
 	oam.resize(0xFF + 1);
 }
 

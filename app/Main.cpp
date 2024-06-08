@@ -88,14 +88,14 @@ void run() {
 }
 
 bool init() {
-	gameboy = new GameBoy();
-
 	std::string path;
 	std::cout << "Enter file path: ";
-	std::getline(std::cin, path);
+	std::getline(std::cin, path, '\n');
 
 	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
-	gameboy->loadGame(path.c_str());
+	gameboy = new GameBoy("C:/Users/RedAP/Desktop/GameBoy Roms/Super Mario Land 2 - 6 Golden Coins (UE) (V1.2) [!].gb");
+	/*gameboy = new GameBoy(path.c_str());*/
+
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;

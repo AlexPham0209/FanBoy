@@ -17,7 +17,7 @@ GameBoy::GameBoy() : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Me
 interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
 
 GameBoy::~GameBoy() {
-	delete cartridge;
+	unloadGame();
 }
 
 void GameBoy::step() {
