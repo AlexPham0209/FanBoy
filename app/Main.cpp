@@ -40,8 +40,8 @@ bool initWindow() {
 		std::cout << "Failed to create texture" << std::endl;
 		return false;
 	}
-	std::cout << "Texture Created" << std::endl;
 
+	std::cout << "Texture Created" << std::endl;
 	return true;
 }
 
@@ -50,6 +50,17 @@ void render(void const* buffer, int pitch) {
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 	SDL_RenderPresent(renderer);
+}
+
+void load() {
+	std::string path;
+	std::cout << "Enter file path: ";
+	std::getline(std::cin, path, '\n');
+
+	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
+
+	if (gameboy != nullptr)
+		gameboy->loadGame(path.c_str());
 }
 
 void input() {
@@ -63,8 +74,12 @@ void input() {
 			if (e.key.keysym.sym == SDLK_ESCAPE)
 				running = false;
 
-			if (keyMap.count(e.key.keysym.sym)) {
+			if (keyMap.count(e.key.keysym.sym)) 
 				gameboy->pressButton(keyMap[e.key.keysym.sym]);
+			
+			if (e.key.keysym.sym == SDLK_k) {
+				gameboy->unloadGame();
+				load();
 			}
 		}
 		// Process keyup events
@@ -72,6 +87,7 @@ void input() {
 			gameboy->releaseButton(keyMap[e.key.keysym.sym]);
 	}
 }
+
 
 void run() {
 	float time = 0;
@@ -88,13 +104,7 @@ void run() {
 }
 
 bool init() {
-	std::string path;
-	std::cout << "Enter file path: ";
-	std::getline(std::cin, path, '\n');
-
-	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
-	gameboy = new GameBoy(path.c_str());
-	
+	gameboy = new GameBoy();
 	keyMap[SDLK_LEFT] = GAMEBOY_LEFT;
 	keyMap[SDLK_RIGHT] = GAMEBOY_RIGHT;
 	keyMap[SDLK_DOWN] = GAMEBOY_DOWN;
@@ -117,6 +127,7 @@ int main(int argc, char* args[]) {
 	if (!init())
 		return -1;
 
+	load();
 	run();
 
 	delete gameboy;

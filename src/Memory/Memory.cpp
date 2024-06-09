@@ -149,9 +149,9 @@ void Memory::loadCartridge(Cartridge* cartridge) {
 }
 
 void Memory::reset() {
-	wRam.clear();
-	vRam.clear();
-	io.clear();
-	hRam.clear();
-	oam.clear();
+	std::fill(wRam.begin(), wRam.end(), 0);
+	std::fill(vRam.begin(), vRam.end(), 0);
+	std::fill(io.begin(), io.end(), 0);
+	std::fill(hRam.begin(), hRam.end(), 0);
+	std::fill(oam.begin(), oam.end(), 0);
 }
