@@ -259,7 +259,7 @@ void PPU::renderSprite(unsigned char y) {
 		unsigned short tileAddress = 0x8000 + (id * 16);
 		bool yFlip = (flags >> 6) & 1;
 		unsigned short yIndex = yFlip ? 2 * ((height - 1) - (y - yPosition)) : 2 * (y - yPosition);
-
+			
 		//Get high and low tile data from memory for specific scanline		
 		unsigned char low = memory.readByte(tileAddress + yIndex);
 		unsigned char high = memory.readByte(tileAddress + yIndex + 1);

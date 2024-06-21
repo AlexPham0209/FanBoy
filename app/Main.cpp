@@ -3,11 +3,9 @@
 #include "../src/Cartridge/CartridgeFactory.h"
 #include <chrono>
 #define SDL_MAIN_HANDLED 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 
-const double DELAY = 0;
-int videoPitch;
 const int SCALE = 4;
 bool running = true;
 
@@ -54,10 +52,11 @@ void render(void const* buffer, int pitch) {
 
 void load() {
 	std::string path;
-	std::cout << "Enter file path: ";
+	std::cout << "\nEnter file path: ";
 	std::getline(std::cin, path, '\n');
 
 	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
+	std::cout << "\n";
 
 	if (gameboy != nullptr)
 		gameboy->loadGame(path.c_str());

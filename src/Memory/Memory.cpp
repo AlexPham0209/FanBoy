@@ -149,6 +149,7 @@ void Memory::loadCartridge(Cartridge* cartridge) {
 }
 
 void Memory::reset() {
+	cartridge = nullptr;
 	std::fill(wRam.begin(), wRam.end(), 0);
 	std::fill(vRam.begin(), vRam.end(), 0);
 	std::fill(io.begin(), io.end(), 0);

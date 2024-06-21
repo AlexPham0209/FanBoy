@@ -57,6 +57,7 @@ void GameBoy::loadGame(const char* path) {
 
 void GameBoy::unloadGame() {
 	delete cartridge;
+	cartridge = nullptr;
 	buffer.reset();
 	mCPU.resetBoot();
 	mPPU.reset();
