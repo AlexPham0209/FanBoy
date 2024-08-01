@@ -1,12 +1,13 @@
 #include <iostream>
-#include "../src/GameBoy.h"
-#include "../src/Cartridge/CartridgeFactory.h"
-#include "../lib/imgui/imgui.h"
-#include "../lib/imgui/backends/imgui_impl_sdl2.h"
-#include "../lib/imgui/backends/imgui_impl_sdlrenderer2.h"
+#include <GameBoy.h>
+#include <Cartridge/CartridgeFactory.h>
+#include <imgui.h>
+#include <backends/imgui_impl_sdlrenderer2.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <SDL.h>
 #include <chrono>
 #define SDL_MAIN_HANDLED 
-#include <SDL.h>
+
 
 
 const int SCALE = 4;

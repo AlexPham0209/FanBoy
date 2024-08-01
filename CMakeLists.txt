@@ -1,8 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 project("GameBoy")
-string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-string(REPLACE "-O2" "-O3" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-
 find_package(SDL2 REQUIRED)
 include_directories(GameBoyTests ${SDL2_INCLUDE_DIRS})
 
