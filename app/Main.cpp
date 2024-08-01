@@ -78,7 +78,8 @@ void createFileDialog() {
 		printf("Error: %s\n", NFD_GetError());
 	}
 
-	gameboy->loadGame(outPath);
+	if (outPath != NULL)
+		gameboy->loadGame(outPath);
 }
 
 void createDemoWindow() {
