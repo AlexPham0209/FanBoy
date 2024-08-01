@@ -20,7 +20,7 @@ class GameBoy {
 		void unloadGame();
 		unsigned int* getFrame();
 		bool canRender();
-		
+		bool isRunning();
 
 	private:
 		bool running = false;

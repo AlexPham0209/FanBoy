@@ -9,13 +9,9 @@
 #define SDL_MAIN_HANDLED 
 #include <SDL.h>
 
-
-
 const int SCALE = 4;
 bool running = true;
-bool show_demo_window = true;
-bool show_another_window = true;
-bool clear_color = true;
+float test = 0;
 
 std::map<int, unsigned char> keyMap;
 
@@ -65,27 +61,40 @@ bool initWindow() {
 	return true;
 }
 
-void createGUI() {
-	static float f = 0.0f;
-	static int counter = 0;
-
-	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Another Window", &show_another_window);
-
-	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		counter++;
-	ImGui::SameLine();
-	ImGui::Text("counter = %d", counter);
-
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::End();
+void createDemoWindow() {
+	ImGui::BeginChild("Test");
+	ImGui::SliderFloat("Color", &test, 0.0f, 1.0f);
 }
+
+
+void createMainMenuBar() {
+	ImGui::BeginMainMenuBar();
+	if (ImGui::MenuItem("Open", "Ctrl+O")) {
+		if (gameboy != nullptr)
+			gameboy->loadGame("C:/Users/RedAP/Desktop/GameBoy Roms/Donkey Kong (JU) (V1.0) [S][!].gb");
+	}
+
+	
+	if (ImGui::MenuItem("Debugger")) {
+		createDemoWindow();
+	}
+
+	if (ImGui::MenuItem("Tile Maps")) {
+	
+	}
+
+	if (ImGui::MenuItem("Palettes")) {
+
+	}
+		
+	ImGui::EndMainMenuBar();
+}
+
+
+void createGUI() {
+	createMainMenuBar();
+}
+
 
 void render(void const* buffer, int pitch) {
 	SDL_UpdateTexture(texture, nullptr, buffer, pitch);
@@ -124,7 +133,6 @@ void input() {
 				gameboy->pressButton(keyMap[e.key.keysym.sym]);
 			
 			if (e.key.keysym.sym == SDLK_k) {
-				gameboy->unloadGame();
 				load();
 			}
 		}
@@ -135,6 +143,19 @@ void input() {
 	}
 }
 
+void isUnloaded() {
+	ImGui_ImplSDLRenderer2_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	createGUI();
+
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+	ImGui::Render();
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+	SDL_RenderPresent(renderer);
+}
+
 
 void run() {
 	float time = 0;
@@ -142,6 +163,11 @@ void run() {
 
 		input();
 		gameboy->step();
+		
+		if (!gameboy->isRunning()) {
+			isUnloaded();
+			continue;
+		}
 
 		if (gameboy->canRender()) {
 			ImGui_ImplSDLRenderer2_NewFrame();
@@ -155,6 +181,15 @@ void run() {
 		}
 		
 	}
+
+	// Cleanup
+	ImGui_ImplSDLRenderer2_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 }
 
 bool init() {
@@ -181,7 +216,7 @@ int main(int argc, char* args[]) {
 	if (!init())
 		return -1;
 
-	load();
+	//load();
 	run();
 
 	delete gameboy;

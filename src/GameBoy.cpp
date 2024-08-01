@@ -13,7 +13,7 @@ interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memor
 	running = true;
 }
 
-GameBoy::GameBoy() : cartridge(cartridge), joypad(Joypad(interrupts)), memory(Memory(joypad)),
+GameBoy::GameBoy() : cartridge(nullptr), joypad(Joypad(interrupts)), memory(Memory(joypad)),
 interrupts(Interrupts(memory)), mCPU(CPU(memory, interrupts)), timer(Timer(memory, interrupts)), buffer(PixelBuffer(160, 144)), mPPU(buffer, memory, interrupts) {}
 
 GameBoy::~GameBoy() {
@@ -23,7 +23,6 @@ GameBoy::~GameBoy() {
 void GameBoy::step() {
 	if (!running)
 		return;
-
 	interrupts.handleInterrupts(mCPU);
 	int cycles = mCPU.step();
 	timer.step(cycles);
@@ -49,14 +48,18 @@ Cartridge* GameBoy::loadCartridge(const char* path) {
 }
 
 void GameBoy::loadGame(const char* path) {
-	running = true;
+	unloadGame();
+	
 	Cartridge* cartridge = loadCartridge(path);
 	this->cartridge = cartridge;
 	memory.loadCartridge(cartridge);
+	running = true;
 }
 
 void GameBoy::unloadGame() {
-	delete cartridge;
+	if (cartridge != nullptr) 
+		delete cartridge;
+	
 	cartridge = nullptr;
 	buffer.reset();
 	mCPU.resetBoot();
@@ -72,4 +75,8 @@ void GameBoy::unloadGame() {
 
 bool GameBoy::canRender() {
 	return mPPU.canRender;
+}
+
+bool GameBoy::isRunning() {
+	return running;
 }
