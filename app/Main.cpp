@@ -8,6 +8,7 @@
 
 #define SDL_MAIN_HANDLED 
 #include <SDL.h>
+#include <nfd.h>
 
 const int SCALE = 4;
 bool running = true;
@@ -61,6 +62,25 @@ bool initWindow() {
 	return true;
 }
 
+void createFileDialog() {
+	nfdchar_t* outPath = NULL;
+	nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outPath);
+
+	if (result == NFD_OKAY) {
+		puts("Success!");
+		puts(outPath);
+		free(outPath);
+	}
+	else if (result == NFD_CANCEL) {
+		puts("User pressed cancel.");
+	}
+	else {
+		printf("Error: %s\n", NFD_GetError());
+	}
+
+	gameboy->loadGame(outPath);
+}
+
 void createDemoWindow() {
 	ImGui::BeginChild("Test");
 	ImGui::SliderFloat("Color", &test, 0.0f, 1.0f);
@@ -70,8 +90,7 @@ void createDemoWindow() {
 void createMainMenuBar() {
 	ImGui::BeginMainMenuBar();
 	if (ImGui::MenuItem("Open", "Ctrl+O")) {
-		if (gameboy != nullptr)
-			gameboy->loadGame("C:/Users/RedAP/Desktop/GameBoy Roms/Donkey Kong (JU) (V1.0) [S][!].gb");
+		createFileDialog();
 	}
 
 	
