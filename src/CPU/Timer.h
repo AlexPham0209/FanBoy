@@ -1,5 +1,5 @@
 #pragma once
-#include "../Memory/Memory.h"
+#include "Memory/Memory.h"
 #include "Interrupts.h"
 
 class Timer {

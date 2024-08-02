@@ -80,3 +80,7 @@ bool GameBoy::canRender() {
 bool GameBoy::isRunning() {
 	return running;
 }
+
+Color* GameBoy::getColors() {
+	return mPPU.getColors();
+}

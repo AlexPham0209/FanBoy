@@ -11,7 +11,11 @@ bool PixelBuffer::setPixel(unsigned char x, unsigned char y, Color color) {
 	if (index < 0 || index >= buffer.size())
 		return false;
 
-	buffer[index] = color.r << 16 | color.g << 8 | color.b;
+	unsigned int r = (unsigned int)(color.r * 255);
+	unsigned int g = (unsigned int)(color.g * 255);
+	unsigned int b = (unsigned int)(color.b * 255);
+
+	buffer[index] = (r << 16) | (g << 8) | (b);
 	return true;
 } 
 
@@ -19,17 +23,17 @@ Color PixelBuffer::getPixel(unsigned char x, unsigned char y) {
 	unsigned short index = y * width + x;
 
 	int color = buffer[index];
-	unsigned char r = (color & 0xFF0000) >> 16;
-	unsigned char g = (color & 0xFF00) >> 8;
-	unsigned char b = (color & 0xFF);
+	float r = (color & 0xFF0000) >> 16;
+	float g = (color & 0xFF00) >> 8;
+	float b = (color & 0xFF);
 
-	return Color{r, g, b};
+	return Color{r * 255, g * 255, b * 255};
 }
 
 void PixelBuffer::reset() {
 	for (int y = 0; y < height; ++y) { 
 		for (int x = 0; x < width; ++x)
-			setPixel(x, y, Color{255, 255, 255});
+			setPixel(x, y, Color{1, 1, 1});
 	}
 }
 

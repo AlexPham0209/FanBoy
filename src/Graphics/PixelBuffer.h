@@ -3,7 +3,7 @@
 #include <iostream>
 
 struct Color {
-	unsigned char r, g, b;
+	float r, g, b;
 };
 
 class PixelBuffer {

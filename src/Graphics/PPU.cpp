@@ -1,11 +1,5 @@
 #include "PPU.h"
 
-std::map<unsigned char, Color> palette = {
-	{0, Color{255, 255, 255}},
-	{1, Color{169, 169, 169}},
-	{2, Color{84, 84, 84}},
-	{3, Color{0, 0, 0}}
-};
 
 PPU::PPU(PixelBuffer& buffer, Memory& memory, Interrupts& interrupts) : buffer(buffer), memory(memory), interrupts(interrupts), mode(OAMSCAN) {}
 
@@ -186,7 +180,7 @@ void PPU::renderBackground(unsigned char y) {
 
 
 		//Based on 2 bit color value, convert it to RGB struct by inputting it into palette map and retrieving color object
-		this->buffer.setPixel(x, y, palette[mappedColor]);
+		this->buffer.setPixel(x, y, *palette[mappedColor]);
 	}
 }
 
@@ -234,7 +228,7 @@ void PPU::renderWindow(unsigned char y) {
 		unsigned char mappedColor = (memory.readByte(0xFF47) >> (color * 2)) & 0x3;
 
 		//Based on 2 bit color value, convert it to RGB struct by inputting it into palette map and retrieving color object
-		this->buffer.setPixel(x, y, palette[mappedColor]);
+		this->buffer.setPixel(x, y, *palette[mappedColor]);
 	}
 }
 
@@ -276,11 +270,11 @@ void PPU::renderSprite(unsigned char y) {
 
 			//Getting color that is already in the background
 			Color other = buffer.getPixel(x + xPosition, y);
-			int existingPixel = (other.r << 16) | (other.g << 8) | other.b;
+			int existingPixel = ((unsigned char)other.r << 16) | ((unsigned char)other.g << 8) | (unsigned char)other.b;
 
 			//Getting the color for index 0
 			int temp = (memory.readByte(0xFF47)) & 0x3;
-			int tempColor = (palette[temp].r << 16) | (palette[temp].g << 8) | palette[temp].b;
+			int tempColor = ((unsigned char)(*(palette[temp])).r << 16) | ((unsigned char)(*(palette[temp])).g << 8) | (unsigned char)(*(palette[temp])).b;
 
 			//If Background/window priority flag is set and background color at pixel is not transparent, then we don't render pixel
 			if (priority && existingPixel != tempColor)
@@ -296,7 +290,7 @@ void PPU::renderSprite(unsigned char y) {
 				continue;
 
 			//if (color != 0 && (!priority || existingPixel == 0xFFFFFF))
-			this->buffer.setPixel(xPosition + x, y, palette[mappedColor]);
+			this->buffer.setPixel(xPosition + x, y, *palette[mappedColor]);
 		}
 	}
 }
@@ -305,4 +299,9 @@ void PPU::reset() {
 	mode = OAMSCAN;
 	cycles = 0;
 	canRender = false;
+}
+
+Color* PPU::getColors()
+{
+	return colors;
 }

@@ -22,6 +22,8 @@ class GameBoy {
 		bool canRender();
 		bool isRunning();
 
+		Color* getColors();
+
 	private:
 		bool running = false;
 		Cartridge* cartridge;

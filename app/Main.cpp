@@ -12,9 +12,12 @@
 
 const int SCALE = 4;
 bool running = true;
-float test = 0;
+bool isPaletteWindowOpen = false;
+bool isControlWindowOpen = false;
 
 std::map<int, unsigned char> keyMap;
+
+Color color;
 
 GameBoy* gameboy;
 SDL_Window* window;
@@ -49,7 +52,6 @@ bool initWindow() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 	// Setup Dear ImGui style
@@ -62,7 +64,7 @@ bool initWindow() {
 	return true;
 }
 
-void createFileDialog() {
+void selectGame() {
 	nfdchar_t* outPath = NULL;
 	nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outPath);
 
@@ -82,30 +84,34 @@ void createFileDialog() {
 		gameboy->loadGame(outPath);
 }
 
-void createDemoWindow() {
-	ImGui::BeginChild("Test");
-	ImGui::SliderFloat("Color", &test, 0.0f, 1.0f);
+void createPaletteWindow() {
+	if (!isPaletteWindowOpen)
+		return;
+
+	ImGui::Begin("Palette");
+	Color* colors = gameboy->getColors();
+	ImGui::ColorEdit3("Color 1", &(*colors).r);
+	ImGui::ColorEdit3("Color 2", &(*(colors + 1)).r);
+	ImGui::ColorEdit3("Color 3", &(*(colors + 2)).r);
+	ImGui::ColorEdit3("Color 4", &(*(colors + 3)).r);
 }
 
+void createControlWindow() {
+	if (!isControlWindowOpen)
+		return;
+
+}
 
 void createMainMenuBar() {
 	ImGui::BeginMainMenuBar();
-	if (ImGui::MenuItem("Open", "Ctrl+O")) {
-		createFileDialog();
-	}
+
+	if (ImGui::MenuItem("Open")) 
+		selectGame();
+
+	if (ImGui::MenuItem("Palettes"))
+		isPaletteWindowOpen = !isPaletteWindowOpen;
 
 	
-	if (ImGui::MenuItem("Debugger")) {
-		createDemoWindow();
-	}
-
-	if (ImGui::MenuItem("Tile Maps")) {
-	
-	}
-
-	if (ImGui::MenuItem("Palettes")) {
-
-	}
 		
 	ImGui::EndMainMenuBar();
 }
@@ -113,6 +119,8 @@ void createMainMenuBar() {
 
 void createGUI() {
 	createMainMenuBar();
+	createPaletteWindow();
+	createControlWindow();
 }
 
 
