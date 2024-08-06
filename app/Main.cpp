@@ -73,12 +73,11 @@ void selectGame() {
 		puts(outPath);
 		free(outPath);
 	}
-	else if (result == NFD_CANCEL) {
+	else if (result == NFD_CANCEL) 
 		puts("User pressed cancel.");
-	}
-	else {
+	else 
 		printf("Error: %s\n", NFD_GetError());
-	}
+	
 
 	if (outPath != NULL)
 		gameboy->loadGame(outPath);
@@ -133,17 +132,6 @@ void render(void const* buffer, int pitch) {
 	SDL_RenderPresent(renderer);
 }
 
-void load() {
-	std::string path;
-	std::cout << "\nEnter file path: ";
-	std::getline(std::cin, path, '\n');
-
-	path.erase(remove(path.begin(), path.end(), '\"'), path.end());
-	std::cout << "\n";
-
-	if (gameboy != nullptr)
-		gameboy->loadGame(path.c_str());
-}
 
 void input() {
 	SDL_Event e;
@@ -159,11 +147,8 @@ void input() {
 
 			if (keyMap.count(e.key.keysym.sym)) 
 				gameboy->pressButton(keyMap[e.key.keysym.sym]);
-			
-			if (e.key.keysym.sym == SDLK_k) {
-				load();
-			}
 		}
+
 		// Process keyup events
 		if (e.type == SDL_KEYUP && keyMap.count(e.key.keysym.sym))
 			gameboy->releaseButton(keyMap[e.key.keysym.sym]);
@@ -202,6 +187,7 @@ void run() {
 			ImGui_ImplSDL2_NewFrame();
 			ImGui::NewFrame();
 			createGUI();
+			ImGui::End();
 
 			unsigned int* frame = gameboy->getFrame();
 			int pitch = sizeof(frame[0]) * 160;
