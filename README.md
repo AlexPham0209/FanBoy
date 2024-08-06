@@ -9,4 +9,17 @@ Go to the latest release of SDL2 (https://github.com/libsdl-org/SDL/releases) an
 
 Unzip the SDL2 files into a safe and easily accessible folder location.  
 
-Then
+Clone the FanBoy repo.  
+
+Open the repository and create a new build directory inside of it using the file explorer or the following command:
+### mkdir build
+
+Run the following command inside of the build folder to generate the CMake BuildSystem:
+### cmake ..
+
+After the CMake project was generated,  go into the CMakeCache.txt file and edit the variable SDL2_DIR to be equal to the location where to installed SDL2-devel
+
+Run the following command to build a runnable executeable.  
+### cmake --build .
+
+Finally drag SDL2.dll inside of lib folder of SDL2-devel into the same folder as the executable.
