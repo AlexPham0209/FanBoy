@@ -26,10 +26,10 @@ Finally drag SDL2.dll that is inside of the lib folder of SDL2-devel into the sa
 
 ## Screenshots
 <p align="center">
-    <img src="images/mario.png" style="margin-right: 10% margin-left: 10%;" width="350" height="350"> 
-    <img src="images/pokemon.png" style="margin-right: 10% margin-left: 10%;"width="350" height="350"> 
-    <img src="images/zelda.png" style="margin-right: 10% margin-left: 10%;" width="350" height="350"> 
-    <img src="images/tetris.png" style="margin-right: 10% margin-left: 10%;" width="350" height="350"> 
+    <img src="images/mario.png" style="margin-right: 30% margin-left: 30%;" width="350" height="350"> 
+    <img src="images/pokemon.png" style="margin-right: 30% margin-left: 30%;"width="350" height="350"> 
+    <img src="images/zelda.png" style="margin-right: 30% margin-left: 30%;" width="350" height="350"> 
+    <img src="images/tetris.png" style="margin-right: 30% margin-left: 30%;" width="350" height="350"> 
 </p>
 
 
