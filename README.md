@@ -25,7 +25,7 @@ Run the following command to build a runnable executeable.
 Finally drag SDL2.dll that is inside of the lib folder of SDL2-devel into the same folder as the executable.
 
 ## Screenshots
-<img src="images/mario.png" width="48"> 
+<img src="images/mario.png" display=block margin width="250"> 
 ![Super Mario Land 2](images/mario.png)
 ![Pokemon Red](images/pokemon.png)
 ![The Legend of Zelda: Link's Awakening](images/zelda.png)
