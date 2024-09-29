@@ -23,3 +23,5 @@ Run the following command to build a runnable executeable.
 > cmake --build .
 
 Finally drag SDL2.dll that is inside of the lib folder of SDL2-devel into the same folder as the executable.
+
+## Screenshots
