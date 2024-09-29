@@ -25,19 +25,12 @@ Run the following command to build a runnable executeable.
 Finally drag SDL2.dll that is inside of the lib folder of SDL2-devel into the same folder as the executable.
 
 ## Screenshots
-<p align="center" style="margin-down: 10%;">
-    <img src="images/mario.png" width="250" height="250"> 
+<p align="center" style="margin-right: 10% margin-left: 10%;">
+    <img src="images/mario.png" width="350" height="350"> 
+    <img src="images/pokemon.png" width="350" height="350"> 
+    <img src="images/zelda.png" width="350" height="350"> 
+    <img src="images/tetris.png" width="350" height="350"> 
 </p>
 
-<p align="center" style="margin-down: 10%;">
-    <img src="images/pokemon.png" width="250" height="250"> 
-</p>
 
-<p align="center" style="margin-down: 10%;">
-    <img src="images/zelda.png" width="250" height="250"> 
-</p>
-
-<p align="center" style="margin-down: 10%;">
-    <img src="images/tetris.png" width="250" height="250"> 
-</p>
 
