@@ -27,7 +27,7 @@ Finally drag SDL2.dll that is inside of the lib folder of SDL2-devel into the sa
 ## Screenshots
 <figure margin-left=auto margin-right=auto>
     <img src="images/mario.png" width="250" height="250"> 
-    <figcaption>Mario Land 2</figcaption>
+    <figcaption margin-left=auto margin-right=auto>Mario Land 2</figcaption>
 </figure>
 
 <figure margin-left=auto margin-right=auto>
